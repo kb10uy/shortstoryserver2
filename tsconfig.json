@@ -1,14 +1,18 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "target": "es2018",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "lib": [
-            "es2018",
-            "dom.iterable",
-            "dom"
-        ],
-        "jsx": "react",
-    },
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "es2018",
+      "dom.iterable",
+      "dom"
+    ],
+    "jsx": "react",
+  },
+  "exclude": [
+    "./node_modules/**/*",
+    "./vendor/**/*"
+  ]
 }

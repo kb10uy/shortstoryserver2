@@ -1,8 +1,11 @@
 const webpack = require('webpack');
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AutoPrefixer = require('autoprefixer');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const LaravelMixManifest = require('webpack-laravel-mix-manifest');
+
 
 module.exports = {
   entry: {
@@ -11,7 +14,7 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'scripts/[name].js',
+    filename: 'scripts/[name].[hash].js',
   },
 
   resolve: {
@@ -23,6 +26,7 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
+        exclude: /node_modules|vendor/,
       },
       {
         test: /\.scss$/,
@@ -48,6 +52,7 @@ module.exports = {
             },
           },
         ],
+        exclude: /node_modules|vendor/,
       },
     ],
   },
@@ -66,8 +71,12 @@ module.exports = {
   },
 
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'styles/[name].css',
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['styles/**/*', 'scripts/**/*'],
     }),
+    new MiniCssExtractPlugin({
+      filename: 'styles/[name].[hash].css',
+    }),
+    new LaravelMixManifest(),
   ],
 };
