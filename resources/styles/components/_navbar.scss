@@ -1,0 +1,46 @@
+$navbar-color-bg: #3c869d;
+$navbar-color-fg: #ecfbff;
+$navbar-menu-color: #74a4b1;
+$navbar-menu-color-em: #bcf0ff;
+
+header {
+  width: 100%;
+  background-color: $navbar-color-bg;
+
+  .navbar {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    max-width: 1280px;
+    margin: 0 auto;
+
+    .left {
+      display: flex;
+      grid-column: 1;
+      align-items: center;
+
+      .logo a {
+        font-size: 2rem;
+        color: $navbar-color-fg;
+        text-decoration: none;
+      }
+
+      .menu {
+        a.item {
+          margin: 10px;
+          color: $navbar-menu-color;
+          text-decoration: none;
+          transition: 0.2s color;
+
+          &:hover {
+            font-weight: bold;
+            color: $navbar-menu-color-em;
+          }
+        }
+      }
+    }
+
+    .right {
+      grid-column: 3;
+    }
+  }
+}

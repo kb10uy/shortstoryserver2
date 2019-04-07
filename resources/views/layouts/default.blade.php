@@ -7,6 +7,7 @@
         <title>@yield('title') - ShortStoryServer</title>
     </head>
     <body>
+        @include('components.navbar')
         @yield('content')
     </body>
 </html>
