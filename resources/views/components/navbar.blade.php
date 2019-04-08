@@ -5,11 +5,11 @@
             <a href="/" class="item">一覧</a>
             <a href="/" class="item">検索</a>
         </div>
-        <div class="user">
+        <div class="user" data-dropdown="user-dropdown">
             <img src="http://placehold.jp/256x256.png" alt="username" class="avatar">
             <span class="dropdown-caret"></span>
 
-            <div class="dropdown">
+            <div id="user-dropdown" class="dropdown">
                 <div class="info">
                     Signed in as<br>
                     <strong>kb10uy</strong>

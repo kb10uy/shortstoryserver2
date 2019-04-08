@@ -66,12 +66,19 @@ header {
         right: 0;
         z-index: 10;
         width: 160px;
-
         font-size: 0.8rem;
         color: $dropdown-color-fg;
+        visibility: hidden;
         background-color: $dropdown-color-bg;
         border: 1px solid $dropdown-color-br;
         border-radius: 8px;
+        opacity: 0;
+        transition: 0.15s all;
+
+        &.show {
+          visibility: visible;
+          opacity: 1;
+        }
 
         &::before {
           position: absolute;
@@ -107,7 +114,7 @@ header {
           padding: 5px 10px;
           color: $dropdown-color-fg;
           text-decoration: none;
-          transition: 0.15s all;
+          transition: 0.15s color, 0.15s background-color;
 
           &:hover {
             color: $dropdown-hover-color-fg;
