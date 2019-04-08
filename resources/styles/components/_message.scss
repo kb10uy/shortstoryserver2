@@ -1,0 +1,19 @@
+.message {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 8px;
+
+  i.fas {
+    margin-right: 10px;
+    font-size: 2rem;
+  }
+
+  &.error {
+    background-color: $status-error-bg;
+    border-color: $status-error-br;
+  }
+}

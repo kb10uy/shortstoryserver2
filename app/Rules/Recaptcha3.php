@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use Log;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Validation\Rule;
@@ -43,9 +44,10 @@ class Recaptcha3 implements Rule
                     'response' => $value,
                 ],
             ]);
-            $data = json_decode($response, true);
+            $data = json_decode((string) $response->getBody(), true);
             return $data['success'] && $data['score'] >= $this->threshold;
         } catch(Exception $ex) {
+            Log::error("Failed to verify reCAPTCHA v3 token: {$ex->getMessage()}");
             return false;
         }
     }
