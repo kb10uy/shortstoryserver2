@@ -11,6 +11,13 @@
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('index');
+})->name('index');
+
+// ログイン
+
+
+Route::get('/home', 'HomeController@index')->name('home');
