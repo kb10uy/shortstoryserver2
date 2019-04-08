@@ -73,6 +73,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: ['styles/**/*', 'scripts/**/*'],
+      cleanAfterEveryBuildPatterns: ['!images/**/*'],
     }),
     new CopyWebpackPlugin([
       {
