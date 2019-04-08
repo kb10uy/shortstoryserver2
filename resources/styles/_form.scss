@@ -1,13 +1,15 @@
 $input-color-border: rgb(182, 182, 182);
+$input-color-disabled-bg: rgb(185, 185, 185);
 $input-color-border-fc: rgb(155, 195, 255);
 $input-color-shadow-fc: rgba(107, 166, 255, 0.7);
 $check-color-fg: rgba(245, 249, 255, 0);
 $check-color-fg-ac: rgb(245, 249, 255);
 $check-color-bg-ac: rgb(46, 130, 255);
+$check-color-bg-hv: rgb(87, 154, 255);
 
 form {
   .pair {
-    margin: 8px auto;
+    margin: 10px auto;
 
     &:first-child {
       margin-top: 0;
@@ -50,6 +52,14 @@ form {
       color: $check-color-fg-ac;
       background-color: $check-color-bg-ac;
       border: 0;
+
+      &:hover {
+        background-color: $check-color-bg-hv;
+      }
+    }
+
+    &:disabled {
+      background-color: $input-color-disabled-bg;
     }
   }
 

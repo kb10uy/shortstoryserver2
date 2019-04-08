@@ -1,77 +1,64 @@
-@extends('layouts.app')
+@extends('layouts.noindex')
+
+@section('title', 'サインアップ')
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+    <div class="medium box">
+        <h1>サインアップ</h1>
+        <form id="signup-form" action="{{ route('register') }}" method="post" onsubmit="submitRegistration(); return false;">
+            @csrf
+            <input type="hidden" id="recaptcha" name="recaptcha_token">
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
-
-                                @if ($errors->has('name'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('name') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <!-- ユーザー名 -->
+            <div class="pair">
+                <label for="name"><i class="fas fa-user"></i> ユーザー名</label>
+                <input type="text" name="name" id="name" required autofocus  autocomplete="off">
             </div>
-        </div>
+            <!-- Email -->
+            <div class="pair">
+                <label for="email"><i class="fas fa-envelope"></i> メールアドレス</label>
+                <input type="email" name="email" id="email" required autofocus  autocomplete="off">
+            </div>
+            <!-- パスワード -->
+            <div class="pair">
+                <label for="password"><i class="fas fa-key"></i> パスワード</label>
+                <input type="password" name="password" id="password" required autocomplete="off">
+            </div>
+            <!-- パスワード再入力 -->
+            <div class="pair">
+                <label for="password-confirm"><i class="fas fa-key"></i> パスワード(再入力)</label>
+                <input type="password" name="password_confirmation" id="password-confirm" required autocomplete="off">
+            </div>
+
+            <!-- サインアップ -->
+            <div class="pair">
+                <input id="submit-form" type="submit" value="サインアップ">
+            </div>
+        </form>
     </div>
 </div>
+
+<!-- reCAPTCHA v3 -->
+<script defer src="https://www.google.com/recaptcha/api.js?render={{ env('RECAPTCHA3_SITE_KEY') }}"></script>
+<script defer>
+function submitRegistration() {
+    const form = document.querySelector('#signup-form');
+    const submit = form.querySelector('#submit-form');
+    const tokenHidden = form.querySelector('#recaptcha');
+    const siteKey = '{{ env("RECAPTCHA3_SITE_KEY") }}';
+
+    grecaptcha.ready(async () => {
+        try {
+            submit.disabled = true;
+            const token = await grecaptcha.execute(siteKey, { action: 'homepage' });
+            tokenHidden.value = token;
+            form.submit();
+        } catch(e) {
+            console.log(e);
+            submit.disabled = false;
+        }
+    });
+}
+</script>
 @endsection
