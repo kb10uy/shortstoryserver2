@@ -9,6 +9,7 @@
     </head>
     <body>
         @include('components.navbar')
+        @include('components.alerts')
         @yield('content')
     </body>
 </html>

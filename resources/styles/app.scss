@@ -1,4 +1,9 @@
 @import '~bootstrap/scss/bootstrap-reboot';
 
+@import './variables';
 @import './core';
+@import './form';
+@import './box';
+
+// components
 @import './components/navbar';
