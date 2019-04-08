@@ -15,14 +15,14 @@
                 <div id="user-dropdown" class="dropdown">
                     <div class="info">
                         Signed in as<br>
-                        <strong>kb10uy</strong>
+                        <strong>{{ Auth::user()->name }}</strong>
                     </div>
                     <div class="separator"></div>
                     <a href="/" class="item">プロフィール</a>
                     <a href="/" class="item">作品</a>
                     <a href="/" class="item">設定</a>
                     <a href="{{ route('logout') }}" class="item"
-                        onclick="this.preventDefault();document.getElementById('logout').submit();">
+                        onclick="document.getElementById('logout').submit(); return false;">
                         ログアウト
                     </a>
                 </div>

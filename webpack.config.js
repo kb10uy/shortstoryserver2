@@ -74,6 +74,12 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: ['styles/**/*', 'scripts/**/*'],
     }),
+    new CopyWebpackPlugin([
+      {
+        from: './resources/assets/images',
+        to: './images'
+      },
+    ]),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[hash].css',
     }),
