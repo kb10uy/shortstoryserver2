@@ -12,6 +12,7 @@ $dropdown-hover-color-fg: rgb(228, 244, 255);
 header {
   width: 100%;
   color: $navbar-color-fg;
+  user-select: none;
   background-color: $navbar-color-bg;
 
   .navbar {

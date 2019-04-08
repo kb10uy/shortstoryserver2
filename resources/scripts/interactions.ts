@@ -41,9 +41,17 @@ export function enableCheckboxes(): void {
     if (checkbox.checked) {
       label.classList.add('checked');
     }
+
     checkboxPair.addEventListener('click', (e): void => {
       checkbox.checked = label.classList.toggle('checked');
+      checkbox.focus();
       e.preventDefault();
+    });
+    checkbox.addEventListener('focus', (e): void => {
+      label.classList.add('focused');
+    });
+    checkbox.addEventListener('blur', (e): void => {
+      label.classList.remove('focused');
     });
   }
 }

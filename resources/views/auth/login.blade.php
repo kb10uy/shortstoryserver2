@@ -21,7 +21,15 @@
             <!-- したまま -->
             <div class="checkbox pair">
                 <input type="checkbox" name="remember" id="remember">
-                <label for="remember">パスワード</label>
+                <label for="remember">ログインしたままにする</label>
+            </div>
+            <!-- ログイン -->
+            <div class="pair">
+                <input type="submit" value="ログイン">
+            </div>
+            <div class="pair">
+                <a href="#">パスワードを忘れてしまいました</a><br>
+                <a href="#">メールアドレスの確認ができません</a>
             </div>
         </form>
     </div>
