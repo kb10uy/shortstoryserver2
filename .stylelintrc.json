@@ -13,6 +13,9 @@
       {
         "except": [
           "first-nested"
+        ],
+        "ignore": [
+          "after-comment"
         ]
       }
     ]

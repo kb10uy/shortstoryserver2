@@ -18,7 +18,7 @@
                         <strong>{{ Auth::user()->name }}</strong>
                     </div>
                     <div class="separator"></div>
-                    <a href="/" class="item">プロフィール</a>
+                    <a href="{{ route('dashboard.index') }}" class="item">ダッシュボード</a>
                     <a href="/" class="item">作品</a>
                     <a href="/" class="item">設定</a>
                     <a href="{{ route('logout') }}" class="item"

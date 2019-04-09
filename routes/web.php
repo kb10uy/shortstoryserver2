@@ -16,3 +16,5 @@ Auth::routes();
 Route::get('/', function () {
     return view('index');
 })->name('index');
+
+Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard.index');

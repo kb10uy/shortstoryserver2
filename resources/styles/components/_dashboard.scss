@@ -1,0 +1,77 @@
+.dashboard {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 10px;
+
+  .left {
+    display: grid;
+    gap: 10px;
+    grid-column: 1;
+
+    .profile {
+      display: grid;
+      grid-template-rows: max-content;
+      grid-template-columns: 100%;
+
+      img.avatar {
+        grid-row: 1;
+        width: 100%;
+        border-radius: 10px;
+        object-fit: cover;
+      }
+
+      .username {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .screen-name {
+        color: $body-color-fg-dim;
+      }
+    }
+
+    // TODO: 分離できそう
+    ul.menu {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+
+      li {
+        & > a {
+          display: block;
+          padding: 8px;
+          color: $floating-color-fg;
+          text-decoration: none;
+          background-color: $floating-color-bg;
+          border: 1px solid $floating-color-br;
+          transition: 0.15s color, 0.15s background-color;
+
+          &.active {
+            background-color: $floating-color-bg-dim;
+          }
+
+          &:hover {
+            color: $floating-hover-color-fg;
+            background-color: $floating-hover-color-bg;
+          }
+        }
+
+        &:nth-child(1n+2) > a {
+          border-top-width: 0;
+        }
+
+        &:first-child > a {
+          border-radius: 8px 8px 0 0;
+        }
+
+        &:last-child > a {
+          border-radius: 0 0 8px 8px;
+        }
+      }
+    }
+  }
+
+  .right {
+    grid-column: 2;
+  }
+}
