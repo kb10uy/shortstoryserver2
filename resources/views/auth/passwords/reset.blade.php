@@ -1,65 +1,33 @@
-@extends('layouts.app')
+@extends('layouts.noindex')
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
-
-                        <input type="hidden" name="token" value="{{ $token }}">
-
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ $email ?? old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="medium box">
+        <h1>パスワードのリセット</h1>
+        <p>
+            登録しているメールアドレス、及び新しいパスワードを入力してください。
+        </p>
+        <form action="{{ route('password.email') }}" method="post">
+            @csrf
+            <!-- Email -->
+            <div class="pair">
+                <label for="email"><i class="fas fa-envelope"></i> メールアドレス</label>
+                <input type="email" name="email" id="email" required autofocus  autocomplete="off">
             </div>
-        </div>
+            <!-- パスワード -->
+            <div class="pair">
+                <label for="password"><i class="fas fa-key"></i> パスワード</label>
+                <input type="password" name="password" id="password" required autocomplete="off">
+            </div>
+            <!-- パスワード再入力 -->
+            <div class="pair">
+                <label for="password-confirm"><i class="fas fa-key"></i> パスワード(再入力)</label>
+                <input type="password" name="password_confirmation" id="password-confirm" required autocomplete="off">
+            </div>
+            <div class="pair">
+                <input id="submit-form" type="submit" value="パスワードをリセット">
+            </div>
+        </form>
     </div>
 </div>
 @endsection
