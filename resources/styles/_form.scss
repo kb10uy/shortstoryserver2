@@ -32,7 +32,7 @@ form {
     }
   }
 
-  input {
+  input, textarea {
     display: block;
     width: 100%;
     padding: 6px;
@@ -103,7 +103,7 @@ form {
 
 // 汎用パーツ
 .button {
-  display: block;
+  // display: block;
   padding: 6px 10px;
   font-size: 1rem;
   color: $check-color-fg-ac;
@@ -120,6 +120,8 @@ form {
   }
 
   &:hover {
+    color: $check-color-fg-ac;
+    text-decoration: none;
     background-color: $check-color-bg-hv;
   }
 
