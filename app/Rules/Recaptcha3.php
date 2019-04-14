@@ -19,7 +19,6 @@ class Recaptcha3 implements Rule
      * Create a new rule instance.
      *
      * @param float $threshold 閾値
-     * @return void
      */
     public function __construct(float $threshold)
     {
@@ -30,8 +29,9 @@ class Recaptcha3 implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function passes($attribute, $value)
@@ -45,9 +45,11 @@ class Recaptcha3 implements Rule
                 ],
             ]);
             $data = json_decode((string) $response->getBody(), true);
+
             return $data['success'] && $data['score'] >= $this->threshold;
         } catch (Exception $ex) {
             Log::error("Failed to verify reCAPTCHA v3 token: {$ex->getMessage()}");
+
             return false;
         }
     }

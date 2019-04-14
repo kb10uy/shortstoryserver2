@@ -8,8 +8,6 @@ class CreatePosts extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -20,13 +18,18 @@ class CreatePosts extends Migration
                 ->nullable()
                 ->references('id')->on('users')
                 ->onDelete('set null');
+            $table->text('title')
+                ->notNullable();
+            $table->text('body')
+                ->notNullable();
+            $table->string('body_type', 16)
+                ->notNullable()
+                ->default('plain');
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {
