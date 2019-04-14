@@ -46,7 +46,7 @@ class Recaptcha3 implements Rule
             ]);
             $data = json_decode((string) $response->getBody(), true);
             return $data['success'] && $data['score'] >= $this->threshold;
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
             Log::error("Failed to verify reCAPTCHA v3 token: {$ex->getMessage()}");
             return false;
         }
