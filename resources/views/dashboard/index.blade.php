@@ -6,22 +6,39 @@
 <div class="container">
     <div class="dashboard">
         <div class="left">
-            <div class="profile">
-                <img src="http://placehold.jp/256x256.png" alt="avatar" class="avatar">
-                <div class="username">{{ Auth::user()->name }}</div>
-                <div class="screen-name">&#x40;{{ Auth::user()->name }}</div>
-            </div>
-            <ul class="menu">
-                <li><a class="active" href="#">ダッシュボード</a></li>
-                <li><a href="#">投稿管理</a></li>
-                <li><a href="#">シリーズ管理</a></li>
-                <li><a href="#">ブックマーク管理</a></li>
-                <li><a href="#">設定</a></li>
-                <li><a href="#">ログアウト</a></li>
-            </ul>
+            @include('dashboard.sidebar')
         </div>
         <div class="right">
-            <h1>ダッシュボード</h1>
+            <div class="box">
+                <h1>ダッシュボード</h1>
+
+                <!-- 作品 -->
+                <h2>新しい作品</h2>
+                <p>
+                    新しい怪文書の着想を獲ましたか？さっそく公開してみましょう！
+                    大丈夫ですよ！ モデレーターは定期的に誤操作で全てのデータを予告をなく削除しますので！
+                </p>
+                <button class="button">新しい作品を投稿する</button>
+
+                <hr>
+
+                <!-- シリーズ -->
+                <h2>新しいシリーズ</h2>
+                <p>
+                    続編も投稿したのですか？いいですね！シリーズ機能を活用して読者に対するナビゲーションを効率化しましょう！
+                </p>
+                <button class="button" disabled>新しい作品を投稿する</button>
+
+                <hr>
+
+                <!-- ブックマーク -->
+                <h2>新しいブックマーク</h2>
+                <p>
+                    投稿するだけでは飽き足らず、ついに他人の性癖にまで手を出すというんですね？結構！
+                    kbs3 のブックマーク機能はあなたの心と下半身を全面的にサポートします。
+                </p>
+                <button class="button" disabled>新しいブックマークリストを作成</button>
+            </div>
         </div>
     </div>
 </div>

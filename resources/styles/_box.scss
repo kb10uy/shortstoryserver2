@@ -1,19 +1,22 @@
 .box {
   padding: 10px;
-  margin: 10px auto;
+  background-color: $floating-color-bg;
   border: 1px solid $body-color-br;
   border-radius: 10px;
 
   &.small {
     max-width: 400px;
+    margin: 10px auto;
   }
 
   &.medium {
     max-width: 600px;
+    margin: 10px auto;
   }
 
   &.large {
     max-width: 800px;
+    margin: 10px auto;
   }
 
   h1 {

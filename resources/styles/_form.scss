@@ -6,6 +6,7 @@ $check-color-fg: rgba(245, 249, 255, 0);
 $check-color-fg-ac: rgb(245, 249, 255);
 $check-color-bg-ac: rgb(46, 130, 255);
 $check-color-bg-hv: rgb(87, 154, 255);
+$button-color-bg-ds: rgb(189, 200, 216);
 
 form {
   .pair {
@@ -97,5 +98,35 @@ form {
         filter: drop-shadow(0 0 4px $input-color-shadow-fc);
       }
     }
+  }
+}
+
+// 汎用パーツ
+.button {
+  display: block;
+  padding: 6px 10px;
+  font-size: 1rem;
+  color: $check-color-fg-ac;
+  background-color: $check-color-bg-ac;
+  border: 1px solid $input-color-border;
+  border-radius: 6px;
+  outline: 0;
+  transition: 0.15s border, 0.15s filter;
+
+  &:focus {
+    filter: drop-shadow(0 0 4px $input-color-shadow-fc);
+    border: 1px solid $input-color-border-fc;
+    outline: 0;
+  }
+
+  &:hover {
+    background-color: $check-color-bg-hv;
+  }
+
+  &:disabled {
+    color: $check-color-fg-ac;
+    background-color: $button-color-bg-ds;
+    filter: none;
+    outline: 0;
   }
 }

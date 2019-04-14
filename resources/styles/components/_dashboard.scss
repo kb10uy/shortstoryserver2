@@ -47,6 +47,7 @@
           transition: 0.15s color, 0.15s background-color;
 
           &.active {
+            font-weight: bold;
             background-color: $floating-color-bg-dim;
           }
 
