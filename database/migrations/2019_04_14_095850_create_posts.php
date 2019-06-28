@@ -14,10 +14,7 @@ class CreatePosts extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->timestamps();
-            $table->foreign('user_id')
-                ->nullable()
-                ->references('id')->on('users')
-                ->onDelete('set null');
+            $table->bigInteger('user_id');
             $table->text('title')
                 ->notNullable();
             $table->text('body')
@@ -25,6 +22,11 @@ class CreatePosts extends Migration
             $table->string('body_type', 16)
                 ->notNullable()
                 ->default('plain');
+
+            $table->foreign('user_id')
+                ->nullable()
+                ->references('id')->on('users')
+                ->onDelete('set null');
         });
     }
 
