@@ -18,7 +18,7 @@ class Node
     private $children;
 
     /**
-     * @param string $tagName タグ名
+     * @param string     $tagName    タグ名
      * @param Collection $attributes タグに付与する属性
      */
     public function __construct(string $tagName, Collection $attributes = null)

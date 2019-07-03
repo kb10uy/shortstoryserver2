@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lib\Formats\S3wf2;
 
+use Lib\Formats\ParseErrorException;
+
 class State
 {
     public const MALE_COLORS = [];
@@ -27,22 +29,33 @@ class State
      * キャラクターを追加する。
      *
      * @param string $type male, female, #ffffff のいずれか
-     * @param string $key 参照する名前
+     * @param string $key  参照する名前
      * @param string $name 表示する名前
      */
-    public function setCharacter(string $type, string $key, string $name)
+    public function setCharacter(string $type, string $key, string $name): void
     {
         $color = '';
         switch ($type) {
             case 'male':
-
-            break;
+                $color = MALE_COLORS[$this->maleIndex];
+                ++$this->maleIndex;
+                break;
             case 'female':
-            break;
+                $color = MALE_COLORS[$this->maleIndex];
+                ++$this->maleIndex;
+                break;
             case 'mob':
-            break;
+                $color = MALE_COLORS[$this->maleIndex];
+                ++$this->maleIndex;
+                break;
             default:
-            break;
+                if (false === preg_match('/^#([\da-f]){3,6}$/i', $type, $matches)) {
+                    throw new ParseErrorException('Invalid character type. One of "male", "female" and "mob" or color code acceptable.');
+                }
+                $color = $type;
+                break;
         }
+
+        $this->characters[$key] = [$name, $color];
     }
 }

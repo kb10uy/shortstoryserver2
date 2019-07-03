@@ -10,7 +10,7 @@ class ParseErrorException extends Exception
 {
     private $errorLine;
 
-    public function __construct(int $line, string $message, Exception $previous = null)
+    public function __construct(string $message, int $line = -1, Exception $previous = null)
     {
         parent::__construct($message, 0, $previous);
         $this->errorLine = $line;
@@ -18,6 +18,6 @@ class ParseErrorException extends Exception
 
     public function __toString(): string
     {
-        return __CLASS__.": Parse failed at line {$this->line}";
+        return __CLASS__ . ": Parse failed at line {$this->line} ({$this->getMessage()})";
     }
 }
