@@ -57,7 +57,8 @@
       "php-cs-fixer fix"
     ],
     "analyze": [
-      "@php vendor/bin/phpstan analyse -l 0 app lib tests"
+      "@php vendor/bin/phpstan analyse -l 7 lib",
+      "@php vendor/bin/phpstan analyse -l 0 app tests"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

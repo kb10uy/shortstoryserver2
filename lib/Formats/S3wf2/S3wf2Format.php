@@ -11,7 +11,7 @@ class S3wf2Format extends Format
 {
     public function parse(string $source): Node
     {
-        $sourceLines = preg_split('/\r\n|\r|\n/', $source, -1, PREG_SPLIT_NO_EMPTY);
+        $sourceLines = preg_split('/\r\n|\r|\n/', $source, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         $paragraphReady = true;
         $currentText = '';

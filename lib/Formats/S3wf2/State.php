@@ -26,9 +26,9 @@ class State
     /**
      * キャラクターを追加する。
      *
-     * @param $type male, female, #ffffff のいずれか
-     * @param $key 参照する名前
-     * @param $name 表示する名前
+     * @param string $type male, female, #ffffff のいずれか
+     * @param string $key 参照する名前
+     * @param string $name 表示する名前
      */
     public function setCharacter(string $type, string $key, string $name)
     {

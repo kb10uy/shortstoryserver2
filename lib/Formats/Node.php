@@ -18,8 +18,8 @@ class Node
     private $children;
 
     /**
-     * @param $tagName タグ名
-     * @param $attributes タグに付与する属性
+     * @param string $tagName タグ名
+     * @param Collection $attributes タグに付与する属性
      */
     public function __construct(string $tagName, Collection $attributes = null)
     {
@@ -51,7 +51,7 @@ class Node
     /**
      * このノードの HTML を生成する。
      *
-     * @return HTML 文字列
+     * @return string 文字列
      */
     public function emit(): string
     {
@@ -72,7 +72,7 @@ class Node
         // 終了タグ
         echo "</{$this->tagName}>";
 
-        return ob_get_clean();
+        return ob_get_clean() ?: '';
     }
 
     /**
