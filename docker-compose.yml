@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  php:
+    build: './docker/php'
+    command: 'php artisan serve --host 0.0.0.0'
+    volumes:
+      - './:/var/www'
+    ports:
+      - '8000:8000'
+  db:
+    image: 'postgres:11-alpine'
+    volumes:
+      - './docker/data/postgres:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_USER: 'takamori'
+      POSTGRES_PASSWORD: 'ku54k4n4t5uk1'
+      POSTGRES_DB: 'shortstoryserver2'
+    expose:
+      - 5432
