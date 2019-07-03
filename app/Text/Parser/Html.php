@@ -8,6 +8,5 @@ class Html
 {
     public static function parse(string $rawBody): HtmlBody
     {
-
     }
 }
