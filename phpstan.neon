@@ -1,3 +1,9 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
 parameters:
-    autoload_files:
-        - _ide_helper.php
+    level: 8
+    paths:
+        - app
+        - lib
+        - config
+        - tests

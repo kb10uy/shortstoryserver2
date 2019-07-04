@@ -22,7 +22,8 @@
     "fzaninotto/faker": "^1.4",
     "mockery/mockery": "^1.0",
     "nunomaduro/collision": "^2.0",
-    "phpstan/phpstan": "^0.11.8",
+    "nunomaduro/larastan": "^0.3.17",
+    "nunomaduro/phpinsights": "^1.7",
     "phpunit/phpunit": "^7.5"
   },
   "config": {
@@ -57,8 +58,10 @@
       "php-cs-fixer fix"
     ],
     "analyze": [
-      "@php vendor/bin/phpstan analyse -l 7 lib",
-      "@php vendor/bin/phpstan analyse -l 0 app tests"
+      "@php artisan code:analyse"
+    ],
+    "insights": [
+      "./vendor/bin/phpinsights"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
@@ -66,8 +69,7 @@
     ],
     "post-update-cmd": [
       "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-      "@php artisan ide-helper:generate",
-      "@php artisan ide-helper:meta"
+      "@php artisan ide-helper:generate"
     ],
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
