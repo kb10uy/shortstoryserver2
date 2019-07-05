@@ -1,11 +1,13 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude('./resources/views/**/*')
-    ->exclude('./storage/**/*')
-    ->exclude('./vendor/**/*')
-    ->exclude('./_ide_helper.php')
+    ->exclude('bootstrap/cache')
+    ->exclude('resources/views')
+    ->exclude('storage')
+    ->exclude('vendor')
+    ->notPath('./_ide_helper.php')
     ->in(__DIR__);
+
 
 return PhpCsFixer\Config::create()
     ->setRules([

@@ -33,7 +33,6 @@ class Node
      */
     public function addTextNode(string $node): void
     {
-        $node = trim($node);
         if ('' === $node) {
             return;
         }
