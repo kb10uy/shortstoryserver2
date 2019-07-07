@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace Lib\Formats\S3wf2;
 
+use Illuminate\Support\Collection;
 use Lib\Formats\Format;
 use Lib\Formats\Node;
 use Lib\Formats\ParseErrorException;
 
 class S3wf2Format extends Format
 {
+    /** @var CharacterSet */
     private $characters;
+
+    /** @var Node */
     private $rootNode;
+
+    /** pvar Node */
     private $currentParagraph;
+
+    /** @var bool */
     private $paragraphInUse;
 
     public function __construct()
@@ -25,7 +33,7 @@ class S3wf2Format extends Format
      */
     public function reset(): void
     {
-        $this->characters = collect();
+        $this->characters = new CharacterSet;
         $this->rootNode = new Node('article');
         $this->rootNode->addTextNode(PHP_EOL);
         $this->currentParagraph = new Node('p');
@@ -51,6 +59,9 @@ class S3wf2Format extends Format
                 // escaped line
                 switch ($matches[1]) {
                     case ':':
+                        $command = $matches[2];
+                        $rawParams = preg_split('/\s+/', $source, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                        $this->processSourceCommandLine($command, collect($rawParams));
                         break;
                     case '/':
                         $tag = $matches[2];
@@ -79,6 +90,25 @@ class S3wf2Format extends Format
     public function toHtml(): string
     {
         return $this->rootNode->emit();
+    }
+
+    /**
+     * コマンド行の処理
+     *
+     * @param string $command コマンド名
+     * @param Collection $params パラメーター
+     */
+    private function processSourceCommandLine(string $command, Collection $params): void
+    {
+        switch ($command) {
+            case 'character':
+                // :character <type> <key> <name>
+                $this->characters->set($params[1], $params[0], $params[2]);
+                break;
+            default:
+                throw new ParseErrorException("Unknown command: $command");
+                break;
+        }
     }
 
     /**
@@ -129,13 +159,22 @@ class S3wf2Format extends Format
      * ソースの中の通常の行やインライン部分を処理する。
      *
      * @param string  $characterKey キャラクターの参照名
-     * @param strinng $line         行
+     * @param string $line         行
      */
     private function processSourceSpeechLine(string $characterKey, string $line): void
     {
-        $attributes = collect(['class' => 'line']);
+        $character = $this->characters->get($characterKey);
+        if (!$character) {
+            throw new ParseErrorException("Unknown character: $characterKey");
+        }
+
+        $name = $character->displayName();
+        $color = $character->colorClass();
+
+        $attributes = collect(['class' => "line $color"]);
         $node = new Node('span', $attributes);
-        $node->addTextNode('');
+        $node->addTextNode($name);
+
         $this->processSourceNormalLine($node, $line);
         $this->currentParagraph->addNode($node);
         $this->currentParagraph->addTextNode(PHP_EOL);
@@ -181,7 +220,7 @@ class S3wf2Format extends Format
                 $node = new Node($tagName);
                 $stack->push($node);
             }
-            $rest = substr($rest, $tagPosition + strlen($tagString));
+            $rest = substr($rest, (int) $tagPosition + strlen($tagString));
         }
 
         if (1 !== $stack->count()) {

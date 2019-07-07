@@ -58,7 +58,7 @@
       "php-cs-fixer fix"
     ],
     "analyze": [
-      "@php artisan code:analyse"
+      "@php ./vendor/bin/phpstan analyse"
     ],
     "insights": [
       "./vendor/bin/phpinsights"
