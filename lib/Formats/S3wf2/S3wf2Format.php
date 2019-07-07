@@ -17,11 +17,17 @@ class S3wf2Format extends Format
     /** @var Node */
     private $rootNode;
 
-    /** pvar Node */
+    /** @var Node */
     private $currentParagraph;
 
     /** @var bool */
     private $paragraphInUse;
+
+    /** @var Node */
+    private $errors;
+
+    /** @var bool */
+    private $errorOccurred;
 
     public function __construct()
     {
@@ -39,6 +45,8 @@ class S3wf2Format extends Format
         $this->currentParagraph = new Node('p');
         $this->currentParagraph->addTextNode(PHP_EOL);
         $this->paragraphInUse = false;
+        $this->errors = new Node('ul', collect(['class' => 's3wf2-errors']));
+        $this->errorOccurred = false;
     }
 
     /**
@@ -55,28 +63,34 @@ class S3wf2Format extends Format
                 continue;
             }
 
-            if (1 === preg_match('/^(:|\/|@)(\w+)\s+(.+)$/u', $lineString, $matches)) {
-                // escaped line
-                switch ($matches[1]) {
-                    case ':':
-                        $command = $matches[2];
-                        $rawParams = preg_split('/\s+/', $source, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-                        $this->processSourceCommandLine($command, collect($rawParams));
-                        break;
-                    case '/':
-                        $tag = $matches[2];
-                        $line = $matches[3];
-                        $this->processSourceBlockLine($tag, $line);
-                        break;
-                    case '@':
-                        $characterKey = $matches[2];
-                        $line = $matches[3];
-                        $this->processSourceSpeechLine($characterKey, $line);
-                        break;
+            try {
+                if (1 === preg_match('/^(:|\/|@)(\w+)\s+(.+)$/u', $lineString, $matches)) {
+                    // escaped line
+                    switch ($matches[1]) {
+                        case ':':
+                            $command = $matches[2];
+                            $rawParams = preg_split('/\s+/', $source, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $this->processSourceCommandLine($command, collect($rawParams));
+                            break;
+                        case '/':
+                            $tag = $matches[2];
+                            $line = $matches[3];
+                            $this->processSourceBlockLine($tag, $line);
+                            break;
+                        case '@':
+                            $characterKey = $matches[2];
+                            $line = $matches[3];
+                            $this->processSourceSpeechLine($characterKey, $line);
+                            break;
+                    }
+                } else {
+                    $this->processSourceNormalLine($this->currentParagraph, $lineString);
+                    $this->currentParagraph->addTextNode(PHP_EOL);
                 }
-            } else {
-                $this->processSourceNormalLine($this->currentParagraph, $lineString);
-                $this->currentParagraph->addTextNode(PHP_EOL);
+            } catch (ParseErrorException $ex) {
+                $errorNode = new Node('li');
+                $this->errors->addNode($errorNode);
+                $this->errorOccurred = true;
             }
         }
         $this->commitParagraph();
@@ -89,7 +103,18 @@ class S3wf2Format extends Format
      */
     public function toHtml(): string
     {
-        return $this->rootNode->emit();
+        ob_start();
+        echo $this->characters->generateCustomColorsStyle()->emit();
+        echo PHP_EOL;
+
+        if ($this->errorOccurred) {
+            echo $this->errors->emit();
+            echo PHP_EOL;
+        }
+
+        echo $this->rootNode->emit();
+        echo PHP_EOL;
+        return ob_get_clean() ?: '';
     }
 
     /**
@@ -193,7 +218,7 @@ class S3wf2Format extends Format
         $rest = $line;
 
         while ('' !== $rest) {
-            $tagFound = preg_match('/\[(\w+)\s+|\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
+            $tagFound = preg_match('/\[(@?(\w+))\s+|\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
 
             // ケツまでタグなし
             if ($tagFound !== 1) {
@@ -217,7 +242,17 @@ class S3wf2Format extends Format
                 $stack->last()->addNode($node);
             } else {
                 $tagName = $matches[1][0];
-                $node = new Node($tagName);
+                if ($tagName[0] === '@') {
+                    // インライン台詞
+                    $character = $this->characters->get($matches[2]);
+                    if (!$character) {
+                        throw new ParseErrorException("Unknown character: {$matches[2]}");
+                    }
+                    $attributes = collect(['class' => "line {$character->colorClass()}"]);
+                    $node = new Node('span', $attributes);
+                } else {
+                    $node = new Node($tagName);
+                }
                 $stack->push($node);
             }
             $rest = substr($rest, (int) $tagPosition + strlen($tagString));
