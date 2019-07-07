@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Lib\Formats\S3wf2;
 
 /**
- * キャラクターの情報
+ * キャラクターの情報.
  */
 class Character
 {
@@ -18,7 +19,8 @@ class Character
     }
 
     /**
-     * セリフで表示される名前
+     * セリフで表示される名前.
+     *
      * @return string
      */
     public function displayName(): string
@@ -27,7 +29,8 @@ class Character
     }
 
     /**
-     * このキャラクターに割り当てられたクラス
+     * このキャラクターに割り当てられたクラス.
+     *
      * @return string
      */
     public function colorClass(): string

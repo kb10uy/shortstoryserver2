@@ -1,14 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Lib\Formats\S3wf2;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Lib\Formats\Node;
 
 /**
- * キャラクター全員を扱う
+ * キャラクター全員を扱う.
  */
 class CharacterSet
 {
@@ -29,7 +29,7 @@ class CharacterSet
     /**
      * 新しいキャラクターを設定する。
      *
-     * @param string $key 参照名
+     * @param string $key  参照名
      * @param string $type キャラクターのタイプ。 male female mob のいずれかか、カラーコードを指定
      * @param string $name 表示される名前
      */
@@ -64,6 +64,7 @@ class CharacterSet
      * 指定したキーのキャラクターを取得する。
      *
      * @param string $key キー
+     *
      * @return Character 存在する場合はそのキャラクター、ない場合は null
      */
     public function get(string $key): ?Character

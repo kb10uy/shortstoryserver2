@@ -39,7 +39,7 @@ class S3wf2Format extends Format
      */
     public function reset(): void
     {
-        $this->characters = new CharacterSet;
+        $this->characters = new CharacterSet();
         $this->rootNode = new Node('article');
         $this->rootNode->addTextNode(PHP_EOL);
         $this->currentParagraph = new Node('p');
@@ -114,14 +114,15 @@ class S3wf2Format extends Format
 
         echo $this->rootNode->emit();
         echo PHP_EOL;
+
         return ob_get_clean() ?: '';
     }
 
     /**
-     * コマンド行の処理
+     * コマンド行の処理.
      *
-     * @param string $command コマンド名
-     * @param Collection $params パラメーター
+     * @param string     $command コマンド名
+     * @param Collection $params  パラメーター
      */
     private function processSourceCommandLine(string $command, Collection $params): void
     {
@@ -183,7 +184,7 @@ class S3wf2Format extends Format
     /**
      * ソースの中の通常の行やインライン部分を処理する。
      *
-     * @param string  $characterKey キャラクターの参照名
+     * @param string $characterKey キャラクターの参照名
      * @param string $line         行
      */
     private function processSourceSpeechLine(string $characterKey, string $line): void
@@ -221,7 +222,7 @@ class S3wf2Format extends Format
             $tagFound = preg_match('/\[(@?(\w+))\s+|\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
 
             // ケツまでタグなし
-            if ($tagFound !== 1) {
+            if (1 !== $tagFound) {
                 $stack->last()->addTextNode($rest);
                 $rest = '';
                 continue;
@@ -242,7 +243,7 @@ class S3wf2Format extends Format
                 $stack->last()->addNode($node);
             } else {
                 $tagName = $matches[1][0];
-                if ($tagName[0] === '@') {
+                if ('@' === $tagName[0]) {
                     // インライン台詞
                     $character = $this->characters->get($matches[2]);
                     if (!$character) {
