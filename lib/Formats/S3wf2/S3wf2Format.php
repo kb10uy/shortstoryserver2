@@ -9,8 +9,17 @@ use Lib\Formats\Format;
 use Lib\Formats\Node;
 use Lib\Formats\ParseErrorException;
 
+/**
+ * ShortStoryServer Writer's Format v2.
+ */
 class S3wf2Format extends Format
 {
+    /** @var Collection */
+    private $allowedBlocks;
+
+    /** @var Collection */
+    private $allowedPhrasings;
+
     /** @var CharacterSet */
     private $characters;
 
@@ -32,6 +41,7 @@ class S3wf2Format extends Format
     public function __construct()
     {
         $this->reset();
+        $this->registerTags();
     }
 
     /**
@@ -46,6 +56,7 @@ class S3wf2Format extends Format
         $this->currentParagraph->addTextNode(PHP_EOL);
         $this->paragraphInUse = false;
         $this->errors = new Node('ul', collect(['class' => 's3wf2-errors']));
+        $this->errors->addTextNode(PHP_EOL);
         $this->errorOccurred = false;
     }
 
@@ -58,6 +69,7 @@ class S3wf2Format extends Format
     {
         $sourceLines = preg_split('/\r\n|\r|\n/', $source) ?: [];
         foreach ($sourceLines as $lineNumber => $lineString) {
+            ++$lineNumber;
             $lineString = trim($lineString);
             if (0 === strpos($lineString, '//')) {
                 continue;
@@ -69,7 +81,7 @@ class S3wf2Format extends Format
                     switch ($matches[1]) {
                         case ':':
                             $command = $matches[2];
-                            $rawParams = preg_split('/\s+/', $source, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $rawParams = preg_split('/\s+/', $matches[3], -1, PREG_SPLIT_NO_EMPTY) ?: [];
                             $this->processSourceCommandLine($command, collect($rawParams));
                             break;
                         case '/':
@@ -89,7 +101,9 @@ class S3wf2Format extends Format
                 }
             } catch (ParseErrorException $ex) {
                 $errorNode = new Node('li');
+                $errorNode->addTextNode("[Line $lineNumber] {$ex->getMessage()}");
                 $this->errors->addNode($errorNode);
+                $this->errors->addTextNode(PHP_EOL);
                 $this->errorOccurred = true;
             }
         }
@@ -161,10 +175,15 @@ class S3wf2Format extends Format
      */
     private function processSourceBlockLine(string $tag, string $line): void
     {
+        $el = $this->allowedBlocks->get($tag);
+        if (!$el) {
+            throw new ParseErrorException("Unknown inline tag: $tag");
+        }
+
         switch ($line) {
             case '>>>':
                 $this->commitParagraph();
-                $node = new Node($tag);
+                $node = new Node($el[0], collect(['class' => $el[1]]));
                 $this->currentParagraph = $node;
                 $this->currentParagraph->addTextNode(PHP_EOL);
                 break;
@@ -173,7 +192,7 @@ class S3wf2Format extends Format
                 break;
             default:
                 $this->commitParagraph();
-                $node = new Node($tag);
+                $node = new Node($el[0], collect(['class' => $el[1]]));
                 $this->currentParagraph = $node;
                 $this->processSourceNormalLine($this->currentParagraph, $line);
                 $this->commitParagraph();
@@ -252,7 +271,11 @@ class S3wf2Format extends Format
                     $attributes = collect(['class' => "line {$character->colorClass()}"]);
                     $node = new Node('span', $attributes);
                 } else {
-                    $node = new Node($tagName);
+                    $el = $this->allowedPhrasings->get($tagName);
+                    if (!$el) {
+                        throw new ParseErrorException("Unknown inline tag: $tagName");
+                    }
+                    $node = new Node($el[0], collect(['class' => $el[1]]));
                 }
                 $stack->push($node);
             }
@@ -265,5 +288,24 @@ class S3wf2Format extends Format
         }
 
         $this->paragraphInUse = true;
+    }
+
+    private function registerTags(): void
+    {
+        // 要素は [タグ, クラス]
+
+        $this->allowedBlocks = collect();
+        $this->allowedBlocks['para'] = ['p', ''];
+        $this->allowedBlocks['quote'] = ['blockquote', ''];
+        $this->allowedBlocks['sec'] = ['h2', 'section'];
+        $this->allowedBlocks['subsec'] = ['h3', 'section'];
+
+        $this->allowedPhrasings = collect();
+        $this->allowedPhrasings['b'] = ['strong', ''];
+        $this->allowedPhrasings['i'] = ['i', ''];
+        $this->allowedPhrasings['m'] = ['code', ''];
+        $this->allowedPhrasings['ul'] = ['span', 'underline'];
+        $this->allowedPhrasings['st'] = ['del', 'underline'];
+        $this->allowedPhrasings['dt'] = ['span', 'dots'];
     }
 }

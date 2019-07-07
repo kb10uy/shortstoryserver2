@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lib\Formats\S3wf2;
 
-use Exception;
 use Lib\Formats\Node;
+use Lib\Formats\ParseErrorException;
 
 /**
  * キャラクター全員を扱う.
@@ -50,8 +50,8 @@ class CharacterSet
                 break;
             default:
                 $isColorCode = preg_match('/^#([\da-f]{3,6})$/ui', $type, $matches);
-                if ($isColorCode) {
-                    throw new Exception("Invalid color code: $type");
+                if (1 !== $isColorCode) {
+                    throw new ParseErrorException("Invalid color code: $type");
                 }
                 $this->customColors->push($matches[1]);
                 $setType = $matches[1];
@@ -80,8 +80,9 @@ class CharacterSet
     public function generateCustomColorsStyle(): Node
     {
         $node = new Node('style');
+        $node->addTextNode(PHP_EOL);
         foreach ($this->customColors as $color) {
-            $node->addTextNode(".custom-$color { color: #$color; }\n");
+            $node->addTextNode(".custom-$color { color: #$color; }" . PHP_EOL);
         }
 
         return $node;
