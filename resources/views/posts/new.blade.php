@@ -12,6 +12,12 @@
             <input type="text" name="title" id="title">
         </div>
         <div class="pair">
+            <label for="body_type">本文のフォーマット</label>
+            <select id="body_type" name="body_type">
+                <option value="s3wf2" selected>ShortStoryServer Writer's Format v2</option>
+            </select>
+        </div>
+        <div class="pair">
             <label for="body">本文</label>
             <textarea name="body" id="body" cols="30" rows="10"></textarea>
         </div>
