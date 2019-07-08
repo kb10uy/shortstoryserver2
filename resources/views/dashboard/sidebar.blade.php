@@ -4,10 +4,10 @@
     <div class="screen-name">&#x40;{{ Auth::user()->name }}</div>
 </div>
 <ul class="menu">
-    <li><a class="active" href="#">ダッシュボード</a></li>
-    <li><a href="#">投稿管理</a></li>
-    <li><a href="#">シリーズ管理</a></li>
-    <li><a href="#">ブックマーク管理</a></li>
-    <li><a href="#">設定</a></li>
-    <li><a href="#">ログアウト</a></li>
+    <li><a class="active" href="#">@lang('actions.menu-dashboard')</a></li>
+    <li><a href="#">@lang('actions.menu-postsmanagement')</a></li>
+    <li><a href="#">@lang('actions.menu-seriesmanagement')</a></li>
+    <li><a href="#">@lang('actions.menu-bookmarksmanagement')</a></li>
+    <li><a href="#">@lang('actions.menu-setting')</a></li>
+    <li><a href="#">@lang('actions.auth-logout')</a></li>
 </ul>
