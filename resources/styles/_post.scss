@@ -1,0 +1,38 @@
+article.post {
+  .male-1 { color: #36c; }
+  .male-2 { color: #15f; }
+  .male-3 { color: #2bf; }
+  .male-4 { color: #7ff; }
+  .female-1 { color: #f6c; }
+  .female-2 { color: #f46; }
+  .female-3 { color: #f95; }
+  .female-4 { color: #fc5; }
+  .mob-1 { color: #af7; }
+  .mob-2 { color: #73c; }
+  .mob-3 { color: #444; }
+  .mob-4 { color: #888; }
+
+  blockquote {
+    padding: 20px;
+    color: #aaa;
+    border-left: 2px solid #aaa;
+  }
+
+  code {
+    background-color: rgba(192, 192, 192, 0.4);
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  span.line {
+    display: block;
+  }
+
+  span.underline {
+    text-decoration: underline;
+  }
+
+  span.dots {
+    text-emphasis: filled circle black;
+  }
+}

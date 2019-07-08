@@ -20,6 +20,7 @@ Route::get('/', function () {
 Route::prefix('/help')->group(function () {
     Route::get('/about', 'HelpController@about')->name('help.about');
     Route::get('/playground', 'HelpController@playground')->name('help.playground');
+    Route::post('/playground', 'HelpController@playground');
     Route::get('/terms', 'HelpController@terms')->name('help.terms');
 });
 

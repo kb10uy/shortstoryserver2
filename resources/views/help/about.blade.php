@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>ShortStoryServer について</h1>
+    <h1>@lang('titles.help-about')</h1>
     <p>
         ShortStoryServer は、よくわからない SS (ショートストーリー) や怪文書を投稿するためのサイトです。
         2015 年ごろに運用を開始し、フレームワーク・バックエンドを転々としつつなんだかんだ <strong>4 年目</strong>に突入してしまいました。

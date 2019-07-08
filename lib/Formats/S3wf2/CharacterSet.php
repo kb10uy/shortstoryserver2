@@ -37,15 +37,15 @@ class CharacterSet
     {
         switch ($type) {
             case 'male':
-                $setType = 'male' . ($this->maleIndex + 1);
+                $setType = 'male-' . ($this->maleIndex + 1);
                 ++$this->maleIndex;
                 break;
             case 'female':
-                $setType = 'female' . ($this->femaleIndex + 1);
+                $setType = 'female-' . ($this->femaleIndex + 1);
                 ++$this->femaleIndex;
                 break;
             case 'mob':
-                $setType = 'mob' . ($this->mobIndex + 1);
+                $setType = 'mob-' . ($this->mobIndex + 1);
                 ++$this->mobIndex;
                 break;
             default:
@@ -54,7 +54,7 @@ class CharacterSet
                     throw new ParseErrorException("Invalid color code: $type");
                 }
                 $this->customColors->push($matches[1]);
-                $setType = $matches[1];
+                $setType = "custom-{$matches[1]}";
                 break;
         }
         $this->characters[$key] = new Character($name, $setType);

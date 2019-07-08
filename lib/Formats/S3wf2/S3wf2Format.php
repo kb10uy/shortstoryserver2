@@ -50,7 +50,7 @@ class S3wf2Format extends Format
     public function reset(): void
     {
         $this->characters = new CharacterSet();
-        $this->rootNode = new Node('article');
+        $this->rootNode = new Node('article', collect(['class' => 'post']));
         $this->rootNode->addTextNode(PHP_EOL);
         $this->currentParagraph = new Node('p');
         $this->currentParagraph->addTextNode(PHP_EOL);
@@ -75,6 +75,10 @@ class S3wf2Format extends Format
                 continue;
             }
 
+            if ($lineString === '') {
+                $this->commitParagraph();
+                continue;
+            }
             try {
                 if (1 === preg_match('/^(:|\/|@)(\w+)\s+(.+)$/u', $lineString, $matches)) {
                     // escaped line
@@ -305,7 +309,7 @@ class S3wf2Format extends Format
         $this->allowedPhrasings['i'] = ['i', ''];
         $this->allowedPhrasings['m'] = ['code', ''];
         $this->allowedPhrasings['ul'] = ['span', 'underline'];
-        $this->allowedPhrasings['st'] = ['del', 'underline'];
+        $this->allowedPhrasings['st'] = ['del', ''];
         $this->allowedPhrasings['dt'] = ['span', 'dots'];
     }
 }
