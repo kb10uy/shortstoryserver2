@@ -17,10 +17,10 @@ Route::get('/', function () {
     return view('index');
 })->name('index');
 
-Route::prefix('/help', function () {
+Route::prefix('/help')->group(function () {
     Route::get('/about', 'HelpController@about')->name('help.about');
-    Route::get('/playground', 'HelpController@about')->name('help.playground');
-    Route::get('/terms', 'HelpController@about')->name('help.terms');
+    Route::get('/playground', 'HelpController@playground')->name('help.playground');
+    Route::get('/terms', 'HelpController@terms')->name('help.terms');
 });
 
 Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard.index');
