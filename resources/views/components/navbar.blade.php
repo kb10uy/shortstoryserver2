@@ -4,6 +4,12 @@
         <div class="menu">
             <a href="/" class="item">@lang('actions.menu-list')</a>
             <a href="/" class="item">@lang('actions.menu-search')</a>
+            <a class="item" data-dropdown="help-dropdown">@lang('actions.menu-help')</a>
+            <div id="help-dropdown" class="dropdown" data-dropdown-merge>
+                <a href="{{ route('help.playground') }}" class="item">@lang('actions.help-playground')</a>
+                <a href="{{ route('help.about') }}" class="item">@lang('actions.help-about')</a>
+                <a href="{{ route('help.terms') }}" class="item">@lang('actions.help-terms')</a>
+            </div>
         </div>
 
         @auth

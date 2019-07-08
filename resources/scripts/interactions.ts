@@ -12,10 +12,20 @@ export function enableDropdownMenu(): void {
 
     const target = document.getElementById(targetId);
     if (!target || !(target instanceof HTMLElement)) continue;
+
+    if (target.dataset.dropdownMerge === '') {
+      const parent = target.parentNode || document.body;
+      parent.removeChild(target);
+      dropdownSource.appendChild(target);
+      target.style.top = '32px';
+      target.style.left = '0px';
+    }
+
     dropdownSource.addEventListener('click', (e): void => {
       target.classList.toggle('show');
       e.stopImmediatePropagation();
     });
+
     window.addEventListener('click', (e): void => {
       if (!(e.target instanceof HTMLElement)) return;
       if (!target.contains(e.target)) {

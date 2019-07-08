@@ -17,6 +17,12 @@ Route::get('/', function () {
     return view('index');
 })->name('index');
 
+Route::prefix('/help', function () {
+    Route::get('/about', 'HelpController@about')->name('help.about');
+    Route::get('/playground', 'HelpController@about')->name('help.playground');
+    Route::get('/terms', 'HelpController@about')->name('help.terms');
+});
+
 Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard.index');
 
 Route::prefix('/posts')->group(function () {
