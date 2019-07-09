@@ -29,4 +29,5 @@ Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard.index
 Route::prefix('/posts')->group(function () {
     Route::get('/new', 'PostsCreationController@new')->name('posts.new');
     Route::post('/new', 'PostsCreationController@post')->name('posts.post');
+    Route::get('/{id}', 'PostsController@show')->name('posts.show');
 });

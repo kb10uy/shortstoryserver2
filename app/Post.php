@@ -7,8 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     protected $fillable = [
-        'title', 'body', 'body_type',
+        'title', 'body', 'body_type', 'user_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * body_type パラメータによって body から HTML を生成する。

@@ -268,7 +268,7 @@ class S3wf2Format extends Format
                 $tagName = $matches[1][0];
                 if ('@' === $tagName[0]) {
                     // インライン台詞
-                    $character = $this->characters->get($matches[2]);
+                    $character = $this->characters->get($matches[2][0]);
                     if (!$character) {
                         throw new ParseErrorException("Unknown character: {$matches[2]}");
                     }
