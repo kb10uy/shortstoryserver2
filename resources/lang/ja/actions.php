@@ -25,4 +25,5 @@ return [
     'dashboard-newseries' => '新しいシリーズを作成する',
     'dashboard-newbookmark' => '新しいブックマークを作成する',
     'posts-submit' => '投稿する',
+    'posts-update' => '更新する',
 ];

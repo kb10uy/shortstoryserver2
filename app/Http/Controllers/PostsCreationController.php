@@ -36,4 +36,20 @@ class PostsCreationController extends Controller
 
         return redirect()->route('posts.show', ['id' => $post->id]);
     }
+
+    public function edit(Request $request)
+    {
+        $target = Post::findOrFail($request->id);
+        $user = Auth::user();
+        if ($user->cant('edit', $target)) {
+            return response()->view('index', [], 403);
+        }
+
+        return view('posts.edit', [
+            'id' => $target->id,
+            'title' => $target->title,
+            'body_type' => $target->body_type,
+            'body' => $target->body,
+        ]);
+    }
 }

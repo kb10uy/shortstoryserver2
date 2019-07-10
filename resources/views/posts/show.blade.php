@@ -10,7 +10,7 @@
             <img src="https://via.placeholder.com/64" alt="{{ $author->name }}">
             <div>
                 Author:<br>
-                {{ $author->name }} <small>&#64;{{ $author->name }}</small>
+                <a href="{{ route('users.show', ['name' => $author->name]) }}">{{ $author->name }} <small>&#64;{{ $author->name }}</small></a>
             </div>
         </div>
         <ul class="tags">

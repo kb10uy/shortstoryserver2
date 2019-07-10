@@ -15,4 +15,5 @@ return [
     'help-playground' => 'Playground',
     'posts-latest' => '最近の投稿',
     'posts-new' => '新しい作品を投稿する',
+    'posts-edit' => '作品を編集する',
 ];
