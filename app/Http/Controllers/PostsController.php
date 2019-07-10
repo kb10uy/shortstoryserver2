@@ -25,6 +25,6 @@ class PostsController extends Controller
         $title = $post->title;
         $articleHtml = $format->toHtml();
 
-        return view('posts.show', compact('articleHtml', 'title'));
+        return view('posts.show', compact('articleHtml', 'title', 'author'));
     }
 }
