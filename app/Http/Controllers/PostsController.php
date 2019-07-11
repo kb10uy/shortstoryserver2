@@ -9,6 +9,13 @@ use Lib\Formats\S3wf2\S3wf2Format;
 
 class PostsController extends Controller
 {
+    public function latest()
+    {
+        $posts = Post::with('user')->orderBy('updated_at', 'desc')->take(10)->get();
+
+        return view('posts.latest', compact('posts'));
+    }
+
     public function show(Request $request)
     {
         $post = Post::findOrFail($request->id);

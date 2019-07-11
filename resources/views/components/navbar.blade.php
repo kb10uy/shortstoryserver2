@@ -2,8 +2,8 @@
     <nav class="navbar">
         <span class="logo"><a href="/" class="item">ShortStoryServer</a></span>
         <div class="menu">
-            <a href="/" class="item">@lang('actions.menu-list')</a>
-            <a href="/" class="item">@lang('actions.menu-search')</a>
+            <a href="{{ route('posts.latest') }}" class="item">@lang('actions.menu-list')</a>
+            <a href="#" class="item">@lang('actions.menu-search')</a>
             <a class="item" data-dropdown="help-dropdown">@lang('actions.menu-help')</a>
             <div id="help-dropdown" class="dropdown" data-dropdown-merge>
                 <a href="{{ route('help.playground') }}" class="item">@lang('actions.help-playground')</a>
@@ -14,7 +14,7 @@
 
         @auth
             <div class="user" data-dropdown="user-dropdown">
-                <img src="http://placehold.jp/256x256.png" alt="username" class="avatar">
+                <img src="https://via.placeholder.com/64" alt="{{ Auth::user()->name }}" class="avatar">
                 <span class="dropdown-caret"></span>
 
                 <!-- メニュー -->

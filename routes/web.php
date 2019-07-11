@@ -31,6 +31,7 @@ Route::prefix('/posts')->group(function () {
     Route::post('/new', 'PostsCreationController@post')->name('posts.post');
     Route::get('/{id}/edit', 'PostsCreationController@edit')->name('posts.edit');
     Route::patch('/{id}/edit', 'PostsCreationController@update')->name('posts.update');
+    Route::get('/latest', 'PostsController@latest')->name('posts.latest');
     Route::get('/{id}', 'PostsController@show')->name('posts.show');
 });
 
