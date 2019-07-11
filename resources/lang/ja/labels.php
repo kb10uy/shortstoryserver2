@@ -17,4 +17,6 @@ return [
     'title' => 'タイトル',
     'body-format' => '本文のフォーマット',
     'body-text' => '本文',
+    'author-menu' => '作者メニュー',
+    'menu' => 'メニュー',
 ];

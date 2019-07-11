@@ -12,8 +12,25 @@
                 Author:<br>
                 <a href="{{ route('users.show', ['name' => $author->name]) }}">{{ $author->name }} <small>&#64;{{ $author->name }}</small></a>
             </div>
+            @if($isAuthor)
+                <details class="author">
+                    <summary>@lang('labels.author-menu')</summary>
+                    <a href="{{ route('posts.edit', ['id' => $id]) }}">@lang('actions.posts-edit')</a>
+                </details>
+            @else
+                <details>
+                    <summary>@lang('labels.menu')</summary>
+                </details>
+            @endif
         </div>
+        <p>
+            あまりにもさみしいのでここになんか説明文が書けるようになるかもしれない。ならないかもしれない。
+        </p>
+
         <ul class="tags">
+            <li>タグは</li>
+            <li>このように</li>
+            <li>表示されます</li>
         </ul>
     </div>
     <hr>

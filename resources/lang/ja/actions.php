@@ -26,4 +26,5 @@ return [
     'dashboard-newbookmark' => '新しいブックマークを作成する',
     'posts-submit' => '投稿する',
     'posts-update' => '更新する',
+    'posts-edit' => '編集する',
 ];

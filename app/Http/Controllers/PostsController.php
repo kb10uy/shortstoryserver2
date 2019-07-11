@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Post;
 use Lib\Formats\S3wf2\S3wf2Format;
@@ -12,6 +13,7 @@ class PostsController extends Controller
     {
         $post = Post::findOrFail($request->id);
         $author = $post->user;
+        $isAuthor = Auth::check() && Auth::user()->id === $author->id;
 
         switch ($post->body_type) {
             case 's3wf2':
@@ -20,11 +22,12 @@ class PostsController extends Controller
             default:
                 return response()->view('index', [], 500);
         }
-
         $format->parse($post->body);
+
+        $id = $post->id;
         $title = $post->title;
         $articleHtml = $format->toHtml();
 
-        return view('posts.show', compact('articleHtml', 'title', 'author'));
+        return view('posts.show', compact('id', 'articleHtml', 'title', 'author', 'isAuthor'));
     }
 }
