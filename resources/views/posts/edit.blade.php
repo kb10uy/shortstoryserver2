@@ -8,6 +8,7 @@
 
     <form name="editpost" method="POST" action="{{ route('posts.update', ['id' => $id]) }}" onsubmit="return false;">
         @csrf
+        <input type="hidden" name="_method" value="PATCH">
         <div class="pair">
             <label for="title">@lang('labels.title')</label>
             <input type="text" name="title" id="title" value="{{ $title }}">

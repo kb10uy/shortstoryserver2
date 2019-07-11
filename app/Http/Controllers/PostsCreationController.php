@@ -6,6 +6,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Post;
+use App\Http\Requests\UpsertPost;
 
 class PostsCreationController extends Controller
 {
@@ -19,22 +20,18 @@ class PostsCreationController extends Controller
         return view('posts.new');
     }
 
-    public function post(Request $request)
+    public function post(UpsertPost $input)
     {
-        $validated = $request->validate([
-            'title' => 'required|max:128',
-            'body_type' => ['required', Rule::in(['s3wf2'])],
-            'body' => 'required|max:1024000',
-        ]);
-
         $post = Post::create([
-            'title' => $validated['title'],
-            'body_type' => $validated['body_type'],
-            'body' => $validated['body'],
+            'title' => $input->title,
+            'body_type' => $input->body_type,
+            'body' => $input->body,
             'user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('posts.show', ['id' => $post->id]);
+        return redirect()
+            ->route('posts.show', ['id' => $post->id])
+            ->with('status', __('statuses.post-created'));
     }
 
     public function edit(Request $request)
@@ -42,7 +39,9 @@ class PostsCreationController extends Controller
         $target = Post::findOrFail($request->id);
         $user = Auth::user();
         if ($user->cant('edit', $target)) {
-            return response()->view('index', [], 403);
+            return redirect()
+                ->route('index')
+                ->with('error', __('statuses.not-your-post'));
         }
 
         return view('posts.edit', [
@@ -51,5 +50,26 @@ class PostsCreationController extends Controller
             'body_type' => $target->body_type,
             'body' => $target->body,
         ]);
+    }
+
+    public function update(Request $request, UpsertPost $input)
+    {
+        $target = Post::findOrFail($request->id);
+        $user = Auth::user();
+        if ($user->cant('edit', $target)) {
+            return redirect()
+                ->route('index')
+                ->with('error', __('statuses.not-your-post'));
+        }
+
+        $target->fill([
+            'title' => $input->title,
+            'body_type' => $input->body_type,
+            'body' => $input->body,
+        ])->save();
+
+        return redirect()
+            ->route('posts.show', ['id' => $target->id])
+            ->with('status', __('statuses.post-updated'));
     }
 }
