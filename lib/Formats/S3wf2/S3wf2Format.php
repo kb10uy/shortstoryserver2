@@ -7,6 +7,7 @@ namespace Lib\Formats\S3wf2;
 use Illuminate\Support\Collection;
 use Lib\Formats\Format;
 use Lib\Formats\Node;
+use Lib\Formats\SingularNode;
 use Lib\Formats\ParseErrorException;
 
 /**
@@ -80,22 +81,22 @@ class S3wf2Format extends Format
                 continue;
             }
             try {
-                if (1 === preg_match('/^(:|\/|@)(\w+)\s+(.+)$/u', $lineString, $matches)) {
+                if (1 === preg_match('/^(:|\/|@)(\w+)(\s+(.*))?$/u', $lineString, $matches)) {
                     // escaped line
                     switch ($matches[1]) {
                         case ':':
                             $command = $matches[2];
-                            $rawParams = preg_split('/\s+/', $matches[3], -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $rawParams = preg_split('/\s+/', $matches[4], -1, PREG_SPLIT_NO_EMPTY) ?: [];
                             $this->processSourceCommandLine($command, collect($rawParams));
                             break;
                         case '/':
                             $tag = $matches[2];
-                            $line = $matches[3];
+                            $line = $matches[4];
                             $this->processSourceBlockLine($tag, $line);
                             break;
                         case '@':
                             $characterKey = $matches[2];
-                            $line = $matches[3];
+                            $line = $matches[4];
                             $this->processSourceSpeechLine($characterKey, $line);
                             break;
                     }
@@ -242,7 +243,8 @@ class S3wf2Format extends Format
         $rest = $line;
 
         while ('' !== $rest) {
-            $tagFound = preg_match('/\[(@?(\w+))\s+|\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
+            // \[(@?(\w+))\s+|[\(\)\]]|\[(\w+)\]
+            $tagFound = preg_match('/\[(@?(\w+))(?:\s+|(?=\())|[\(\)\]]|\[(\w+)\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
 
             // ケツまでタグなし
             if (1 !== $tagFound) {
@@ -258,13 +260,50 @@ class S3wf2Format extends Format
             $stack->last()->addTextNode($before);
 
             if (']' === $tagString) {
+                // タグ閉じ
                 if (1 === $stack->count()) {
                     // 閉じタグが多すぎる
                     throw new ParseErrorException('Too many closing tag: ' . $line);
                 }
                 $node = $stack->pop();
                 $stack->last()->addNode($node);
+
+            } elseif ('(' === $tagString) {
+                // パラメーター開き
+                if ($stack->count() === 1) {
+                    throw new ParseErrorException('No parent tag found');
+                }
+                $parameter = new Node('*');
+                $parameter->setEmitter(function ($tag, $attrs, $params, $nodes) {
+                    ob_start();
+                    foreach ($nodes as $node) {
+                        echo (string) $node;
+                    }
+                    return ob_get_clean() ?: '';
+                });
+                $stack->push($parameter);
+
+            } elseif (')' === $tagString) {
+                // パラメーター閉じ
+                if (1 === $stack->count()) {
+                    throw new ParseErrorException('No parameter there');
+                }
+                $parameter = $stack->pop();
+                if ($parameter->tagName() !== '*') {
+                    throw new ParseErrorException('Invalid parameter');
+                }
+                $stack->last()->addParameter($parameter);
+
+            } elseif ($tagString[0] === '[' && substr($tagString, -1) === ']') {
+                // 単一タグ
+                if ($tagString !== '[br]') {
+                    // TODO: そのうち <br> 以外にも対応する
+                    throw new ParseErrorException('Other than [br] is unacceptable');
+                }
+                $stack->last()->addNode(new SingularNode('br'));
+
             } else {
+                // タグ開き
                 $tagName = $matches[1][0];
                 if ('@' === $tagName[0]) {
                     // インライン台詞
@@ -279,7 +318,11 @@ class S3wf2Format extends Format
                     if (!$el) {
                         throw new ParseErrorException("Unknown inline tag: $tagName");
                     }
+
                     $node = new Node($el[0], collect(['class' => $el[1]]));
+                    if (isset($el[2])) {
+                        $node->setEmitter($el[2]);
+                    }
                 }
                 $stack->push($node);
             }
@@ -303,13 +346,42 @@ class S3wf2Format extends Format
         $this->allowedBlocks['quote'] = ['blockquote', ''];
         $this->allowedBlocks['sec'] = ['h2', 'section'];
         $this->allowedBlocks['subsec'] = ['h3', 'section'];
+        $this->allowedBlocks['enum'] = ['il', ''];
+        $this->allowedBlocks['list'] = ['ul', ''];
 
         $this->allowedPhrasings = collect();
+        $this->allowedPhrasings['item'] = ['li', ''];
         $this->allowedPhrasings['b'] = ['strong', ''];
         $this->allowedPhrasings['i'] = ['i', ''];
         $this->allowedPhrasings['m'] = ['code', ''];
         $this->allowedPhrasings['ul'] = ['span', 'underline'];
         $this->allowedPhrasings['st'] = ['del', ''];
         $this->allowedPhrasings['dt'] = ['span', 'dots'];
+
+        $this->allowedPhrasings['link'] = ['a', '', function ($tag, $attrs, $params, $nodes) {
+            $target = $params->count() >= 1 ? urlencode($params[0]->emitPlain()) : '#';
+            ob_start();
+            echo "<a href=\"$target\">";
+            foreach ($nodes as $node) {
+                echo (string) $node;
+            }
+            echo '</a>';
+            return ob_get_clean() ?: '';
+        }];
+
+        $this->allowedPhrasings['ruby'] = ['ruby', '', function($tag, $attrs, $params, $nodes) {
+            $rubyHtml = $params->count() >= 1 ? $params[0]->emit() : '';
+
+            ob_start();
+            echo '<ruby>';
+            foreach ($nodes as $node) {
+                echo (string) $node;
+            }
+            echo '<rp>(</rp><rt>';
+            echo $rubyHtml;
+            echo '</rt><rp>)</rp>';
+            echo '</ruby>';
+            return ob_get_clean() ?: '';
+        }];
     }
 }

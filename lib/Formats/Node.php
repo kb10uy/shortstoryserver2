@@ -14,8 +14,14 @@ class Node
     /** @var Collection 属性 */
     private $attributes;
 
+    /** @var Collection パラメーター */
+    private $parameters;
+
     /** @var Collection 子要素 */
     private $children;
+
+    /** @var callable カスタムエミッター */
+    private $emitter;
 
     /**
      * @param string     $tagName    タグ名
@@ -26,6 +32,15 @@ class Node
         $this->tagName = $tagName;
         $this->attributes = $attributes ?? collect();
         $this->children = collect();
+        $this->parameters = collect();
+    }
+
+    /**
+     * タグ名
+     */
+    public function tagName(): string
+    {
+        return $this->tagName;
     }
 
     /**
@@ -48,12 +63,33 @@ class Node
     }
 
     /**
+     * パラメーター
+     */
+    public function addParameter(Node $parameter): void
+    {
+        $this->parameters->push($parameter);
+    }
+
+    /**
+     * エミッターを指定する。
+     * シグネチャは function (string $tagName, Collection $attributes, Collection $parameters, Collection $children)
+     */
+    public function setEmitter(callable $emitter): void
+    {
+        $this->emitter = $emitter;
+    }
+
+    /**
      * このノードの HTML を生成する。
      *
      * @return string 文字列
      */
     public function emit(): string
     {
+        if ($this->emitter !== null) {
+            return call_user_func($this->emitter, $this->tagName, $this->attributes, $this->parameters, $this->children);
+        }
+
         ob_start();
         // 開始タグ
         echo "<{$this->tagName}";
@@ -72,6 +108,16 @@ class Node
         echo "</{$this->tagName}>";
 
         return ob_get_clean() ?: '';
+    }
+
+    /**
+     * プレーンテキストでこのノードを生成する。
+     *
+     * @return string 文字列
+     */
+    public function emitPlain(): string
+    {
+        return htmlspecialchars_decode(strip_tags($this->emit()));
     }
 
     /**
