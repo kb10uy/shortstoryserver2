@@ -6,24 +6,8 @@ namespace Lib\Formats;
 
 use Illuminate\Support\Collection;
 
-class SingularNode
+class SingularNode extends Node
 {
-    /** @var string タグ */
-    private $tagName;
-
-    /** @var Collection 属性 */
-    private $attributes;
-
-    /**
-     * @param string     $tagName    タグ名
-     * @param Collection $attributes タグに付与する属性
-     */
-    public function __construct(string $tagName, Collection $attributes = null)
-    {
-        $this->tagName = $tagName;
-        $this->attributes = $attributes ?? collect();
-    }
-
     /**
      * このノードの HTML を生成する。
      *

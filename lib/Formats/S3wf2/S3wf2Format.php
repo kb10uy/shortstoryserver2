@@ -359,7 +359,7 @@ class S3wf2Format extends Format
         $this->allowedPhrasings['dt'] = ['span', 'dots'];
 
         $this->allowedPhrasings['link'] = ['a', '', function ($tag, $attrs, $params, $nodes) {
-            $target = $params->count() >= 1 ? urlencode($params[0]->emitPlain()) : '#';
+            $target = $params->count() >= 1 ? htmlspecialchars($params[0]->emitPlain()) : '#';
             ob_start();
             echo "<a href=\"$target\">";
             foreach ($nodes as $node) {

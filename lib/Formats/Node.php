@@ -9,19 +9,19 @@ use Illuminate\Support\Collection;
 class Node
 {
     /** @var string タグ */
-    private $tagName;
+    protected $tagName;
 
     /** @var Collection 属性 */
-    private $attributes;
+    protected $attributes;
 
     /** @var Collection パラメーター */
-    private $parameters;
+    protected $parameters;
 
     /** @var Collection 子要素 */
-    private $children;
+    protected $children;
 
     /** @var callable カスタムエミッター */
-    private $emitter;
+    protected $emitter;
 
     /**
      * @param string     $tagName    タグ名
