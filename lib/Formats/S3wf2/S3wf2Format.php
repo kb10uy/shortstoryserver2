@@ -243,8 +243,7 @@ class S3wf2Format extends Format
         $rest = $line;
 
         while ('' !== $rest) {
-            // \[(@?(\w+))\s+|[\(\)\]]|\[(\w+)\]
-            $tagFound = preg_match('/\[(@?(\w+))(?:\s+|(?=\())|[\(\)\]]|\[(\w+)\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
+            $tagFound = preg_match('/\[(@?(\w+))(?:\s+|(?=\())|[{}\]]|\[(\w+)\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
 
             // ケツまでタグなし
             if (1 !== $tagFound) {
@@ -259,16 +258,7 @@ class S3wf2Format extends Format
             $before = substr($rest, 0, $tagPosition);
             $stack->last()->addTextNode($before);
 
-            if (']' === $tagString) {
-                // タグ閉じ
-                if (1 === $stack->count()) {
-                    // 閉じタグが多すぎる
-                    throw new ParseErrorException('Too many closing tag: ' . $line);
-                }
-                $node = $stack->pop();
-                $stack->last()->addNode($node);
-
-            } elseif ('(' === $tagString) {
+            if ('{' === $tagString) {
                 // パラメーター開き
                 if ($stack->count() === 1) {
                     throw new ParseErrorException('No parent tag found');
@@ -283,7 +273,7 @@ class S3wf2Format extends Format
                 });
                 $stack->push($parameter);
 
-            } elseif (')' === $tagString) {
+            } elseif ('}' === $tagString) {
                 // パラメーター閉じ
                 if (1 === $stack->count()) {
                     throw new ParseErrorException('No parameter there');
@@ -293,6 +283,15 @@ class S3wf2Format extends Format
                     throw new ParseErrorException('Invalid parameter');
                 }
                 $stack->last()->addParameter($parameter);
+
+            } elseif (']' === $tagString) {
+                // タグ閉じ
+                if (1 === $stack->count()) {
+                    // 閉じタグが多すぎる
+                    throw new ParseErrorException('Too many closing tag: ' . $line);
+                }
+                $node = $stack->pop();
+                $stack->last()->addNode($node);
 
             } elseif ($tagString[0] === '[' && substr($tagString, -1) === ']') {
                 // 単一タグ
