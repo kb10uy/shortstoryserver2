@@ -311,7 +311,7 @@ class S3wf2Format extends Format
                     if (!$character) {
                         throw new ParseErrorException("Unknown character: {$matches[2]}");
                     }
-                    $attributes = collect(['class' => "line {$character->colorClass()}"]);
+                    $attributes = collect(['class' => "line inline {$character->colorClass()}"]);
                     $node = new Node('span', $attributes);
                 } else {
                     $el = $this->allowedPhrasings->get($tagName);

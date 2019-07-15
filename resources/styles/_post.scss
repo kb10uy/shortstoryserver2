@@ -143,6 +143,10 @@ article.post {
 
   span.line {
     display: block;
+
+    &.inline {
+      display: inline;
+    }
   }
 
   span.underline {
