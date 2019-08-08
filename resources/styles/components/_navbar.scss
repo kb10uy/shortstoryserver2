@@ -44,13 +44,13 @@ header {
     // ドロップダウンメニュー
     .dropdown {
       position: absolute;
-      z-index: 10;
       top: 0;
       left: 0;
+      z-index: 10;
       width: 160px;
       font-size: 0.8rem;
-      color: $floating-color-fg;
       font-weight: normal;
+      color: $floating-color-fg;
       visibility: hidden;
       background-color: $floating-color-bg;
       border: 1px solid $floating-color-br;
@@ -77,15 +77,15 @@ header {
 
       a.item {
         display: block;
-        margin: 0;
         padding: 5px 10px;
+        margin: 0;
         color: $floating-color-fg;
         text-decoration: none;
         transition: 0.15s color, 0.15s background-color;
 
         &:hover {
-          color: $floating-hover-color-fg;
           font-weight: normal;
+          color: $floating-hover-color-fg;
           background-color: $floating-hover-color-bg;
         }
 
@@ -133,12 +133,12 @@ header {
 
       .dropdown {
         top: calc(100% + 12px);
-        left: unset;
         right: 0;
+        left: unset;
 
         &::before {
-          left: unset;
           right: 24px;
+          left: unset;
         }
       }
     }

@@ -25,7 +25,7 @@
                     </div>
                     <div class="separator"></div>
                     <a href="{{ route('dashboard.index') }}" class="item">@lang('actions.menu-dashboard')</a>
-                    <a href="/" class="item">@lang('actions.menu-posts')</a>
+                    <a href="{{ route('posts.new') }}" class="item">@lang('actions.menu-posts')</a>
                     <a href="/" class="item">@lang('actions.menu-setting')</a>
                     <a href="{{ route('logout') }}" class="item"
                         onclick="document.getElementById('logout').submit(); return false;">

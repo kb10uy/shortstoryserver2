@@ -22,6 +22,8 @@
             </ul>
         </section>
     @endforeach
+
+    {{ $posts->links() }}
 </div>
 @endsection
 
