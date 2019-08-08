@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Post;
 use App\Http\Requests\UpsertPost;
 

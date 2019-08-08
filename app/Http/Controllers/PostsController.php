@@ -24,7 +24,7 @@ class PostsController extends Controller
 
         switch ($post->body_type) {
             case 's3wf2':
-                $format = new S3wf2Format;
+                $format = new S3wf2Format();
                 break;
             default:
                 return response()->view('index', [], 500);

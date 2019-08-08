@@ -76,7 +76,7 @@ class S3wf2Format extends Format
                 continue;
             }
 
-            if ($lineString === '') {
+            if ('' === $lineString) {
                 $this->commitParagraph();
                 continue;
             }
@@ -260,7 +260,7 @@ class S3wf2Format extends Format
 
             if ('{' === $tagString) {
                 // パラメーター開き
-                if ($stack->count() === 1) {
+                if (1 === $stack->count()) {
                     throw new ParseErrorException('No parent tag found');
                 }
                 $parameter = new Node('*');
@@ -269,21 +269,20 @@ class S3wf2Format extends Format
                     foreach ($nodes as $node) {
                         echo (string) $node;
                     }
+
                     return ob_get_clean() ?: '';
                 });
                 $stack->push($parameter);
-
             } elseif ('}' === $tagString) {
                 // パラメーター閉じ
                 if (1 === $stack->count()) {
                     throw new ParseErrorException('No parameter there');
                 }
                 $parameter = $stack->pop();
-                if ($parameter->tagName() !== '*') {
+                if ('*' !== $parameter->tagName()) {
                     throw new ParseErrorException('Invalid parameter');
                 }
                 $stack->last()->addParameter($parameter);
-
             } elseif (']' === $tagString) {
                 // タグ閉じ
                 if (1 === $stack->count()) {
@@ -292,15 +291,13 @@ class S3wf2Format extends Format
                 }
                 $node = $stack->pop();
                 $stack->last()->addNode($node);
-
-            } elseif ($tagString[0] === '[' && substr($tagString, -1) === ']') {
+            } elseif ('[' === $tagString[0] && ']' === substr($tagString, -1)) {
                 // 単一タグ
-                if ($tagString !== '[br]') {
+                if ('[br]' !== $tagString) {
                     // TODO: そのうち <br> 以外にも対応する
                     throw new ParseErrorException('Other than [br] is unacceptable');
                 }
                 $stack->last()->addNode(new SingularNode('br'));
-
             } else {
                 // タグ開き
                 $tagName = $matches[1][0];
@@ -365,10 +362,11 @@ class S3wf2Format extends Format
                 echo (string) $node;
             }
             echo '</a>';
+
             return ob_get_clean() ?: '';
         }];
 
-        $this->allowedPhrasings['ruby'] = ['ruby', '', function($tag, $attrs, $params, $nodes) {
+        $this->allowedPhrasings['ruby'] = ['ruby', '', function ($tag, $attrs, $params, $nodes) {
             $rubyHtml = $params->count() >= 1 ? $params[0]->emit() : '';
 
             ob_start();
@@ -380,6 +378,7 @@ class S3wf2Format extends Format
             echo $rubyHtml;
             echo '</rt><rp>)</rp>';
             echo '</ruby>';
+
             return ob_get_clean() ?: '';
         }];
     }

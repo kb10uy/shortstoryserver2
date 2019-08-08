@@ -36,7 +36,7 @@ class Node
     }
 
     /**
-     * タグ名
+     * タグ名.
      */
     public function tagName(): string
     {
@@ -72,7 +72,7 @@ class Node
 
     /**
      * エミッターを指定する。
-     * シグネチャは function (string $tagName, Collection $attributes, Collection $parameters, Collection $children)
+     * シグネチャは function (string $tagName, Collection $attributes, Collection $parameters, Collection $children).
      */
     public function setEmitter(callable $emitter): void
     {
@@ -86,7 +86,7 @@ class Node
      */
     public function emit(): string
     {
-        if ($this->emitter !== null) {
+        if (null !== $this->emitter) {
             return call_user_func($this->emitter, $this->tagName, $this->attributes, $this->parameters, $this->children);
         }
 

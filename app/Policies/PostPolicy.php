@@ -12,12 +12,9 @@ class PostPolicy
 
     /**
      * Create a new policy instance.
-     *
-     * @return void
      */
     public function __construct()
     {
-        //
     }
 
     public function edit(User $user, Post $post)

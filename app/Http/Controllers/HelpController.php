@@ -23,7 +23,7 @@ class HelpController extends Controller
         if ($request->filled('body')) {
             $request->flash();
 
-            $format = new S3wf2Format;
+            $format = new S3wf2Format();
             $format->parse($request->body);
             $parsedHtml = $format->toHtml();
         }

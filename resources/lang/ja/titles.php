@@ -8,7 +8,7 @@ return [
     'auth-login' => 'ログイン',
     'auth-forgotpassword' => 'パスワードを忘れてしまいました',
     'auth-resetpassword' => 'パスワードのリセット',
-    'auth-sentverification' =>'確認メールを送信しました',
+    'auth-sentverification' => '確認メールを送信しました',
     'dashboard-top' => 'ダッシュボード',
     'help-about' => 'ShortStoryServer について',
     'help-terms' => '利用規約',

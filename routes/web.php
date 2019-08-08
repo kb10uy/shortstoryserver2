@@ -35,6 +35,6 @@ Route::prefix('/posts')->group(function () {
     Route::get('/{id}', 'PostsController@show')->name('posts.show');
 });
 
-Route::prefix('/users') ->group(function () {
+Route::prefix('/users')->group(function () {
     Route::get('/{name}', 'UsersController@show')->name('users.show');
 });
