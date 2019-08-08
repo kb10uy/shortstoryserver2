@@ -1,5 +1,5 @@
 <div class="profile">
-    <img src="http://placehold.jp/256x256.png" alt="avatar" class="avatar">
+    <img src="{{ Auth::user()->avatar_url }}" alt="avatar" class="avatar">
     <div class="username">{{ Auth::user()->name }}</div>
     <div class="screen-name">&#x40;{{ Auth::user()->name }}</div>
 </div>

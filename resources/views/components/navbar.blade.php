@@ -14,7 +14,7 @@
 
         @auth
             <div class="user" data-dropdown="user-dropdown">
-                <img src="https://via.placeholder.com/64" alt="{{ Auth::user()->name }}" class="avatar">
+                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="avatar">
                 <span class="dropdown-caret"></span>
 
                 <!-- メニュー -->
