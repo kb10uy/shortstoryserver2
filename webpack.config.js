@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const LaravelMixManifest = require('webpack-laravel-mix-manifest');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 
 module.exports = {
@@ -54,6 +55,10 @@ module.exports = {
         ],
         exclude: /node_modules|vendor/,
       },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
     ],
   },
 
@@ -81,6 +86,7 @@ module.exports = {
         to: './images'
       },
     ]),
+    new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[hash].css',
     }),

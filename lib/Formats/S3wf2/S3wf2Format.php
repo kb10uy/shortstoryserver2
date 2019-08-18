@@ -243,7 +243,7 @@ class S3wf2Format extends Format
         $rest = $line;
 
         while ('' !== $rest) {
-            $tagFound = preg_match('/\[(@?(\w+))(?:\s+|(?={))|[{}\]]|\[(\w+)\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
+            $tagFound = preg_match('/\[(@?(\w+))(?:\s+|(?=[{\[]))|[{}\]]|\[(\w+)\]/u', $rest, $matches, PREG_OFFSET_CAPTURE);
 
             // ケツまでタグなし
             if (1 !== $tagFound) {
