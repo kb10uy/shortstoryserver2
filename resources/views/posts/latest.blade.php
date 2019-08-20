@@ -13,7 +13,11 @@
                 <small>by {{ $post->user->name }}</small>
             </h2>
             <p class="summary">
-                ここに説明文が表示される予定です。実装しないかもしれません。
+                @if($post->description)
+                    {{ $post->description }}
+                @else
+                    @lang('labels.no-description')
+                @endif
             </p>
             @if($post->tags->isNotEmpty())
                 <ul class="tags">

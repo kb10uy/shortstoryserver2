@@ -15,36 +15,17 @@ class PostsCreationController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * GET /posts/new
+     */
     public function new()
     {
         return view('posts.new');
     }
 
-    public function post(UpsertPost $input)
-    {
-        $post = Post::create([
-            'title' => $input->title,
-            'body_type' => $input->body_type,
-            'body' => $input->body,
-            'user_id' => Auth::id(),
-        ]);
-
-        $tags = json_decode($input->tags_json);
-        $tagIds = [];
-        foreach ($tags as $tagName) {
-            if (!is_string($tagName)) {
-                continue;
-            }
-            $tag = Tag::firstOrCreate(['name' => $tagName]);
-            $tagIds[] = $tag->id;
-        }
-        $post->tags()->sync($tagIds);
-
-        return redirect()
-            ->route('posts.show', ['id' => $post->id])
-            ->with('status', __('statuses.post-created'));
-    }
-
+    /**
+     * GET /posts/:id/edit
+     */
     public function edit(Request $request)
     {
         $target = Post::with('tags')->findOrFail($request->id);
@@ -62,7 +43,25 @@ class PostsCreationController extends Controller
             'body_type' => $target->body_type,
             'tags_json' => $tagsJson,
             'body' => $target->body,
+            'description' => $target->description,
         ]);
+    }
+
+    public function post(UpsertPost $input)
+    {
+        $post = Post::create([
+            'title' => $input->title,
+            'body_type' => $input->body_type,
+            'body' => $input->body,
+            'user_id' => Auth::id(),
+            'description' => $input->description,
+        ]);
+        $tags = json_decode($input->tags_json);
+        $post->tags()->sync($this->tagsToIds($tags));
+
+        return redirect()
+            ->route('posts.show', ['id' => $post->id])
+            ->with('status', __('statuses.post-created'));
     }
 
     public function update(Request $request, UpsertPost $input)
@@ -79,10 +78,30 @@ class PostsCreationController extends Controller
             'title' => $input->title,
             'body_type' => $input->body_type,
             'body' => $input->body,
+            'description' => $input->description,
         ])->save();
+        $tags = json_decode($input->tags_json);
+        $target->tags()->sync($this->tagsToIds($tags));
 
         return redirect()
             ->route('posts.show', ['id' => $target->id])
             ->with('status', __('statuses.post-updated'));
+    }
+
+    /**
+     * タグを全て存在する状態にしてそれらの ID を返す
+     */
+    private function tagsToIds(array $tags): array
+    {
+        $tagIds = [];
+        foreach ($tags as $tagName) {
+            if (!is_string($tagName)) {
+                continue;
+            }
+            $tag = Tag::firstOrCreate(['name' => $tagName]);
+            $tagIds[] = $tag->id;
+        }
+
+        return $tagIds;
     }
 }

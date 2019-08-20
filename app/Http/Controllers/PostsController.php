@@ -34,8 +34,9 @@ class PostsController extends Controller
         $id = $post->id;
         $title = $post->title;
         $articleHtml = $format->toHtml();
+        $description = $post->description;
         $tags = $post->tags;
 
-        return view('posts.show', compact('id', 'articleHtml', 'title', 'tags', 'author', 'isAuthor'));
+        return view('posts.show', compact('id', 'articleHtml', 'title', 'description', 'tags', 'author', 'isAuthor'));
     }
 }

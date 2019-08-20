@@ -23,8 +23,12 @@
                 </details>
             @endif
         </div>
-        <p>
-            あまりにもさみしいのでここになんか説明文が書けるようになるかもしれない。ならないかもしれない。
+        <p class="summary">
+            @if($description)
+                {{ $description }}
+            @else
+                @lang('labels.no-description')
+            @endif
         </p>
 
         @if($tags->isNotEmpty())

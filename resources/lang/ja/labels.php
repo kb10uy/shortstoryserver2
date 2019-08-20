@@ -19,6 +19,8 @@ return [
     'tags' => 'タグ',
     'tags-placeholder' => 'タグを入力して Enter で確定',
     'body-text' => '本文',
+    'description' => '説明文(任意、 500 文字以内)',
+    'no-description' => '(説明はありません)',
     'author-menu' => '作者メニュー',
     'menu' => 'メニュー',
 ];

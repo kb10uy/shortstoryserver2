@@ -28,6 +28,10 @@
             </select>
         </div>
         <div class="pair">
+            <label for="body">@lang('labels.description')</label>
+            <textarea name="description" id="description" cols="30" rows="3"></textarea>
+        </div>
+        <div class="pair">
             <label for="body">@lang('labels.body-text')</label>
             <textarea name="body" id="body" cols="30" rows="10"></textarea>
         </div>
