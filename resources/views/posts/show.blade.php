@@ -27,11 +27,13 @@
             あまりにもさみしいのでここになんか説明文が書けるようになるかもしれない。ならないかもしれない。
         </p>
 
-        <ul class="tags">
-            <li class="tag">タグは</li>
-            <li class="tag">このように</li>
-            <li class="tag">表示されます</li>
-        </ul>
+        @if($tags->isNotEmpty())
+            <ul class="tags">
+                @foreach($tags as $tag)
+                    <li class="tag">{{ $tag->name }}</li>
+                @endforeach
+            </ul>
+        @endif
     </div>
     <hr>
 

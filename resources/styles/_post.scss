@@ -78,11 +78,16 @@ section.post-summary {
     }
   }
 
+  p.summary {
+    margin: 0;
+  }
+
   // タグ一覧
   ul.tags {
     display: flex;
     padding: 0;
     margin: 0;
+    margin-top: 10px;
     gap: 10px;
 
     li {

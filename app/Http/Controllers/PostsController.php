@@ -11,14 +11,14 @@ class PostsController extends Controller
 {
     public function latest()
     {
-        $posts = Post::with('user')->orderBy('updated_at', 'desc')->paginate(10);
+        $posts = Post::with(['user', 'tags'])->orderBy('updated_at', 'desc')->paginate(10);
 
         return view('posts.latest', compact('posts'));
     }
 
     public function show(Request $request)
     {
-        $post = Post::findOrFail($request->id);
+        $post = Post::with(['user', 'tags'])->findOrFail($request->id);
         $author = $post->user;
         $isAuthor = Auth::check() && Auth::user()->id === $author->id;
 
@@ -34,7 +34,8 @@ class PostsController extends Controller
         $id = $post->id;
         $title = $post->title;
         $articleHtml = $format->toHtml();
+        $tags = $post->tags;
 
-        return view('posts.show', compact('id', 'articleHtml', 'title', 'author', 'isAuthor'));
+        return view('posts.show', compact('id', 'articleHtml', 'title', 'tags', 'author', 'isAuthor'));
     }
 }
