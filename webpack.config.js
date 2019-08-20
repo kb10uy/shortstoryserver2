@@ -11,6 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 module.exports = {
   entry: {
     app: ['./resources/scripts/app.ts', './resources/styles/app.scss'],
+    'edit-post': './resources/scripts/pages/edit-post.ts',
   },
 
   output: {
@@ -20,6 +21,9 @@ module.exports = {
 
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.scss'],
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js',
+    },
   },
 
   module: {
@@ -28,6 +32,9 @@ module.exports = {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules|vendor/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        },
       },
       {
         test: /\.scss$/,
@@ -86,10 +93,10 @@ module.exports = {
         to: './images'
       },
     ]),
-    new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[hash].css',
     }),
+    new VueLoaderPlugin(),
     new LaravelMixManifest(),
   ],
 };

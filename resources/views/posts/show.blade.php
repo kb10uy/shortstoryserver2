@@ -28,9 +28,9 @@
         </p>
 
         <ul class="tags">
-            <li>タグは</li>
-            <li>このように</li>
-            <li>表示されます</li>
+            <li class="tag">タグは</li>
+            <li class="tag">このように</li>
+            <li class="tag">表示されます</li>
         </ul>
     </div>
     <hr>

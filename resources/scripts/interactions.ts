@@ -57,10 +57,10 @@ export function enableCheckboxes(): void {
       checkbox.focus();
       e.preventDefault();
     });
-    checkbox.addEventListener('focus', (e): void => {
+    checkbox.addEventListener('focus', (): void => {
       label.classList.add('focused');
     });
-    checkbox.addEventListener('blur', (e): void => {
+    checkbox.addEventListener('blur', (): void => {
       label.classList.remove('focused');
     });
   }

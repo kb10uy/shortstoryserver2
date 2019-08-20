@@ -2,8 +2,12 @@
 
 @section('title', __('titles.posts-new'))
 
+@section('includes')
+<script defer src="{{ mix('/scripts/edit-post.js') }}"></script>
+@endsection
+
 @section('content')
-<div class="container">
+<div class="container" id="app">
     <h1>@lang('titles.posts-new')</h1>
 
     <form name="newpost" method="POST" action="{{ route('posts.post') }}" onsubmit="return false;">
@@ -11,6 +15,10 @@
         <div class="pair">
             <label for="title">@lang('labels.title')</label>
             <input type="text" name="title" id="title">
+        </div>
+        <div class="pair">
+            <label for="tags">タグ</label>
+            <tag-editor></tag-editor>
         </div>
         <div class="pair">
             <label for="body_type">@lang('labels.body-format')</label>
