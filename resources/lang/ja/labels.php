@@ -16,6 +16,8 @@ return [
     'new-bookmark' => '新しいブックマーク',
     'title' => 'タイトル',
     'body-format' => '本文のフォーマット',
+    'tags' => 'タグ',
+    'tags-placeholder' => 'タグを入力して Enter で確定',
     'body-text' => '本文',
     'author-menu' => '作者メニュー',
     'menu' => 'メニュー',

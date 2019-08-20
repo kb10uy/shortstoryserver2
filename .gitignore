@@ -1,4 +1,5 @@
 /node_modules
+/public/favicon.ico
 /public/hot
 /public/storage
 /public/scripts

@@ -92,6 +92,10 @@ module.exports = {
         from: './resources/assets/images',
         to: './images'
       },
+      {
+        from: './resources/assets/favicon.ico',
+        to: './favicon.ico',
+      },
     ]),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[hash].css',

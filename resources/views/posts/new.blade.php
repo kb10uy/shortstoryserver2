@@ -4,6 +4,7 @@
 
 @section('includes')
 <script defer src="{{ mix('/scripts/edit-post.js') }}"></script>
+<link rel="stylesheet" href="{{ mix('/styles/edit-post.css') }}" media="all">
 @endsection
 
 @section('content')
@@ -17,8 +18,8 @@
             <input type="text" name="title" id="title">
         </div>
         <div class="pair">
-            <label for="tags">タグ</label>
-            <tag-editor></tag-editor>
+            <label for="tags">@lang('labels.tags')</label>
+            <tag-editor placeholder="{{ __('labels.tags-placeholder') }}"></tag-editor>
         </div>
         <div class="pair">
             <label for="body_type">@lang('labels.body-format')</label>
