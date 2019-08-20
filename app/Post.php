@@ -15,6 +15,11 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     /**
      * body_type パラメータによって body から HTML を生成する。
      * HTML として安全な文字列を返さなければならない。
