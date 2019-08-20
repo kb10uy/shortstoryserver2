@@ -1,5 +1,23 @@
 ul.pagination {
   display: flex;
+  justify-content: center;
   padding: 0;
-  margin: 10px auto;
+  margin: 10px;
+  list-style-type: none;
+
+  li {
+    box-sizing: border-box;
+    padding: 8px;
+    min-width: 40px;
+    border: 1px solid $body-color-br;
+    text-align: center;
+
+    &:first-child {
+      border-radius: 10px 0 0 10px;
+    }
+
+    &:last-child {
+      border-radius: 0 10px 10px 0;
+    }
+  }
 }
