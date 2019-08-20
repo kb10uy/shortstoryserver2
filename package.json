@@ -3,7 +3,8 @@
   "scripts": {
     "development": "webpack --mode development --progress --hide-modules",
     "watch": "webpack --mode development --progress --hide-modules --watch",
-    "production": "webpack --mode production --no-progress --hide-modules"
+    "production": "webpack --mode production --no-progress --hide-modules",
+    "lint:style": "stylelint --fix ./resources/styles/**/*.scss"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.0.0",

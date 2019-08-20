@@ -7,10 +7,10 @@ ul.pagination {
 
   li {
     box-sizing: border-box;
-    padding: 8px;
     min-width: 40px;
-    border: 1px solid $body-color-br;
+    padding: 8px;
     text-align: center;
+    border: 1px solid $body-color-br;
 
     &:first-child {
       border-radius: 10px 0 0 10px;
