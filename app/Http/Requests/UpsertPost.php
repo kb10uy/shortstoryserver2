@@ -28,6 +28,7 @@ class UpsertPost extends FormRequest
             'title' => 'required|max:128',
             'body_type' => ['required', Rule::in(['s3wf2'])],
             'body' => 'required|max:1024000',
+            'tags_json' => 'required|json',
         ];
     }
 }

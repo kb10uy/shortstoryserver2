@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Illuminate\Http\Request;
 use App\Post;
+use App\Tag;
 use App\Http\Requests\UpsertPost;
 
 class PostsCreationController extends Controller
@@ -28,6 +29,17 @@ class PostsCreationController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        $tags = json_decode($input->tags_json);
+        $tagIds = [];
+        foreach ($tags as $tagName) {
+            if (!is_string($tagName)) {
+                continue;
+            }
+            $tag = Tag::firstOrCreate(['name' => $tagName]);
+            $tagIds[] = $tag->id;
+        }
+        $post->tags()->sync($tagIds);
+
         return redirect()
             ->route('posts.show', ['id' => $post->id])
             ->with('status', __('statuses.post-created'));
@@ -35,7 +47,7 @@ class PostsCreationController extends Controller
 
     public function edit(Request $request)
     {
-        $target = Post::findOrFail($request->id);
+        $target = Post::with('tags')->findOrFail($request->id);
         $user = Auth::user();
         if ($user->cant('edit', $target)) {
             return redirect()
@@ -43,10 +55,12 @@ class PostsCreationController extends Controller
                 ->with('error', __('statuses.not-your-post'));
         }
 
+        $tagsJson = json_encode($target->tags->map(function ($tag) { return $tag->name; })->toArray());
         return view('posts.edit', [
             'id' => $target->id,
             'title' => $target->title,
             'body_type' => $target->body_type,
+            'tags_json' => $tagsJson,
             'body' => $target->body,
         ]);
     }

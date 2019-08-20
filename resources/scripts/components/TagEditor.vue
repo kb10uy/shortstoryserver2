@@ -1,7 +1,7 @@
 <template>
   <div>
     <input type="text" name="composition" :placeholder="placeholder" v-model="tagText" @keypress.enter.prevent="addTag">
-    <input type="hidden" name="tags_json" id="tags_json">
+    <input type="hidden" name="tags_json" id="tags_json" :value="tagsJson">
     <ul class="tags">
       <li class="tag" v-for="(tag, index) of tags" :key="index">
         {{ tag }}
@@ -32,12 +32,17 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    initialTags: {
+      type: String,
+      required: false,
+      default: '[]',
+    },
   },
 
   data() {
     return {
       // 設定されているタグ
-      tags: [] as string[],
+      tags: JSON.parse(this.initialTags) as string[],
 
       // 入力中のタグ
       tagText: '',
