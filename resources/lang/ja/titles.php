@@ -13,6 +13,7 @@ return [
     'help-about' => 'ShortStoryServer について',
     'help-terms' => '利用規約',
     'help-playground' => 'Playground',
+    'users-profile' => ':name さんのプロフィール',
     'posts-latest' => '最近の投稿',
     'posts-new' => '新しい作品を投稿する',
     'posts-edit' => '作品を編集する',

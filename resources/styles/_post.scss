@@ -94,8 +94,8 @@ section.post-summary {
       display: inline;
       padding: 2px 6px;
       font-size: 0.9rem;
-      color: #fff;
-      background-color: #26f;
+      color: $tag-color-fg;
+      background-color: $tag-color-bg;
       border-radius: 4px;
 
       a {

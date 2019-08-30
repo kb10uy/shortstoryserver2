@@ -9,5 +9,5 @@
     <li><a href="#">@lang('actions.menu-seriesmanagement')</a></li>
     <li><a href="#">@lang('actions.menu-bookmarksmanagement')</a></li>
     <li><a href="#">@lang('actions.menu-setting')</a></li>
-    <li><a href="#">@lang('actions.auth-logout')</a></li>
+    <li><a href="{{ route('logout') }}" onclick="document.getElementById('logout').submit(); return false;">@lang('actions.auth-logout')</a></li>
 </ul>
