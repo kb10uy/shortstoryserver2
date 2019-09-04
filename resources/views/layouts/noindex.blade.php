@@ -6,7 +6,7 @@
         <meta name="robots" content="noindex,nofollow,noarchive">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @include('components.includes')
-        @include('includes')
+        @yield('includes')
         <title>@yield('title') - ShortStoryServer</title>
     </head>
     <body>
