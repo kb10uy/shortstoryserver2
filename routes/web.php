@@ -13,9 +13,7 @@
 
 Auth::routes();
 
-Route::get('/', function () {
-    return view('index');
-})->name('index');
+Route::get('/', 'HomeController@index')->name('index');
 
 Route::prefix('/help')->group(function () {
     Route::get('/about', 'HelpController@about')->name('help.about');
