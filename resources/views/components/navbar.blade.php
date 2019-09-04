@@ -1,8 +1,8 @@
 <header>
     <nav class="navbar">
-        <span class="logo">
+        <a class="logo" href="/">
             <img src="/images/newlogo.png" alt="kbS3">
-            <a href="/" class="item">ShortStoryServer</a>
+            <span class="title">ShortStoryServer</span>
         </span>
         <div class="menu">
             <a href="{{ route('posts.latest') }}" class="item">@lang('actions.menu-list')</a>

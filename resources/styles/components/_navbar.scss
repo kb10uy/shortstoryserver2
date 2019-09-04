@@ -26,6 +26,9 @@ header {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-size: 2rem;
+      color: $navbar-color-fg;
+      text-decoration: none;
 
       img {
         width: 40px;
@@ -36,11 +39,7 @@ header {
         }
       }
 
-      a {
-        font-size: 2rem;
-        color: $navbar-color-fg;
-        text-decoration: none;
-
+      .title {
         @include mq-sp {
           display: none;
         }
