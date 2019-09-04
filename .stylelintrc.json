@@ -9,6 +9,8 @@
   "rules": {
     "max-empty-lines": 1,
     "no-descending-specificity": null,
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": null,
     "rule-empty-line-before": [
       "always",
       {
