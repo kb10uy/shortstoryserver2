@@ -37,7 +37,7 @@ class AllowedUsername implements Rule
         }
 
         return preg_match('/^[a-z0-9_]{2,64}$/iu', $value)
-            && in_array($value, self::PROHIBITED_NAMES);
+            && !in_array($value, self::PROHIBITED_NAMES);
     }
 
     public function message()
