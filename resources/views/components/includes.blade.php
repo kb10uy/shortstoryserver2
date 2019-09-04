@@ -6,4 +6,3 @@
 <link rel="stylesheet" href="{{ mix('/styles/app.css') }}">
 <link rel="icon" href="/favicon.ico">
 <script defer src="{{ mix('/scripts/vendor.js') }}"></script>
-<script defer src="{{ mix('/scripts/app.js') }}"></script>

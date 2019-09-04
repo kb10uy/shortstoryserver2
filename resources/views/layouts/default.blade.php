@@ -12,5 +12,6 @@
         @include('components.navbar')
         @include('components.alerts')
         @yield('content')
+        <script defer src="{{ mix('/scripts/app.js') }}"></script>
     </body>
 </html>
