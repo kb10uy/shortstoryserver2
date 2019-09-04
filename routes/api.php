@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,5 +12,5 @@ use Illuminate\Http\Request;
  */
 
 Route::prefix('/users')->group(function () {
-    Route::get('/latest_posts', 'UsersController@latestPosts')->name('api.users.latest-post');
+    Route::get('/latest_posts', 'UsersController@latestPosts')->name('api.users.latest-posts');
 });

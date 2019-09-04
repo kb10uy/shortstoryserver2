@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="container" id="app">
-    <user-profile name="{{ $user->name }}" avatar="{{ $user->avatar_url }}">
+    <user-profile name="{{ $user->name }}" avatar="{{ $user->avatar_url }}" user-id="{{ $user->id }}">
         <template v-slot:posts-count>{{ $postsCount }}</template>
         <template v-slot:series-count>0</template>
         <template v-slot:bookmarks-count>0</template>

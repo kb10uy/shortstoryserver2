@@ -20,6 +20,11 @@
       <span class="label" for="user-profile-bookmarks">ブックマーク</span>
     </div>
   </div>
+
+  <transition-group name="items" tag="div">
+    <post-item class="items-item" v-for="post of posts" :key="post.id" :post="post" />
+  </transition-group>
+  <spinner :loading="loading" />
 </div>
 </template>
 
@@ -27,8 +32,6 @@
 @import '../../styles/variables';
 
 .user-profile {
-  color: $floating-color-fg;
-
   .avatar-box {
     display: grid;
     grid-template-columns: 1fr minmax(100px, 400px) 1fr;
@@ -56,6 +59,7 @@
 
   .counts-box {
     display: flex;
+    color: $floating-color-fg;
     background-color: $floating-color-bg;
     border: 1px solid $floating-color-br;
     border-top: 0;
@@ -92,20 +96,45 @@
     }
   }
 }
+
+.items-item {
+  transition: 0.3s opacity;
+}
+
+.items-enter, .items-leave-to {
+  opacity: 0;
+}
+
+.items-leave-active {
+  position: absolute;
+}
 </style>
 
 <script lang="ts">
+import { kbs3 } from '../bootstrap';
 import Vue from 'vue';
+import Spinner from './Spinner.vue';
+import PostItem from './PostItem.vue';
 
 interface UserProfileData {
   posts: any[] | false;
   series: any[] | false;
   bookmarks: any[] | false;
+  loading: boolean;
 }
 
 export default Vue.extend({
+  components: {
+    PostItem,
+    Spinner,
+  },
+
   props: {
     name: {
+      type: String,
+      required: true,
+    },
+    userId: {
       type: String,
       required: true,
     },
@@ -120,11 +149,27 @@ export default Vue.extend({
       posts: false,
       series: false,
       bookmarks: false,
+      loading: false,
     };
   },
 
-  methods: {
+  computed: {
+    hasMore(): boolean {
+      // TODO: なんかやる
+      return false;
+    },
+  },
 
+  async mounted() {
+    await this.loadPosts();
+  },
+
+  methods: {
+    async loadPosts() {
+      this.loading = true;
+      this.posts = (await kbs3.get(`/api/users/latest_posts?user_id=${this.userId}`)).data;
+      this.loading = false;
+    },
   },
 });
 </script>

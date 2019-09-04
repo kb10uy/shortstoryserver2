@@ -1,9 +1,10 @@
 import Vue from 'vue';
 import UserProfile from './../components/UserProfile.vue';
 
-new Vue({
-  el: '#app',
+const app = new Vue({
   components: {
     UserProfile,
   },
 });
+
+app.$mount('#app');

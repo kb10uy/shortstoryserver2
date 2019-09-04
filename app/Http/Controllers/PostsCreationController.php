@@ -16,7 +16,7 @@ class PostsCreationController extends Controller
     }
 
     /**
-     * GET /posts/new
+     * GET /posts/new.
      */
     public function new()
     {
@@ -24,7 +24,7 @@ class PostsCreationController extends Controller
     }
 
     /**
-     * GET /posts/:id/edit
+     * GET /posts/:id/edit.
      */
     public function edit(Request $request)
     {
@@ -37,6 +37,7 @@ class PostsCreationController extends Controller
         }
 
         $tagsJson = json_encode($target->tags->map(function ($tag) { return $tag->name; })->toArray());
+
         return view('posts.edit', [
             'id' => $target->id,
             'title' => $target->title,
@@ -89,7 +90,7 @@ class PostsCreationController extends Controller
     }
 
     /**
-     * タグを全て存在する状態にしてそれらの ID を返す
+     * タグを全て存在する状態にしてそれらの ID を返す.
      */
     private function tagsToIds(array $tags): array
     {

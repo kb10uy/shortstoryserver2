@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Rule;
 class AllowedUsername implements Rule
 {
     /**
-     * キーワード的に使えないユーザー名
+     * キーワード的に使えないユーザー名.
      */
     protected const PROHIBITED_NAMES = [
         'root',
@@ -25,8 +25,9 @@ class AllowedUsername implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function passes($attribute, $value)
