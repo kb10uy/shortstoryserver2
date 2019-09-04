@@ -3,10 +3,19 @@
   grid-template-columns: 200px 1fr;
   gap: 10px;
 
+  @include mq-tab {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
   .left {
     display: grid;
     gap: 10px;
     grid-column: 1;
+
+    @include mq-tab {
+      grid-row: 1;
+    }
 
     .profile {
       display: grid;
@@ -74,5 +83,10 @@
 
   .right {
     grid-column: 2;
+
+    @include mq-tab {
+      grid-column: 1;
+      grid-row: 2;
+    }
   }
 }

@@ -1,0 +1,14 @@
+$bp-smartphone-max: 420px;
+$bp-tablet-max: 800px;
+
+@mixin mq-sp {
+  @media (max-width: $bp-smartphone-max) {
+    @content;
+  }
+}
+
+@mixin mq-tab {
+  @media (max-width: $bp-tablet-max) {
+    @content;
+  }
+}

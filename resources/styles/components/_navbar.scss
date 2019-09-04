@@ -17,6 +17,11 @@ header {
     padding: 0 10px;
     margin: 0 auto;
 
+    @include mq-tab {
+      grid-template-rows: max-content max-content;
+      grid-template-columns: max-content 1fr max-content;
+    }
+
     .logo {
       display: flex;
       align-items: center;
@@ -25,18 +30,31 @@ header {
       img {
         width: 40px;
         height: 40px;
+
+        @include mq-sp {
+          margin-top: 4px;
+        }
       }
 
       a {
-        grid-column: 1;
         font-size: 2rem;
         color: $navbar-color-fg;
         text-decoration: none;
+
+        @include mq-sp {
+          display: none;
+        }
       }
     }
 
     .menu {
       grid-column: 2;
+
+      @include mq-tab {
+        display: flex;
+        grid-row: 2;
+        grid-column: 1 / 4;
+      }
 
       a.item {
         position: relative;
@@ -133,6 +151,10 @@ header {
       grid-column: 4;
       align-items: center;
       cursor: pointer;
+
+      @include mq-tab {
+        grid-column: 3;
+      }
 
       img.avatar {
         width: 40px;

@@ -1,3 +1,4 @@
+@if (session('status') || session('error') || $errors->isNotEmpty())
 <div class="container" id="statuses">
     @if (session('status'))
         <div class="alert success" role="alert">
@@ -18,3 +19,4 @@
         </div>
     @endforeach
 </div>
+@endif

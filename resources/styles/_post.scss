@@ -5,6 +5,12 @@
   grid-template-columns: 1fr max-content;
   align-items: flex-start;
 
+  @include mq-tab {
+    grid-template-rows: repeat(4, max-content);
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
   h1 {
     grid-column: 1;
   }
@@ -22,6 +28,11 @@
     border: 1px solid $floating-color-br;
     border-radius: 8px;
     gap: 8px;
+
+    @include mq-tab {
+      grid-row: 4;
+      grid-column: 1;
+    }
 
     & > img {
       grid-column: 1;
@@ -139,9 +150,9 @@ article.post {
 
   code {
     padding: 4px;
+    line-height: calc(1rem + 16px);
     background-color: rgba(192, 192, 192, 0.4);
     border-radius: 4px;
-    line-height: calc(1rem + 16px);
   }
 
   span.line {
