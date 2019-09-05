@@ -1,6 +1,6 @@
 @extends('layouts.noindex')
 
-@section('title', __('titles.posts-latest'))
+@section('title', __('titles.search-tag', ['name' => e($query)]))
 
 @section('content')
 <div class="container">
