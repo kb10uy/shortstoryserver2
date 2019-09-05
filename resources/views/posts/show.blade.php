@@ -34,7 +34,7 @@
         @if($tags->isNotEmpty())
             <ul class="tags">
                 @foreach($tags as $tag)
-                    <li class="tag">{{ $tag->name }}</li>
+                    <li class="tag"><a href="{{ route('search.tag', ['q' => $tag->name]) }}">{{ $tag->name }}</a></li>
                 @endforeach
             </ul>
         @endif

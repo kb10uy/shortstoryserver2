@@ -36,3 +36,7 @@ Route::prefix('/posts')->group(function () {
 Route::prefix('/users')->group(function () {
     Route::get('/{name}', 'UsersController@show')->name('users.show');
 });
+
+Route::prefix('/search')->group(function () {
+    Route::get('/tag', 'SearchController@tag')->name('search.tag');
+});

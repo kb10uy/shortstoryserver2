@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>@lang('titles.posts-latest')</h1>
+    <h1>@lang('titles.search-tag', ['name' => e($query)])</h1>
 
     @foreach($posts as $post)
         @component('components.post-block', ['post' => $post])

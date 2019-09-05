@@ -24,6 +24,7 @@ class UsersController extends Controller
         ]);
 
         $postsQuery = Post::select(['id', 'title', 'description'])
+            ->with('tags')
             ->where('user_id', $validated['user_id']);
         if (isset($validated['max_id'])) {
             $postsQuery = $postsQuery->where('id', '<', $validated['max_id']);
