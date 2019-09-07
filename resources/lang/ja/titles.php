@@ -12,6 +12,7 @@ return [
     'auth-resetpassword' => 'パスワードのリセット',
     'auth-sentverification' => '確認メールを送信しました',
     'dashboard-top' => 'ダッシュボード',
+    'dashboard-posts' => '投稿管理',
     'help-about' => 'ShortStoryServer について',
     'help-terms' => '利用規約',
     'help-playground' => 'Playground',

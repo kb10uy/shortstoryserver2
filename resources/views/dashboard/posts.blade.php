@@ -1,17 +1,17 @@
 @extends('layouts.noindex')
 
-@section('title', __('titles.dashboard-top'))
+@section('title', __('titles.dashboard-posts'))
 
 @section('content')
 <div class="container">
     <div class="dashboard">
         <div class="left">
-            @component('dashboard.sidebar', ['selected' => 'dashboard'])
+            @component('dashboard.sidebar', ['selected' => 'posts'])
             @endcomponent
         </div>
         <div class="right">
             <div class="box">
-                <h1>@lang('titles.dashboard-top')</h1>
+                <h1>@lang('titles.dashboard-posts')</h1>
 
                 <!-- 作品 -->
                 <h2>@lang('labels.new-post')</h2>

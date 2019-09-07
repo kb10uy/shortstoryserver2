@@ -22,7 +22,10 @@ Route::prefix('/help')->group(function () {
     Route::get('/terms', 'HelpController@terms')->name('help.terms');
 });
 
-Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard.index');
+Route::prefix('/dashboard')->group(function () {
+    Route::get('/', 'DashboardController@dashboard')->name('dashboard.index');
+    Route::get('/posts', 'DashboardController@posts')->name('dashboard.posts');
+});
 
 Route::prefix('/posts')->group(function () {
     Route::get('/new', 'PostsCreationController@new')->name('posts.new');

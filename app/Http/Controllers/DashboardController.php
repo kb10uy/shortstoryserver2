@@ -16,4 +16,12 @@ class DashboardController extends Controller
     {
         return view('dashboard.index');
     }
+
+    /**
+     * 投稿管理画面.
+     */
+    public function posts()
+    {
+        return view('dashboard.posts');
+    }
 }
