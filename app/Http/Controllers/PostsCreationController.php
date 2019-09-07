@@ -45,6 +45,7 @@ class PostsCreationController extends Controller
             'tags_json' => $tagsJson,
             'body' => $target->body,
             'description' => $target->description,
+            'visibility' => $target->visibility,
         ]);
     }
 
@@ -56,6 +57,7 @@ class PostsCreationController extends Controller
             'body' => $input->body,
             'user_id' => Auth::id(),
             'description' => $input->description,
+            'visibility' => $input->visibility,
         ]);
         $tags = json_decode($input->tags_json);
         $post->tags()->sync($this->tagsToIds($tags));
@@ -80,6 +82,7 @@ class PostsCreationController extends Controller
             'body_type' => $input->body_type,
             'body' => $input->body,
             'description' => $input->description,
+            'visibility' => $input->visibility,
         ])->save();
         $tags = json_decode($input->tags_json);
         $target->tags()->sync($this->tagsToIds($tags));

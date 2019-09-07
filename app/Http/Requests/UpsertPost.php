@@ -30,6 +30,7 @@ class UpsertPost extends FormRequest
             'body' => 'required|max:1024000',
             'tags_json' => 'required|json',
             'description' => 'nullable|max:500',
+            'visibility' => ['required', Rule::in(['public', 'unlisted', 'draft', 'hidden'])],
         ];
     }
 }

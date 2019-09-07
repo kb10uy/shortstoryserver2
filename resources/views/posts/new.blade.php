@@ -35,6 +35,17 @@
             <label for="body">@lang('labels.body-text')</label>
             <textarea name="body" id="body" cols="30" rows="10"></textarea>
         </div>
+
+        <hr>
+        <div class="pair">
+            <label for="visibility">@lang('labels.visibility')</label>
+            <select id="visibility" name="visibility">
+                <option value="public" selected>@lang('labels.visibility-public')</option>
+                <option value="unlisted">@lang('labels.visibility-unlisted')</option>
+                <option value="draft">@lang('labels.visibility-draft')</option>
+                <option value="hidden">@lang('labels.visibility-hidden')</option>
+            </select>
+        </div>
         <div class="pair">
             <button type="button" class="button" onclick="newpost.submit();">@lang('actions.posts-submit')</button>
         </div>

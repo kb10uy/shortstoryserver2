@@ -24,6 +24,7 @@ class SearchController extends Controller
         } else {
             $posts = $tag
                 ->posts()->with(['user', 'tags'])
+                ->public()
                 ->orderBy('updated_at', 'desc')
                 ->paginate(10);
         }

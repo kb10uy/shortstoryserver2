@@ -21,4 +21,13 @@ class PostPolicy
     {
         return $user->id === $post->user_id;
     }
+
+    public function view(?User $user, Post $post)
+    {
+        if ($post->isAccessible()) {
+            return true;
+        }
+
+        return $user && $post->user_id === $user->id;
+    }
 }

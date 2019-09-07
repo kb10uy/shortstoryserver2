@@ -3,6 +3,7 @@
 // タイトルのテキストを登録
 
 return [
+    'error-403' => 'ちくしょう！',
     'error-404' => 'おおっと！',
     'index-motto' => 'Something black, something awesome.',
     'auth-signup' => 'サインアップ',

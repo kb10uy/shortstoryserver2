@@ -36,6 +36,18 @@
             <label for="body">@lang('labels.body-text')</label>
             <textarea name="body" id="body" cols="30" rows="10">{{ $body }}</textarea>
         </div>
+
+        <hr>
+        <div class="pair">
+            <label for="visibility">@lang('labels.visibility')</label>
+            <select id="visibility" name="visibility" value="{{ $visibility }}">
+                <!-- TODO: もっとまともな書き方を模索する -->
+                <option value="public" @if($visibility === 'public') selected @endif>@lang('labels.visibility-public')</option>
+                <option value="unlisted" @if($visibility === 'unlisted') selected @endif>@lang('labels.visibility-unlisted')</option>
+                <option value="draft" @if($visibility === 'draft') selected @endif>@lang('labels.visibility-draft')</option>
+                <option value="hidden" @if($visibility === 'hidden') selected @endif>@lang('labels.visibility-hidden')</option>
+            </select>
+        </div>
         <div class="pair">
             <button type="button" class="button" onclick="editpost.submit();">@lang('actions.posts-update')</button>
         </div>
