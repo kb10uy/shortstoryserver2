@@ -30,7 +30,7 @@
         </div>
         <div class="pair">
             <label for="body">@lang('labels.description')</label>
-            <textarea name="description" id="description" cols="30" rows="3"></textarea>
+            <textarea name="description" id="description" cols="30" rows="3">{{ $description }}</textarea>
         </div>
         <div class="pair">
             <label for="body">@lang('labels.body-text')</label>
