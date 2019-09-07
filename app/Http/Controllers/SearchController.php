@@ -9,7 +9,7 @@ use App\Tag;
 class SearchController extends Controller
 {
     /**
-     * タグ検索
+     * タグ検索.
      */
     public function tag(Request $request)
     {
