@@ -1,6 +1,11 @@
 <template>
-  <section class="post-summary">
-    <h2><a :href="postLink">{{ post.title }}</a></h2>
+  <section class="post-summary" :class="post.visibility || 'public'">
+    <h2>
+      <a :href="postLink">{{ post.title }}</a>
+      <small v-if="post.visibility === 'hidden'">(非公開)</small>
+      <small v-else-if="post.visibility === 'draft'">(下書き)</small>
+      <small v-else-if="post.visibility === 'unlisted'">(未収載)</small>
+    </h2>
     <p class="summary" v-if="post.description !== null">
       {{ post.description }}
     </p>
@@ -10,6 +15,20 @@
     </ul>
   </section>
 </template>
+
+<style lang="scss" scoped>
+.unlisted {
+  background-color: rgba(200, 255, 216, 0.3);
+}
+
+.draft {
+  background-color: rgba(255, 255, 200, 0.3);
+}
+
+.hidden {
+  background-color: rgba(255, 200, 200, 0.3);
+}
+</style>
 
 <script lang="ts">
 import Vue from 'vue';

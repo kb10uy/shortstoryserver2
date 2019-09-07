@@ -38,4 +38,27 @@ class UsersController extends Controller
 
         return response()->json($posts);
     }
+
+    public function latestUserPosts(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|numeric',
+            'max_id' => 'nullable|numeric',
+        ]);
+
+        $postsQuery = Post::select(['id', 'title', 'description', 'visibility'])
+            ->with('tags')
+            ->where('user_id', $validated['user_id']);
+
+        if (isset($validated['max_id'])) {
+            $postsQuery = $postsQuery->where('id', '<', $validated['max_id']);
+        }
+
+        $posts = $postsQuery
+            ->orderBy('updated_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json($posts);
+    }
 }

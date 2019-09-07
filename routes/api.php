@@ -13,4 +13,5 @@
 
 Route::prefix('/users')->group(function () {
     Route::get('/latest_posts', 'UsersController@latestPosts')->name('api.users.latest-posts');
+    Route::get('/latest_user_posts', 'UsersController@latestUserPosts')->name('api.users.latest-user-posts');
 });
