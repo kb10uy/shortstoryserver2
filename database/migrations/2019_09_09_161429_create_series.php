@@ -8,8 +8,6 @@ class CreateSeries extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -38,8 +36,6 @@ class CreateSeries extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

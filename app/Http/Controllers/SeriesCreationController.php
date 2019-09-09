@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Auth;
 use App\Series;
 use App\Http\Requests\UpsertSeries;
@@ -21,7 +20,7 @@ class SeriesCreationController extends Controller
 
     public function post(UpsertSeries $request)
     {
-        $series = new Series;
+        $series = new Series();
         $series->title = $request->title;
         $series->description = $request->description;
         $series->user_id = Auth::user()->id;

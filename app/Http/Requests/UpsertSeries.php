@@ -25,7 +25,7 @@ class UpsertSeries extends FormRequest
     {
         return [
             'title' => 'required|max:128',
-            'description' =>'nullable|max:500',
+            'description' => 'nullable|max:500',
         ];
     }
 }
