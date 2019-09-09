@@ -1,6 +1,6 @@
 @extends('layouts.default')
 
-@section('title', $title)
+@section('title', htmlspecialchars($title))
 
 @section('content')
 <div class="container">

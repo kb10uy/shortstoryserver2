@@ -28,7 +28,7 @@
                 <p>
                     続編も投稿したのですか？いいですね！シリーズ機能を活用して読者に対するナビゲーションを効率化しましょう！
                 </p>
-                <button class="button" disabled>@lang('actions.dashboard-newseries')</button>
+                <a href="{{ route('series.new') }}" class="button">@lang('actions.dashboard-newseries')</a>
 
                 <hr>
 

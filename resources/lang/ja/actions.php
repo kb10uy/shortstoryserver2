@@ -27,4 +27,5 @@ return [
     'posts-submit' => '投稿する',
     'posts-update' => '更新する',
     'posts-edit' => '編集する',
+    'series-submit' => '作成する',
 ];

@@ -17,6 +17,7 @@ class CreateSeries extends Migration
             $table->bigIncrements('id');
             $table->string('title', 128)->notNullable();
             $table->string('description', 500);
+            $table->bigInteger('user_id')->notNullable()->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
 

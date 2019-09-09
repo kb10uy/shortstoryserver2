@@ -20,5 +20,6 @@ return [
     'posts-latest' => '最近の投稿',
     'posts-new' => '新しい作品を投稿する',
     'posts-edit' => '作品を編集する',
+    'series-new' => '新しいシリーズを作成する',
     'search-tag' => 'タグ :name の検索結果',
 ];
