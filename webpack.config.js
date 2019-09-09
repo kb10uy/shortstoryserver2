@@ -14,6 +14,7 @@ module.exports = {
     'dashboard': './resources/scripts/pages/dashboard.ts',
     'edit-post': './resources/scripts/pages/edit-post.ts',
     'show-user': './resources/scripts/pages/show-user.ts',
+    'show-post': './resources/scripts/pages/show-post.ts',
   },
 
   output: {

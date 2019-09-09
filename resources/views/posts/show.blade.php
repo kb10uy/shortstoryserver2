@@ -2,9 +2,14 @@
 
 @section('title', htmlspecialchars($title))
 
+@section('includes')
+<script defer src="{{ mix('/scripts/show-post.js') }}"></script>
+<link rel="stylesheet" href="{{ mix('/styles/show-post.css') }}" media="all">
+@endsection
+
 @section('content')
 <div class="container">
-    <div class="post-info">
+    <div class="post-info" id="app">
         <h1>{{ $title }}</h1>
         <div class="user">
             <img src="{{ $author->avatar_url }}" alt="{{ $author->name }}">
@@ -15,7 +20,8 @@
             @if($isAuthor)
                 <details class="author">
                     <summary>@lang('labels.author-menu')</summary>
-                    <a href="{{ route('posts.edit', ['id' => $id]) }}">@lang('actions.posts-edit')</a>
+                    <a href="{{ route('posts.edit', ['id' => $id]) }}">@lang('actions.posts-edit')</a><br>
+                    <a @click="showSeriesDialog" href="#">@lang('actions.posts-edit')</a>
                 </details>
             @else
                 <details>
@@ -38,6 +44,10 @@
                 @endforeach
             </ul>
         @endif
+
+        <modal-dialog button-type="ok-cancel" v-if="shown.series" @dialog-ok="addToSeries" @dialog-closed="shown.series = false">
+            <template v-slot:label>シリーズに追加</template>
+        </modal-dialog>
     </div>
     <hr>
 
