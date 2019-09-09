@@ -36,6 +36,12 @@ Route::prefix('/posts')->group(function () {
     Route::get('/{id}', 'PostsController@show')->name('posts.show');
 });
 
+Route::prefix('/series')->group(function () {
+    Route::get('/new', 'SeriesCreationController@new')->name('series.new');
+    Route::post('/new', 'SeriesCreationController@post')->name('series.post');
+    Route::get('/{id}', 'SeriesController@show')->name('series.show');
+});
+
 Route::prefix('/users')->group(function () {
     Route::get('/{name}', 'UsersController@show')->name('users.show');
 });
