@@ -7,6 +7,7 @@ $check-color-fg-ac: rgb(245, 249, 255);
 $check-color-bg-ac: rgb(46, 130, 255);
 $check-color-bg-hv: rgb(87, 154, 255);
 $button-color-bg-ds: rgb(189, 200, 216);
+$button-color-bg-wr: rgb(230, 115, 115);
 
 form {
   .pair {
@@ -142,6 +143,10 @@ form {
     background-color: $button-color-bg-ds;
     filter: none;
     outline: 0;
+  }
+
+  &.warning {
+    background-color: $button-color-bg-wr;
   }
 }
 

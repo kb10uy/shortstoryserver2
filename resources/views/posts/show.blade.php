@@ -21,7 +21,7 @@
                 <details class="author">
                     <summary>@lang('labels.author-menu')</summary>
                     <a href="{{ route('posts.edit', ['id' => $id]) }}">@lang('actions.posts-edit')</a><br>
-                    <a @click="showSeriesDialog" href="#">@lang('actions.posts-edit')</a>
+                    <a @click="showSeriesDialog" href="#">@lang('actions.posts-add-to-series')</a>
                 </details>
             @else
                 <details>
@@ -45,8 +45,20 @@
             </ul>
         @endif
 
-        <modal-dialog button-type="ok-cancel" v-if="shown.series" @dialog-ok="addToSeries" @dialog-closed="shown.series = false">
+        <modal-dialog v-cloak button-type="ok-cancel" v-if="shown.series" @dialog-ok="addToSeries({{ $id }})" @dialog-closed="shown.series = false">
             <template v-slot:label>シリーズに追加</template>
+            <p>
+                作品をシリーズに追加すると、シリーズのページからもこの作品にアクセスできるようになるほか、
+                登録されているシリーズが作品ページにも表示されます。
+            </p>
+            <form>
+                <div class="pair">
+                    <label for="dialog-series">追加先</label>
+                    <select id="dialog-series" name="series_target" v-model="selectedSeries">
+                        <option v-for="seriesItem of series" :key="seriesItem.id" :value="seriesItem.id">@{{ seriesItem.title }}</option>
+                    </select>
+                </div>
+            </form>
         </modal-dialog>
     </div>
     <hr>

@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\User;
 use App\Post;
+use App\Series;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy
@@ -20,6 +21,11 @@ class PostPolicy
     public function edit(User $user, Post $post)
     {
         return $user->id === $post->user_id;
+    }
+
+    public function addToSeries(User $user, Post $post, Series $series)
+    {
+        return $user->id === $post->user_id && $user->id === $series->user_id;
     }
 
     public function view(?User $user, Post $post)

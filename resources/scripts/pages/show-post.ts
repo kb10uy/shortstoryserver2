@@ -26,8 +26,21 @@ const app = new Vue({
       this.shown.series = true;
     },
 
-    async addToSeries() {
-      if (this.selectedSeries === -1) return;
+    async addToSeries(postId: number) {
+      if (this.selectedSeries === -1) {
+        this.shown.series = false;
+        return;
+      }
+
+      try {
+        const result = await kbs3.post('/api/series/push', {
+          post_id: postId,
+          series_id: this.selectedSeries,
+        });
+        alert(result.data.status);
+      } catch (e) {
+        alert('追加できませんでした。');
+      }
       this.shown.series = false;
     },
   },

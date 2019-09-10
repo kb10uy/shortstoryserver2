@@ -8,8 +8,8 @@
     <slot></slot>
     <hr>
     <div class="buttons">
-      <button class="button" @click="onClosed">キャンセル</button>
-      <button class="button" @click="onOk" v-if="buttonType === 'ok-cancel'">OK</button>
+      <button class="warning button" @click="onClosed">キャンセル</button>
+      <button class="button" @click="onOk" v-if="buttonType === 'ok-cancel'">&nbsp;&nbsp;O K&nbsp;&nbsp;</button>
       <button class="button" @click="onOk" v-if="buttonType === 'submit-cancel'">送信</button>
     </div>
   </div>
@@ -37,6 +37,7 @@
     margin: 10px;
     padding: 10px;
     min-width: 200px;
+    max-width: 600px;
     background-color: $floating-color-bg;
     border: 1px solid $floating-color-br;
     border-radius: 10px;
