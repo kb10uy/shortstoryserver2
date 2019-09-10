@@ -66,7 +66,7 @@ export default Vue.extend({
   methods: {
     async loadPosts() {
       this.loading = true;
-      this.posts = (await kbs3.get(`/api/users/latest_user_posts?user_id=${this.userId}`)).data;
+      this.posts = (await kbs3.get(`/api/users/latest_user_posts`)).data;
       this.loading = false;
     },
   },

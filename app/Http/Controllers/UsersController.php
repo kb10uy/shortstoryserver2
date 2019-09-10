@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
 use App\Post;
 use App\User;
+use App\Series;
 
 class UsersController extends Controller
 {
@@ -42,13 +44,12 @@ class UsersController extends Controller
     public function latestUserPosts(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|numeric',
             'max_id' => 'nullable|numeric',
         ]);
 
         $postsQuery = Post::select(['id', 'title', 'description', 'visibility'])
             ->with('tags')
-            ->where('user_id', $validated['user_id']);
+            ->where('user_id', Auth::user()->id);
 
         if (isset($validated['max_id'])) {
             $postsQuery = $postsQuery->where('id', '<', $validated['max_id']);
@@ -60,5 +61,25 @@ class UsersController extends Controller
             ->get();
 
         return response()->json($posts);
+    }
+
+    public function latestUserSeries(Request $request)
+    {
+        $validated = $request->validate([
+            'max_id' => 'nullable|numeric',
+        ]);
+
+        $seriesQuery = Series::select(['id', 'title', 'description'])
+            ->where('user_id', Auth::user()->id);
+
+        if (isset($validated['max_id'])) {
+            $seriesQuery = $seriesQuery->where('id', '<', $validated['max_id']);
+        }
+
+        $series = $seriesQuery
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json($series);
     }
 }
