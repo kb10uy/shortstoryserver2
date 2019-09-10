@@ -12,7 +12,7 @@ use App\Post;
 class SeriesController extends Controller
 {
     /**
-     * GET /series/{id}
+     * GET /series/{id}.
      */
     public function show(Request $request)
     {
@@ -25,7 +25,7 @@ class SeriesController extends Controller
     }
 
     /**
-     * POST /api/series/push
+     * POST /api/series/push.
      */
     public function push(Request $request)
     {
@@ -46,9 +46,9 @@ class SeriesController extends Controller
         $seriesCount = DB::table('series_posts')
             ->where('series_id', $series->id)
             ->count();
-        $now = new DateTime;
+        $now = new DateTime();
 
-        DB::table('series_posts')->insert([
+        DB::table('series_posts')->insertOrIgnore([
             'series_id' => $series->id,
             'post_id' => $post->id,
             'order' => $seriesCount + 1,
