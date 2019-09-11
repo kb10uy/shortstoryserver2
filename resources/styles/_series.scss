@@ -20,3 +20,44 @@ section.series-summary {
   }
 }
 
+table.series-editor {
+  display: block;
+  width: 100%;
+  user-select: none;
+
+  thead {
+    tr {
+      background-color: #ddd;
+    }
+  }
+
+  tbody {
+    tr {
+      height: 2rem;
+      border: solid #aaa;
+      border-width: 1px 0;
+
+      &:first-child {
+        border-top: 0;
+      }
+
+      td.handle {
+        width: 60px;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      td.title {
+        width: 2000px;
+      }
+
+      td.date {
+        width: 320px;
+      }
+    }
+
+    tr:hover {
+      background-color: #eff;
+    }
+  }
+}

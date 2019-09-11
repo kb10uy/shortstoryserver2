@@ -71,4 +71,18 @@ class SeriesController extends Controller
         return response()
             ->json(['status' => '追加しました。'], 201);
     }
+
+    public function editOrder(Request $request)
+    {
+        $user = Auth::user();
+        $series = Series::findOrFail($request->id);
+        if ($user->cant('edit', $series)) {
+            return redirect()
+                ->route('index')
+                ->with('error', __('statuses.not-your-seriess', ['title' => $series->title]));
+        }
+
+        $posts = $series->posts()->orderBy('pivot_order')->get();
+        return view('series.edit-order', compact('series', 'posts'));
+    }
 }

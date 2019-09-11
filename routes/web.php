@@ -39,6 +39,10 @@ Route::prefix('/posts')->group(function () {
 Route::prefix('/series')->group(function () {
     Route::get('/new', 'SeriesCreationController@new')->name('series.new');
     Route::post('/new', 'SeriesCreationController@post')->name('series.post');
+    Route::middleware('auth')->group(function () {
+        Route::get('/{id}/edit_order', 'SeriesController@editOrder')->name('series.edit-order');
+    });
+
     Route::get('/latest', 'SeriesController@latest')->name('series.latest');
     Route::get('/{id}', 'SeriesController@show')->name('series.show');
 });

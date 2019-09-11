@@ -6,4 +6,5 @@ return [
     'post-not-found' => 'その作品は存在しないか、非公開に設定されています。',
     'not-your-post' => ':title はあなたの作品ではありません。',
     'series-created' => 'シリーズを作成しました！',
+    'not-your-series' => ':title はあなたのシリーズではありません。',
 ];
