@@ -20,44 +20,26 @@ section.series-summary {
   }
 }
 
-table.series-editor {
-  display: block;
+.series-editor {
   width: 100%;
   user-select: none;
 
-  thead {
-    tr {
-      background-color: #ddd;
+  .item {
+    display: grid;
+    grid-template-columns: min-content max-content 1fr max-content;
+    grid-template-rows: max-content;
+    gap: 10px;
+    padding: 10px;
+
+    background-color: $floating-color-bg;
+    border: 1px solid $floating-color-br;
+
+    .handle {
+      grid-column: 1;
+      cursor: move;
     }
-  }
-
-  tbody {
-    tr {
-      height: 2rem;
-      border: solid #aaa;
-      border-width: 1px 0;
-
-      &:first-child {
-        border-top: 0;
-      }
-
-      td.handle {
-        width: 60px;
-        text-align: center;
-        cursor: pointer;
-      }
-
-      td.title {
-        width: 2000px;
-      }
-
-      td.date {
-        width: 320px;
-      }
-    }
-
-    tr:hover {
-      background-color: #eff;
-    }
+    .order { grid-column: 2; }
+    .title { grid-column: 3; }
+    .date { grid-column: 4; }
   }
 }

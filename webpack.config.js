@@ -12,6 +12,7 @@ module.exports = {
   entry: {
     app: ['./resources/scripts/app.ts', './resources/styles/app.scss'],
     'dashboard': './resources/scripts/pages/dashboard.ts',
+    'edit-series': './resources/scripts/pages/edit-series.ts',
     'edit-post': './resources/scripts/pages/edit-post.ts',
     'show-user': './resources/scripts/pages/show-user.ts',
     'show-post': './resources/scripts/pages/show-post.ts',
