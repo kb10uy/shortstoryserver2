@@ -5,8 +5,14 @@
             <span class="title">ShortStoryServer</span>
         </span>
         <div class="menu">
-            <a href="{{ route('posts.latest') }}" class="item">@lang('actions.menu-list')</a>
+            <a class="item" data-dropdown="list-dropdown">@lang('actions.menu-list')</a>
+            <div id="list-dropdown" class="dropdown" data-dropdown-merge>
+                <a class="item" href="{{ route('posts.latest') }}">@lang('actions.posts-latest')</a>
+                <a class="item" href="{{ route('series.latest') }}">@lang('actions.series-latest')</a>
+            </div>
+
             <a href="#" class="item">@lang('actions.menu-search')</a>
+
             <a class="item" data-dropdown="help-dropdown">@lang('actions.menu-help')</a>
             <div id="help-dropdown" class="dropdown" data-dropdown-merge>
                 <a href="{{ route('help.playground') }}" class="item">@lang('actions.help-playground')</a>

@@ -25,6 +25,18 @@ class SeriesController extends Controller
     }
 
     /**
+     * GET /series/latest.
+     */
+    public function latest(Request $request)
+    {
+        $series = Series::with('user')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+
+        return view('series.latest', compact('series'));
+    }
+
+    /**
      * POST /api/series/push.
      */
     public function push(Request $request)

@@ -1,0 +1,22 @@
+// /series/latest などで表示するアイテム
+section.series-summary {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid $body-color-br;
+  border-radius: 10px;
+
+  h2 {
+    & > a {
+      text-decoration: none;
+    }
+
+    & > small {
+      color: $body-color-fg-dim;
+    }
+  }
+
+  p.summary {
+    margin: 0;
+  }
+}
+

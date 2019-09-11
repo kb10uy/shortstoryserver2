@@ -28,5 +28,7 @@ return [
     'posts-update' => '更新する',
     'posts-edit' => '編集する',
     'posts-add-to-series' => 'シリーズに追加する',
+    'posts-latest' => '最近の作品',
     'series-submit' => '作成する',
+    'series-latest' => '最近のシリーズ',
 ];
