@@ -21,6 +21,7 @@ return [
     'posts-new' => '新しい作品を投稿する',
     'posts-edit' => '作品を編集する',
     'series-new' => '新しいシリーズを作成する',
+    'series-edit' => 'シリーズ情報の編集',
     'series-edit-order' => ':title に登録されている作品の並べ替え・削除',
     'series-latest' => '最近のシリーズ',
     'search-tag' => 'タグ :name の検索結果',

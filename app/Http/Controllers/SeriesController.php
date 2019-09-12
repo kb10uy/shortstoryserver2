@@ -18,10 +18,10 @@ class SeriesController extends Controller
     {
         /** @var Series */
         $series = Series::with('user')->findOrFail($request->id);
-
         $posts = $series->posts()->orderBy('pivot_order')->get();
+        $isAuthor = Auth::check() && Auth::user()->id === $series->user->id;
 
-        return view('series.show', compact('series', 'posts'));
+        return view('series.show', compact('series', 'posts', 'isAuthor'));
     }
 
     /**
@@ -73,7 +73,7 @@ class SeriesController extends Controller
     }
 
     /**
-     * GET /series/{id}/edit_order
+     * GET /series/{id}/edit_order.
      */
     public function editOrder(Request $request)
     {
@@ -86,11 +86,12 @@ class SeriesController extends Controller
         }
 
         $posts = $series->posts()->orderBy('pivot_order')->get();
+
         return view('series.edit-order', compact('series', 'posts'));
     }
 
     /**
-     * GET /api/series/list_posts
+     * GET /api/series/list_posts.
      */
     public function listPosts(Request $request)
     {
@@ -102,7 +103,7 @@ class SeriesController extends Controller
         $series = Series::findOrFail($validated['series_id']);
         if ($user->cant('edit', $series)) {
             return response()
-                ->json(['error' =>  __('statuses.not-your-seriess', ['title' => $series->title])], 403);
+                ->json(['error' => __('statuses.not-your-seriess', ['title' => $series->title])], 403);
         }
 
         $posts = $series
@@ -110,6 +111,40 @@ class SeriesController extends Controller
             ->select(['posts.id as id', 'posts.title as title', 'posts.created_at as created_at', 'series_posts.order as original_order'])
             ->orderBy('pivot_order')
             ->get();
+
         return response()->json($posts);
+    }
+
+    /**
+     * POST /api/series/update.
+     */
+    public function update(Request $request)
+    {
+        $validated = $request->validate([
+            'series_id' => 'required|numeric',
+            'data' => 'required',
+        ]);
+        $user = Auth::user();
+        $series = Series::findOrFail($validated['series_id']);
+        if ($user->cant('edit', $series)) {
+            return response()
+                ->json(['error' => __('statuses.not-your-seriess', ['title' => $series->title])], 403);
+        }
+
+        $reorderedItems = collect($validated['data'])->filter(function ($item) {
+            return false === $item['remove'];
+        })->values();
+
+        // TODO: DELETE しなくて済む方法がありそうなんだよな
+        DB::table('series_posts')->where('series_id', $series->id)->delete();
+        DB::table('series_posts')->insert($reorderedItems->map(function ($item, $index) use ($series) {
+            return [
+                'series_id' => $series->id,
+                'post_id' => $item['post_id'],
+                'order' => $index + 1,
+            ];
+        })->toArray());
+
+        return response()->json($reorderedItems);
     }
 }

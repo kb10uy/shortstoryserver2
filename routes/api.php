@@ -25,5 +25,6 @@ Route::prefix('/series')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/list_posts', 'SeriesController@listPosts')->name('api.series.list-posts');
         Route::post('/push', 'SeriesController@push')->name('api.series.push');
+        Route::post('/update', 'SeriesController@update')->name('api.series.update');
     });
 });

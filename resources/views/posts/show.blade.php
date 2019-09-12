@@ -21,7 +21,7 @@
                 <details class="author">
                     <summary>@lang('labels.author-menu')</summary>
                     <a href="{{ route('posts.edit', ['id' => $id]) }}">@lang('actions.posts-edit')</a><br>
-                    <a @click="showSeriesDialog" href="#">@lang('actions.posts-add-to-series')</a>
+                    <a href="" onclick="return false;" @click="showSeriesDialog">@lang('actions.posts-add-to-series')</a>
                 </details>
             @else
                 <details>

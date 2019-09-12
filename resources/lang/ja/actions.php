@@ -30,5 +30,8 @@ return [
     'posts-add-to-series' => 'シリーズに追加する',
     'posts-latest' => '最近の作品',
     'series-submit' => '作成する',
+    'series-update' => '更新する',
+    'series-edit' => 'シリーズ情報の編集',
+    'series-edit-order' => '登録作品の並べ替え・削除',
     'series-latest' => '最近のシリーズ',
 ];

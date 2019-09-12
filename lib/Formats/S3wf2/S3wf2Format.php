@@ -191,6 +191,7 @@ class S3wf2Format extends Format
             $this->currentParagraph = $node;
             $this->paragraphInUse = true;
             $this->commitParagraph();
+
             return;
         }
 

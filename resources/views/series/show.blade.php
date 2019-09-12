@@ -8,6 +8,13 @@
 
     <p>{{ $series->description }}</p>
 
+    @if($isAuthor)
+    <p>
+        <a href="{{ route('series.edit', ['id' => $series->id]) }}">@lang('actions.series-edit')</a><br>
+        <a href="{{ route('series.edit-order', ['id' => $series->id]) }}">@lang('actions.series-edit-order')</a>
+    </p>
+    @endif
+
     @foreach($posts as $post)
         @component('components.post-block', ['post' => $post])
         @endcomponent
