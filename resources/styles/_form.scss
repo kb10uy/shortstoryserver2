@@ -91,11 +91,14 @@ form {
         display: inline-block;
         width: 1rem;
         height: 1rem;
+        padding: 0.1rem;
         margin-right: 8px;
         font-weight: bold;
         line-height: 1rem;
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
         color: $check-color-fg;
-        content: '✓';
+        content: '\f00c';
         background-color: $check-color-fg-ac;
         border: 1px solid $input-color-border;
         border-radius: 4px;
