@@ -19,6 +19,9 @@ class S3wf2Format extends Format
     private $allowedBlocks;
 
     /** @var Collection */
+    private $allowedNonClosingBlocks;
+
+    /** @var Collection */
     private $allowedPhrasings;
 
     /** @var CharacterSet */
@@ -86,17 +89,17 @@ class S3wf2Format extends Format
                     switch ($matches[1]) {
                         case ':':
                             $command = $matches[2];
-                            $rawParams = preg_split('/\s+/', $matches[4], -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $rawParams = preg_split('/\s+/', $matches[4] ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
                             $this->processSourceCommandLine($command, collect($rawParams));
                             break;
                         case '/':
                             $tag = $matches[2];
-                            $line = $matches[4];
+                            $line = $matches[4] ?? '';
                             $this->processSourceBlockLine($tag, $line);
                             break;
                         case '@':
                             $characterKey = $matches[2];
-                            $line = $matches[4];
+                            $line = $matches[4] ?? '';
                             $this->processSourceSpeechLine($characterKey, $line);
                             break;
                     }
@@ -180,6 +183,17 @@ class S3wf2Format extends Format
      */
     private function processSourceBlockLine(string $tag, string $line): void
     {
+        // 閉じタグできないやつは優先的に対応
+        $ncel = $this->allowedNonClosingBlocks->get($tag);
+        if ($ncel) {
+            $this->commitParagraph();
+            $node = new SingularNode($ncel[0]);
+            $this->currentParagraph = $node;
+            $this->paragraphInUse = true;
+            $this->commitParagraph();
+            return;
+        }
+
         $el = $this->allowedBlocks->get($tag);
         if (!$el) {
             throw new ParseErrorException("Unknown inline tag: $tag");
@@ -336,6 +350,9 @@ class S3wf2Format extends Format
     private function registerTags(): void
     {
         // 要素は [タグ, クラス]
+
+        $this->allowedNonClosingBlocks = collect();
+        $this->allowedNonClosingBlocks['hori'] = ['hr', ''];
 
         $this->allowedBlocks = collect();
         $this->allowedBlocks['para'] = ['p', ''];

@@ -38,6 +38,7 @@
                 <li><code>/subsec 小見出し</code> 小見出し。将来的にリンクが生成できるようになります</li>
                 <li><code>/para >>></code> 段落。あえて使う必要性はあまりありませんが……</li>
                 <li><code>/quote >>></code> 引用</li>
+                <li><code>/hori</code> 水平線</li>
             </ul>
 
             <h3>インライン要素</h3>
