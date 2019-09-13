@@ -38,8 +38,9 @@
     padding: 10px;
     min-width: 200px;
     max-width: 600px;
-    background-color: $floating-color-bg;
-    border: 1px solid $floating-color-br;
+    color: var(--color-floating-foreground);
+    background-color: var(--color-floating-background);
+    border: 1px solid var(--color-floating-border);
     border-radius: 10px;
     z-index: 101;
 
@@ -53,7 +54,7 @@
       }
 
       & > i {
-        color: $floating-color-fg;
+        color: var(--color-floating-foreground);
         font-size: 1.5rem;
         margin-left: 10px;
       }

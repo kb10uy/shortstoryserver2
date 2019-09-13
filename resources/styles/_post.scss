@@ -24,8 +24,9 @@
     grid-column: 2;
     align-items: flex-start;
     padding: 8px;
-    background-color: $floating-color-bg;
-    border: 1px solid $floating-color-br;
+    color: var(--color-floating-foreground);
+    background-color: var(--color-floating-background);
+    border: 1px solid var(--color-floating-border);
     border-radius: 8px;
     gap: 8px;
 
@@ -45,7 +46,7 @@
       grid-column: 2;
 
       small {
-        color: $body-color-fg-dim;
+        color: var(--color-body-foreground-dim);
       }
     }
 
@@ -76,7 +77,7 @@
 section.post-summary {
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid $body-color-br;
+  border: 1px solid var(--color-body-border);
   border-radius: 10px;
 
   h2 {
@@ -85,7 +86,7 @@ section.post-summary {
     }
 
     & > small {
-      color: $body-color-fg-dim;
+      color: var(--color-body-foreground-dim);
     }
   }
 
@@ -105,8 +106,8 @@ section.post-summary {
       display: inline;
       padding: 2px 6px;
       font-size: 0.9rem;
-      color: $tag-color-fg;
-      background-color: $tag-color-bg;
+      color: var(--color-tag-foreground);
+      background-color: var(--color-tag-background);
       border-radius: 4px;
 
       a {

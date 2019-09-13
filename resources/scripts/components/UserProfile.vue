@@ -36,8 +36,9 @@
     display: grid;
     grid-template-columns: 1fr minmax(100px, 400px) 1fr;
     grid-template-rows: max-content;
-    background-color: $floating-color-bg;
-    border: 1px solid $floating-color-br;
+    color: var(--color-floating-foreground);
+    background-color: var(--color-floating-background);
+    border: 1px solid var(--color-floating-border);
     border-radius: 10px 10px 0 0;
 
     .avatar-content {
@@ -59,9 +60,9 @@
 
   .counts-box {
     display: flex;
-    color: $floating-color-fg;
-    background-color: $floating-color-bg;
-    border: 1px solid $floating-color-br;
+    color: var(--color-floating-foreground);
+    background-color: var(--color-floating-background);
+    border: 1px solid var(--color-floating-border);
     border-top: 0;
     cursor: pointer;
 
@@ -79,7 +80,7 @@
         width: 100%;
         height: 5px;
         bottom: 0;
-        background-color: $tag-color-bg;
+        background-color: var(--color-tag-background);
         content: '';
       }
 

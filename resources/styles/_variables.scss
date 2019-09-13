@@ -19,3 +19,48 @@ $tag-author-color-fg: #fff;
 $tag-author-color-bg: #f76;
 $tag-color-fg: #fff;
 $tag-color-bg: #26f;
+
+@mixin mq-dark {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+:root {
+  --color-body-background: rgb(236, 246, 255);
+  --color-body-border: rgb(186, 209, 229);
+  --color-body-foreground: rgb(12, 25, 39);
+  --color-body-foreground-dim: rgb(59, 78, 97);
+
+  --color-floating-background: rgb(246, 251, 255);
+  --color-floating-background-dim: rgb(170, 201, 255);
+  --color-floating-border: rgb(213, 228, 255);
+  --color-floating-foreground: rgb(60, 66, 122);
+  --color-floating-hover-background: rgb(49, 111, 151);
+  --color-floating-hover-foreground: rgb(228, 244, 255);
+
+  --color-status-success-border: rgb(78, 201, 65);
+  --color-status-success-background: rgba(144, 255, 138, 0.6);
+  --color-status-error-border: rgb(255, 78, 65);
+  --color-status-error-background: rgba(255, 146, 138, 0.6);
+
+  --color-tag-author-foreground: #fff;
+  --color-tag-author-background: #f76;
+  --color-tag-foreground: #fff;
+  --color-tag-background: #26f;
+
+  @include mq-dark {
+    --color-body-background: rgb(61, 74, 84);
+    --color-body-border: rgb(186, 209, 229);
+    --color-body-foreground: rgb(230, 249, 247);
+    --color-body-foreground-dim: rgb(165, 187, 207);
+
+    --color-floating-background: rgb(85, 97, 116);
+    --color-floating-background-dim: rgb(118, 146, 171);
+    --color-floating-border: rgb(146, 170, 185);
+    --color-floating-foreground: rgb(209, 235, 255);
+    --color-floating-hover-background: rgb(197, 210, 244);
+    --color-floating-hover-foreground: rgb(68, 84, 95);
+  }
+}
+

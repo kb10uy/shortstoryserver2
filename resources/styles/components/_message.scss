@@ -13,8 +13,8 @@
   }
 
   &.error {
-    background-color: $status-error-bg;
-    border-color: $status-error-br;
+    background-color: var(--color-status-error-background);
+    border-color: var(--color-status-error-border);
   }
 }
 
@@ -33,12 +33,12 @@
   }
 
   &.success {
-    background-color: $status-success-bg;
-    border-color: $status-success-br;
+    background-color: var(--color-status-success-background);
+    border-color: var(--color-status-success-border);
   }
 
   &.error {
-    background-color: $status-error-bg;
-    border-color: $status-error-br;
+    background-color: var(--color-status-error-backgound);
+    border-color: var(--color-status-error-border);
   }
 }

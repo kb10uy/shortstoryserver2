@@ -10,7 +10,7 @@ ul.pagination {
     min-width: 40px;
     padding: 8px;
     text-align: center;
-    border: 1px solid $body-color-br;
+    border: 1px solid var(--color-body-border);
 
     &:first-child {
       border-radius: 10px 0 0 10px;

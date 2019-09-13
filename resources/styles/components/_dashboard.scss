@@ -36,7 +36,7 @@
       }
 
       .screen-name {
-        color: $body-color-fg-dim;
+        color: var(--color-body-foreground-dim);
       }
     }
 
@@ -50,20 +50,20 @@
         & > a {
           display: block;
           padding: 8px;
-          color: $floating-color-fg;
+          color: var(--color-floating-foreground);
           text-decoration: none;
-          background-color: $floating-color-bg;
-          border: 1px solid $floating-color-br;
+          background-color: var(--color-floating-background);
+          border: 1px solid var(--color-floating-border);
           transition: 0.15s color, 0.15s background-color;
 
           &.active {
             font-weight: bold;
-            background-color: $floating-color-bg-dim;
+            background-color: var(--color-floating-background-dim);
           }
 
           &:hover {
-            color: $floating-hover-color-fg;
-            background-color: $floating-hover-color-bg;
+            color: var(--color-floating-hover-foreground);
+            background-color: var(--color-floating-hover-background);
           }
         }
 
