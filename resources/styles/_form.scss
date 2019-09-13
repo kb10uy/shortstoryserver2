@@ -1,14 +1,3 @@
-$input-color-border: rgb(182, 182, 182);
-$input-color-disabled-bg: rgb(185, 185, 185);
-$input-color-border-fc: rgb(155, 195, 255);
-$input-color-shadow-fc: rgba(107, 166, 255, 0.7);
-$check-color-fg: rgba(245, 249, 255, 0);
-$check-color-fg-ac: rgb(245, 249, 255);
-$check-color-bg-ac: rgb(46, 130, 255);
-$check-color-bg-hv: rgb(87, 154, 255);
-$button-color-bg-ds: rgb(189, 200, 216);
-$button-color-bg-wr: rgb(230, 115, 115);
-
 form {
   .pair {
     margin: 10px auto;
@@ -38,30 +27,30 @@ form {
     width: 100%;
     padding: 6px;
     font-size: 1rem;
-    border: 1px solid $input-color-border;
+    border: 1px solid var(--color-input-border);
     border-radius: 6px;
     outline: 0;
     transition: 0.15s border, 0.15s filter;
 
     &:focus {
-      filter: drop-shadow(0 0 4px $input-color-shadow-fc);
-      border: 1px solid $input-color-border-fc;
+      filter: drop-shadow(0 0 4px var(--color-input-shadow-focus));
+      border: 1px solid var(--color-input-border-focus);
     }
 
     &[type=submit] {
       width: initial;
       padding: 6px 10px;
-      color: $check-color-fg-ac;
-      background-color: $check-color-bg-ac;
+      color: var(--color-check-foreground-active);
+      background-color: var(--color-check-background-active);
       border: 0;
 
       &:hover {
-        background-color: $check-color-bg-hv;
+        background-color: var(--color-check-background-hover);
       }
     }
 
     &:disabled {
-      background-color: $input-color-disabled-bg;
+      background-color: var(--color-input-background-disabled);
     }
   }
 
@@ -70,7 +59,7 @@ form {
     width: 100%;
     padding: 6px;
     font-size: 1rem;
-    border: 1px solid $input-color-border;
+    border: 1px solid var(--color-input-border);
     border-radius: 6px;
     outline: 0;
     appearance: none;
@@ -97,21 +86,21 @@ form {
         line-height: 1rem;
         font-family: 'Font Awesome 5 Free';
         font-weight: 900;
-        color: $check-color-fg;
+        color: var(--color-check-foreground);
         content: '\f00c';
-        background-color: $check-color-fg-ac;
-        border: 1px solid $input-color-border;
+        background-color: var(--color-check-foreground-active);
+        border: 1px solid var(--color-input-border);
         border-radius: 4px;
         transition: 0.15s all;
       }
 
       &.checked::before {
-        color: $check-color-fg-ac;
-        background-color: $check-color-bg-ac;
+        color: var(--color-check-foreground-active);
+        background-color: var(--color-check-background-active);
       }
 
       &.focused::before {
-        filter: drop-shadow(0 0 4px $input-color-shadow-fc);
+        filter: drop-shadow(0 0 4px var(--color-input-shadow-focus));
       }
     }
   }
@@ -122,28 +111,28 @@ form {
   // display: block;
   padding: 6px 10px;
   font-size: 1rem;
-  color: $check-color-fg-ac;
-  background-color: $check-color-bg-ac;
-  border: 1px solid $input-color-border;
+  color: var(--color-check-foreground-active);
+  background-color: var(--color-check-background-active);
+  border: 1px solid var(--color-input-border);
   border-radius: 6px;
   outline: 0;
   transition: 0.15s border, 0.15s filter;
 
   &:focus {
-    filter: drop-shadow(0 0 4px $input-color-shadow-fc);
-    border: 1px solid $input-color-border-fc;
+    filter: drop-shadow(0 0 4px var(--color-input-shadow-focus));
+    border: 1px solid var(--color-input-border-focus);
     outline: 0;
   }
 
   &:hover {
-    color: $check-color-fg-ac;
+    color: var(--color-check-forground-active);
     text-decoration: none;
-    background-color: $check-color-bg-hv;
+    background-color: var(--color-check-background-hover);
   }
 
   &:disabled {
-    color: $check-color-fg-ac;
-    background-color: $button-color-bg-ds;
+    color: var(--color-check-foreground-active);
+    background-color: var(--color-button-background-disabled);
     filter: none;
     outline: 0;
   }
@@ -155,7 +144,7 @@ form {
   }
 
   &.warning {
-    background-color: $button-color-bg-wr;
+    background-color: var(--color-button-background-warning);
   }
 }
 
