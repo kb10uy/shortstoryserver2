@@ -44,6 +44,13 @@
                 @endforeach
             </ul>
         @endif
+        <div class="social">
+            @component('components.tissue-checkin')
+            @endcomponent
+            @component('components.tweet-button')
+            @endcomponent
+        </div>
+
 
         <modal-dialog v-cloak button-type="ok-cancel" v-if="shown.series" @dialog-ok="addToSeries({{ $id }})" @dialog-closed="shown.series = false">
             <template v-slot:label>シリーズに追加</template>

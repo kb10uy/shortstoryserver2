@@ -5,3 +5,4 @@
     crossorigin="anonymous">
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="{{ mix('/styles/app.css') }}">
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
