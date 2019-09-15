@@ -1,7 +1,6 @@
 a.share-button {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   padding: 2px 4px;
   border-radius: 4px;
   color: white;
@@ -12,6 +11,10 @@ a.share-button {
 
   &:hover {
     color: white;
+  }
+
+  & > span {
+    margin-left: 4px;
   }
 
   & i.fab {

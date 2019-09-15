@@ -19,7 +19,10 @@ ul.tags {
   padding: 0;
   margin: 0;
   margin-top: 10px;
-  gap: 10px;
+
+  li.tag {
+    margin-right: 10px;
+  }
 }
 </style>
 

@@ -9,10 +9,11 @@
   }
 
   .left {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
     grid-column: 1;
+    grid-auto-rows: max-content;
+    gap: 10px;
 
     @include mq-tab {
       grid-row: 1;
