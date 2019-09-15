@@ -47,7 +47,9 @@
         <div class="social">
             @component('components.tissue-checkin')
             @endcomponent
-            @component('components.tweet-button')
+            @component('components.mastodon-share', ['text' => "$title - ShortStoryServer"])
+            @endcomponent
+            @component('components.tweet-button', ['text' => "$title - ShortStoryServer"])
             @endcomponent
         </div>
 

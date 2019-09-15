@@ -1,0 +1,53 @@
+a.share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: none;
+  user-select: none;
+
+  &:hover {
+    color: white;
+  }
+
+  & i.fab {
+    font-weight: normal;
+    font-size: 0.8rem;
+  }
+
+  // Tissue チェックイン
+  &.tissue {
+    background-color: #e040fb;
+
+    &:hover {
+      background-color: #c838dc;
+    }
+
+    & > svg.logo {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  // Mastoshare
+  &.mastodon {
+    background-color: #2b90d9;
+
+    &:hover {
+      background-color: #217ec2;
+    }
+  }
+
+  // Twitter
+  &.twitter {
+    background-color: #1da1f2;
+
+    &:hover {
+      background-color: #198dd4;
+    }
+  }
+}
