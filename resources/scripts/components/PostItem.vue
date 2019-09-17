@@ -11,7 +11,7 @@
     </p>
     <p class="summary" v-else>(説明はありません)</p>
     <ul class="tags" v-if="post.tags.length > 0">
-      <li class="tag" v-for="tag of post.tags" :key="tag.id"><a :href="`/search/tag?q=${encodeURIComponent(tag.name)}`">{{ tag.name }}</a></li>
+      <li class="tag" v-for="tag of post.tags" :key="tag.id"><a :href="`/search?query=${encodeURIComponent(tag.name)}&type=tag`">{{ tag.name }}</a></li>
     </ul>
   </section>
 </template>
