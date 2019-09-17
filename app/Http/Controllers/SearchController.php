@@ -74,8 +74,8 @@ class SearchController extends Controller
         return view('search.index', [
             'titleKeyword' => $validated['query'] ?? '',
             'keyword' => $validated['query'] ?? '',
-            'selectedType' => $validated['type'],
-            'selectedSort' => $validated['sort'],
+            'selectedType' => $validated['type'] ?? 'keyword',
+            'selectedSort' => $validated['sort'] ?? 'updated',
             'searchResult' => $posts,
         ]);
     }
