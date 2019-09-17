@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Post;
 use App\User;
 use App\Tag;
