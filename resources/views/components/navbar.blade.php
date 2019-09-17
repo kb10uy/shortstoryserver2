@@ -11,7 +11,7 @@
                 <a class="item" href="{{ route('series.latest') }}">@lang('actions.series-latest')</a>
             </div>
 
-            <a href="#" class="item">@lang('actions.menu-search')</a>
+            <a href="{{ route('search.index') }}" class="item">@lang('actions.menu-search')</a>
 
             <a class="item" data-dropdown="help-dropdown">@lang('actions.menu-help')</a>
             <div id="help-dropdown" class="dropdown" data-dropdown-merge>
