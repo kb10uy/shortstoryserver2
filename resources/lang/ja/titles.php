@@ -24,5 +24,7 @@ return [
     'series-edit' => 'シリーズ情報の編集',
     'series-edit-order' => ':title に登録されている作品の並べ替え・削除',
     'series-latest' => '最近のシリーズ',
+    'search-index' => '検索',
+    'search-result' => ':result の検索結果',
     'search-tag' => 'タグ :name の検索結果',
 ];

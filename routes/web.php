@@ -54,5 +54,6 @@ Route::prefix('/users')->group(function () {
 });
 
 Route::prefix('/search')->group(function () {
+    Route::get('/', 'SearchController@index')->name('search.index');
     Route::get('/tag', 'SearchController@tag')->name('search.tag');
 });

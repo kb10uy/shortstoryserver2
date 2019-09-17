@@ -9,6 +9,14 @@ use App\Tag;
 class SearchController extends Controller
 {
     /**
+     * GET /search
+     */
+    public function index(Request $request)
+    {
+        return view('search.index');
+    }
+
+    /**
      * タグ検索.
      */
     public function tag(Request $request)
@@ -29,6 +37,10 @@ class SearchController extends Controller
                 ->paginate(10);
         }
 
-        return view('search.tag', compact('query', 'posts'));
+        return view('search.index', [
+            'titleKeyword' => $query,
+            'keyword' => $query,
+            'searchResult' => $posts,
+        ]);
     }
 }
