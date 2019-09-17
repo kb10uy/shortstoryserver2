@@ -102,7 +102,7 @@ class CharacterSet
      */
     private function invertColorCode(string $color): string
     {
-        $original = strlen($color) === 6 ? $color : "{$color[0]}{$color[0]}{$color[1]}{$color[1]}{$color[2]}{$color[2]}";
+        $original = 6 === strlen($color) ? $color : "{$color[0]}{$color[0]}{$color[1]}{$color[1]}{$color[2]}{$color[2]}";
         $red = hexdec(substr($original, 0, 2)) / 255.0;
         $green = hexdec(substr($original, 2, 2)) / 255.0;
         $blue = hexdec(substr($original, 4, 2)) / 255.0;
@@ -112,6 +112,7 @@ class CharacterSet
 
         $f2h = function (float $value) {
             $intValue = (int) ($value * 255.0);
+
             return str_pad(dechex($intValue), 2, '0');
         };
 
@@ -133,7 +134,7 @@ class CharacterSet
                 if ($hue < 0.0) {
                     $hue += 6.0;
                 }
-            } else if ($max === $green) {
+            } elseif ($max === $green) {
                 $hue = 2.0 + ($blue - $red) / $hue;
             } else {
                 $hue = 4.0 + ($red - $green) / $hue;
@@ -142,7 +143,7 @@ class CharacterSet
         $hue /= 6.0;
 
         $saturation = $max - $min;
-        if ($max != 0.0) {
+        if (0.0 != $max) {
             $saturation /= $max;
         }
 

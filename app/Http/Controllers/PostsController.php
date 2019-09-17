@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use DB;
 use Illuminate\Http\Request;
 use App\Post;
 use Lib\Formats\S3wf2\S3wf2Format;
