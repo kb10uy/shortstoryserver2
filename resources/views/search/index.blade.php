@@ -14,7 +14,7 @@ if (isset($searchResult)) {
 <div class="container">
     <h1>{{ $unescapedTitle }}</h1>
 
-    <form action="/search" method="post">
+    <form action="/search" method="get">
         <div class="pair">
             <label for="search-query">@lang('labels.search-query')</label>
             <input id="search-query" type="text" name="query" value="{{ $keyword ?: '' }}">
@@ -23,16 +23,16 @@ if (isset($searchResult)) {
             <div class="pair">
                 <label for="search-type">@lang('labels.search-type')</label>
                 <select id="search-type" name="type">
-                    <option value="keyword">@lang('labels.search-keyword')</option>
-                    <option value="tag">@lang('labels.search-tag')</option>
-                    <option value="user">@lang('labels.search-user')</option>
+                    <option {!! kbs3_option('keyword', $selectedType) !!}>@lang('labels.search-keyword')</option>
+                    <option {!! kbs3_option('tag', $selectedType) !!}>@lang('labels.search-tag')</option>
+                    <option {!! kbs3_option('user', $selectedType) !!}>@lang('labels.search-user')</option>
                 </select>
             </div>
             <div class="pair">
                 <label for="search-sort">@lang('labels.posts-sort')</label>
                 <select id="search-sort" name="sort">
-                    <option value="created">@lang('labels.sort-created')</option>
-                    <option value="updated">@lang('labels.sort-updated')</option>
+                    <option {!! kbs3_option('created', $selectedSort) !!}>@lang('labels.sort-created')</option>
+                    <option {!! kbs3_option('updated', $selectedSort) !!}>@lang('labels.sort-updated')</option>
                 </select>
             </div>
         </div>
