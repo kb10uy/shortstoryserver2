@@ -1,5 +1,5 @@
 [package]
-name = "s3wf2-wasm"
+name = "s3wf2-rs"
 version = "0.1.0"
 authors = ["Yuu Kobayashi <kb10uy@kb10uy.org>"]
 edition = "2018"
