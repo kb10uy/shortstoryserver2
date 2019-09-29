@@ -26,6 +26,7 @@ pub enum ErrorKind {
     TooManyTagOpening,
     TooManyTagClosing,
     NotEnoughParameters { given: usize, needed: usize },
+    Nonsurrounding,
     UnknownCommand(String),
     UnknownElement(String),
     Semantic(SemanticErrorKind),
@@ -41,6 +42,7 @@ impl fmt::Display for ErrorKind {
                 "Not enough parameters ({} given, {} needed)",
                 given, needed
             ),
+            ErrorKind::Nonsurrounding => write!(f, "Non-surrounding block detected"),
             ErrorKind::UnknownCommand(cmd) => write!(f, "Unknown command: {}", cmd),
             ErrorKind::UnknownElement(elm) => write!(f, "Unknown element: {}", elm),
             ErrorKind::Semantic(kind) => write!(f, "Semantic error ({})", kind),

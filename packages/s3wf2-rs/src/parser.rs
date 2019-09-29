@@ -1,5 +1,5 @@
 use crate::{
-    document::{BlockNode, CharacterSet, CharacterType, Document},
+    document::{Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode},
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
@@ -15,22 +15,17 @@ lazy_static! {
 }
 
 /// S3WF2 parser state.
-pub struct Parser<'a> {
-    characters: CharacterSet,
-    blocks: Vec<BlockNode<'a>>,
-}
+pub struct Parser {}
 
-impl<'a> Parser<'a> {
-    pub fn new() -> Parser<'a> {
-        Parser {
-            blocks: vec![],
-            characters: CharacterSet::new(4),
-        }
+impl<'a> Parser {
+    pub fn new() -> Parser {
+        Parser {}
     }
 
     /// Parses text and append the result to held document.
-    pub fn parse(&mut self, source: &'a str) -> Result<(), Error> {
+    pub fn parse(&mut self, source: &'a str) -> Result<Document<'a>, Error> {
         let lines = source.lines();
+        let mut document = Document::new();
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
@@ -41,85 +36,142 @@ impl<'a> Parser<'a> {
                 let cmd_type = captures.get(1).unwrap().as_str();
                 let name = captures.get(2).unwrap().as_str();
                 let rest = captures.get(2).map(|m| m.as_str());
-                self.parse_command_line(cmd_type, name, rest)
+                self.parse_command_line(&mut document, cmd_type, name, rest)
             } else {
-                self.parse_element_line(trimmed_line)
+                let parent_block = &mut document.uncommited_block;
+                self.parse_element_line(parent_block, trimmed_line)
             };
 
             line_parse_result.map_err(|kind| Error { kind, line_number })?;
         }
 
-        Ok(())
+        Ok(document)
     }
 
     fn parse_command_line(
         &mut self,
+        document: &mut Document,
         ctype: &'a str,
         name: &'a str,
         rest: Option<&'a str>,
     ) -> Result<(), ErrorKind> {
         match ctype {
-            ":" => self.parse_meta_command(name, rest),
-            "/" => self.parse_meta_block(name, rest),
-            "@" => self.parse_meta_line(name, rest),
+            ":" => self.parse_meta_command(document, name, rest),
+            "/" => self.parse_meta_block(document, name, rest),
+            "@" => self.parse_meta_line(document, name, rest),
             // Not included in regex, therefore unreachable
             _ => unreachable!("Unexpected command type"),
         }
     }
 
-    fn parse_element_line(&mut self, line: &'a str) -> Result<(), ErrorKind> {
-        let rest = line;
+    fn parse_element_line(
+        &mut self,
+        parent_block: &mut BlockNode<'a>,
+        line: &'a str,
+    ) -> Result<(), ErrorKind> {
+        let mut uncommited: Vec<ElementNode<'a>> = vec![];
+        let commited = match parent_block {
+            BlockNode::Surrounded { children, .. } => children,
+            _ => return Err(ErrorKind::Nonsurrounding),
+        };
+
+        let mut rest = line;
         loop {
-            let tag_captures = REGEX_ELEMENT_LINE.captures(line);
+            match REGEX_ELEMENT_LINE.captures(rest) {
+                Some(captures) => {
+
+                }
+                // whole `rest` is plain text
+                None => break,
+            }
         }
         Ok(())
     }
 
-    fn parse_meta_command(&mut self, name: &'a str, rest: Option<&'a str>) -> Result<(), ErrorKind> {
+    fn parse_meta_command(
+        &mut self,
+        document: &mut Document,
+        name: &'a str,
+        rest: Option<&'a str>,
+    ) -> Result<(), ErrorKind> {
         let params: Option<Vec<_>> = rest.map(|raw| REGEX_SPACES.split(raw).collect());
         match name {
             "character" => {
-                let params = params.ok_or(ErrorKind::NotEnoughParameters { given: 0, needed: 3})?;
+                let params = params.ok_or(ErrorKind::NotEnoughParameters {
+                    given: 0,
+                    needed: 3,
+                })?;
                 if params.len() < 3 {
                     Err(ErrorKind::NotEnoughParameters {
                         given: params.len(),
                         needed: 3,
                     })
                 } else {
-                    self.command_character(params[0], params[1], params[2])
+                    self.command_character(
+                        &mut document.characters,
+                        params[0],
+                        params[1],
+                        params[2],
+                    )
                 }
             }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
     }
 
-    fn parse_meta_block(&mut self, element: &'a str, rest: Option<&'a str>) -> Result<(), ErrorKind> {
+    fn parse_meta_block(
+        &mut self,
+        document: &mut Document,
+        element: &'a str,
+        rest: Option<&'a str>,
+    ) -> Result<(), ErrorKind> {
         Ok(())
     }
 
-    fn parse_meta_line(&mut self, element: &'a str, rest: Option<&'a str>) -> Result<(), ErrorKind> {
+    fn parse_meta_line(
+        &mut self,
+        document: &mut Document,
+        element: &'a str,
+        rest: Option<&'a str>,
+    ) -> Result<(), ErrorKind> {
         Ok(())
     }
 
     // command functions ------------------------------------------------------
 
-    fn command_character(&mut self, kind: &'a str, id: &'a str, name: &'a str) -> Result<(), ErrorKind> {
+    fn command_character(
+        &mut self,
+        character_set: &mut CharacterSet,
+        kind: &'a str,
+        id: &'a str,
+        name: &'a str,
+    ) -> Result<(), ErrorKind> {
         if !REGEX_CHARACTER_ID.is_match(id) {
-            return Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(format!("{} (invalid ID)", id))));
+            return Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
+                format!("{} (invalid ID)", id),
+            )));
         }
 
         match kind {
-            "male" => self.characters.add_male(id, name).map_err(|kind| ErrorKind::Semantic(kind)),
-            "female" => self.characters.add_female(id, name).map_err(|kind| ErrorKind::Semantic(kind)),
-            "mob" => self.characters.add_mob(id, name).map_err(|kind| ErrorKind::Semantic(kind)),
+            "male" => character_set
+                .add_male(id, name)
+                .map_err(|kind| ErrorKind::Semantic(kind)),
+            "female" => character_set
+                .add_female(id, name)
+                .map_err(|kind| ErrorKind::Semantic(kind)),
+            "mob" => character_set
+                .add_mob(id, name)
+                .map_err(|kind| ErrorKind::Semantic(kind)),
             colorcode => {
                 if !REGEX_COLORCODE.is_match(colorcode) {
-                    Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(format!("{} (invalid colorcode {})", id, colorcode))))
+                    Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
+                        format!("{} (invalid colorcode {})", id, colorcode),
+                    )))
                 } else {
                     // TODO: とっとと実装しろ
                     unimplemented!()
                 }
-            },
+            }
         }
     }
 }

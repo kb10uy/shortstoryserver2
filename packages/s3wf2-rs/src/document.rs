@@ -161,4 +161,15 @@ pub enum ElementNode<'a> {
 pub struct Document<'a> {
     pub(crate) characters: CharacterSet,
     pub(crate) blocks: Vec<BlockNode<'a>>,
+    pub(crate) uncommited_block: BlockNode<'a>,
+}
+
+impl<'a> Document<'a> {
+    pub(crate) fn new() -> Document<'a> {
+        Document {
+            characters: CharacterSet::new(4),
+            blocks: vec![],
+            uncommited_block: BlockNode::Surrounded { kind: Block::Paragraph, children: vec![] },
+        }
+    }
 }
