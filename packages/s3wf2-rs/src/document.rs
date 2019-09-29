@@ -1,23 +1,19 @@
+use crate::error::SemanticErrorKind;
 use std::collections::BTreeMap;
-
-/// Represents errors in document information.
-pub enum DocumentError {
-    ExistingCharacter,
-}
 
 /// Indicates the type of characters in document.
 pub enum CharacterType {
     /// Preset male character
-    Male(usize),
+    Male(usize, String),
 
     /// Preset female character
-    Female(usize),
+    Female(usize, String),
 
     /// Preset mob character
-    Mob(usize),
+    Mob(usize, String),
 
     /// Customized color character
-    Custom(String),
+    Custom(String, String),
 }
 
 /// The characters container.
@@ -42,37 +38,43 @@ impl CharacterSet {
     }
 
     /// Adds a male character.
-    pub fn add_male(&mut self, id: &str) -> Result<(), DocumentError> {
+    pub fn add_male(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
-            Err(DocumentError::ExistingCharacter)
+            Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
         } else {
             self.used_male += 1;
-            self.characters
-                .insert(id.to_string(), CharacterType::Male(self.used_male));
+            self.characters.insert(
+                id.to_string(),
+                CharacterType::Male(self.used_male, name.to_string()),
+            );
             Ok(())
         }
     }
 
     /// Adds a female character.
-    pub fn add_female(&mut self, id: &str) -> Result<(), DocumentError> {
+    pub fn add_female(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
-            Err(DocumentError::ExistingCharacter)
+            Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
         } else {
             self.used_female += 1;
-            self.characters
-                .insert(id.to_string(), CharacterType::Female(self.used_female));
+            self.characters.insert(
+                id.to_string(),
+                CharacterType::Female(self.used_female, name.to_string()),
+            );
             Ok(())
         }
     }
 
     /// Adds a mob character.
-    pub fn add_mob(&mut self, id: &str) -> Result<(), DocumentError> {
+    pub fn add_mob(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
-            Err(DocumentError::ExistingCharacter)
+            Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
         } else {
             self.used_mob += 1;
-            self.characters
-                .insert(id.to_string(), CharacterType::Mob(self.used_mob));
+            self.characters.insert(
+                id.to_string(),
+                CharacterType::Mob(self.used_mob, name.to_string()),
+            );
             Ok(())
         }
     }
@@ -82,10 +84,10 @@ impl CharacterSet {
         let character = self.characters.get(id)?;
 
         Some(match character {
-            CharacterType::Male(n) => format!("male-{}", n % self.preset_max),
-            CharacterType::Female(n) => format!("female-{}", n % self.preset_max),
-            CharacterType::Mob(n) => format!("mob-{}", n % self.preset_max),
-            CharacterType::Custom(_) => unimplemented!(),
+            CharacterType::Male(n, _) => format!("male-{}", n % self.preset_max),
+            CharacterType::Female(n, _) => format!("female-{}", n % self.preset_max),
+            CharacterType::Mob(n, _) => format!("mob-{}", n % self.preset_max),
+            CharacterType::Custom(_, _) => unimplemented!(),
         })
     }
 }
@@ -132,20 +134,24 @@ pub enum Element {
     Link(String),
 
     /// text with ruby
-    Ruby(String),
+    Ruby(Box<Element>),
 
     /// line, speech
     Line(String),
 }
 
-pub struct BlockNode<'a> {
-    kind: Block,
-    children: Vec<ElementNode<'a>>,
+pub enum BlockNode<'a> {
+    Singular(Block),
+    Surrounded {
+        kind: Block,
+        children: Vec<ElementNode<'a>>,
+    },
 }
 
 pub enum ElementNode<'a> {
     Text(&'a str),
-    Styled {
+    Singular(Element),
+    Surrounded {
         kind: Element,
         children: Vec<ElementNode<'a>>,
     },

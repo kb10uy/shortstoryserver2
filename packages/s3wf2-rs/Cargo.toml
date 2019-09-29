@@ -9,3 +9,6 @@ edition = "2018"
 [dependencies.regex]
 version = "1.3"
 features = ["std", "perf", "unicode-perl"]
+
+[dependencies.lazy_static]
+version = "1.4"
