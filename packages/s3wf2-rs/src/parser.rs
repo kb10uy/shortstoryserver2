@@ -9,7 +9,7 @@ lazy_static! {
     static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|/|@)([[:word:]]+)(\s+(.*))?$").unwrap();
     static ref REGEX_SPACES: Regex = Regex::new(r"\s+").unwrap();
     static ref REGEX_CHARACTER_ID: Regex = Regex::new(r"^[[:word:]]+$").unwrap();
-    static ref REGEX_COLORCODE: Regex = Regex::new(r"^[[:xdigit:]]{3,6}$").unwrap();
+    static ref REGEX_COLORCODE: Regex = Regex::new(r"^#([[:xdigit:]]{3,6})$").unwrap();
     // MEMO: 後方一致が無いのでキャプチャーグループの終端でもってマッチを終了させる
     static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[[:word:]]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
 }
@@ -352,19 +352,20 @@ impl<'a> Parser {
                 .map_err(ErrorKind::Semantic),
             "mob" => character_set.add_mob(id, name).map_err(ErrorKind::Semantic),
             colorcode => {
-                if !REGEX_COLORCODE.is_match(colorcode) {
-                    Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
-                        format!("{} (invalid colorcode {})", id, colorcode),
-                    )))
-                } else {
-                    match colorcode.len() {
+                if let Some(captured) = REGEX_COLORCODE.captures(colorcode) {
+                    let color = captured.get(1).unwrap().as_str();
+                    match color.len() {
                         3 | 6 => character_set
-                            .add_custom(id, name, colorcode)
+                            .add_custom(id, name, color)
                             .map_err(ErrorKind::Semantic),
                         _ => Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
                             format!("{} (invalid colorcode {})", id, colorcode),
                         ))),
                     }
+                } else {
+                    Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
+                        format!("{} (invalid colorcode {})", id, colorcode),
+                    )))
                 }
             }
         }
