@@ -1,17 +1,17 @@
 use crate::{
-    document::{Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode},
+    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode},
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|\/|@)([[:word:]]+)(\s+(.*))?$").unwrap();
+    static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|/|@)([[:word:]]+)(\s+(.*))?$").unwrap();
     static ref REGEX_SPACES: Regex = Regex::new(r"\s+").unwrap();
     static ref REGEX_CHARACTER_ID: Regex = Regex::new(r"^[[:word:]]+$").unwrap();
     static ref REGEX_COLORCODE: Regex = Regex::new(r"^[[:xdigit:]]{3,6}$").unwrap();
     // MEMO: 後方一致が無いのでキャプチャーグループの終端でもってマッチを終了させる
-    static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[[:word:]]+)[\]{\s]|[\]{}]").unwrap();
+    static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[[:word:]]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
 }
 
 /// S3WF2 parser state.
@@ -147,14 +147,14 @@ impl<'a> Parser {
         rest: Option<&'a str>,
     ) -> Result<(), ErrorKind> {
         let id = element.to_string();
-        if let None = characters.get(element) {
+        if characters.get(element).is_none() {
             return Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
                 id,
             )));
         }
 
         let mut children = vec![];
-        self.parse_normal(&mut children, rest.unwrap_or(""));
+        self.parse_normal(&mut children, rest.unwrap_or(""))?;
         parent_block.children.push(ElementNode::Surrounded {
             kind: Element::Line(id),
             parameters: vec![],
@@ -173,18 +173,107 @@ impl<'a> Parser {
 
         let mut rest = line;
         while let Some(captures) = REGEX_ELEMENT_LINE.captures(rest) {
-            let next_rest_start = 0;
+            // before tag separation
+            let whole_match = captures.get(0).unwrap();
+            let leading_text = ElementNode::Text(&rest[0..whole_match.start()]);
+            // TODO: 本当はこれを何回も書きたくない
+            if uncommited.is_empty() {
+                commited.push(leading_text);
+            } else {
+                match uncommited.last_mut().unwrap() {
+                    ElementNode::Surrounded { children, .. } => children.push(leading_text),
+                    ElementNode::Text(_) => unreachable!("Text node must not be pushed as a tag"),
+                }
+            }
+
+            let next_rest_start = if let Some(tag_start) = captures.get(1) {
+                let element = tag_start.as_str();
+                if element.starts_with('@') {
+                    // line element
+                    uncommited.push(ElementNode::new_surrounded(Element::Line(
+                        (&element[1..]).to_string(),
+                    )));
+                } else {
+                    // other
+                    let kind = Parser::parse_element_kind(element)?;
+                    uncommited.push(ElementNode::new_surrounded(kind));
+                }
+                let ending = captures.get(2).unwrap();
+                match ending.as_str() {
+                    "[" | "]" | "{" => tag_start.end(),
+                    "}" => return Err(ErrorKind::InvalidParenPair),
+                    _ => ending.end(),
+                }
+            } else {
+                match whole_match.as_str() {
+                    "]" => {
+                        let popped = uncommited.pop().ok_or(ErrorKind::TooManyTagClosing)?;
+                        match popped {
+                            ElementNode::Text(_) => {
+                                unreachable!("Text node must not be pushed as a tag")
+                            }
+                            ElementNode::Surrounded {
+                                kind: Element::Parameter,
+                                ..
+                            } => return Err(ErrorKind::InvalidParenPair),
+                            _ => {
+                                if uncommited.is_empty() {
+                                    commited.push(popped);
+                                } else {
+                                    match uncommited.last_mut().unwrap() {
+                                        ElementNode::Surrounded { children, .. } => {
+                                            children.push(popped)
+                                        }
+                                        ElementNode::Text(_) => {
+                                            unreachable!("Text node must not be pushed as a tag")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    "{" => {
+                        uncommited.push(ElementNode::new_surrounded(Element::Parameter));
+                    }
+                    "}" => {
+                        let popped = uncommited.pop().ok_or(ErrorKind::TooManyTagClosing)?;
+                        match popped {
+                            ElementNode::Text(_) => {
+                                unreachable!("Text node must not be pushed as a tag")
+                            }
+                            ElementNode::Surrounded {
+                                kind: Element::Parameter,
+                                ..
+                            } => {
+                                if uncommited.is_empty() {
+                                    commited.push(popped);
+                                } else {
+                                    match uncommited.last_mut().unwrap() {
+                                        ElementNode::Surrounded { children, .. } => {
+                                            children.push(popped)
+                                        }
+                                        ElementNode::Text(_) => {
+                                            unreachable!("Text node must not be pushed as a tag")
+                                        }
+                                    }
+                                }
+                            }
+                            _ => return Err(ErrorKind::InvalidParenPair),
+                        }
+                    }
+                    _ => unreachable!("Unexpected paren"),
+                }
+                whole_match.end()
+            };
             rest = &rest[next_rest_start..];
         }
 
         if !uncommited.is_empty() {
-            Err(ErrorKind::TooManyTagOpening)
-        } else {
-            if rest != "" {
-                commited.push(ElementNode::Text(rest));
-            }
-            Ok(())
+            return Err(ErrorKind::TooManyTagOpening);
+        } else if rest != "" {
+            commited.push(ElementNode::Text(rest));
         }
+        Ok(())
     }
 
     fn parse_element_kind(name: &'a str) -> Result<Element, ErrorKind> {
@@ -220,21 +309,25 @@ impl<'a> Parser {
         match kind {
             "male" => character_set
                 .add_male(id, name)
-                .map_err(|kind| ErrorKind::Semantic(kind)),
+                .map_err(ErrorKind::Semantic),
             "female" => character_set
                 .add_female(id, name)
-                .map_err(|kind| ErrorKind::Semantic(kind)),
-            "mob" => character_set
-                .add_mob(id, name)
-                .map_err(|kind| ErrorKind::Semantic(kind)),
+                .map_err(ErrorKind::Semantic),
+            "mob" => character_set.add_mob(id, name).map_err(ErrorKind::Semantic),
             colorcode => {
                 if !REGEX_COLORCODE.is_match(colorcode) {
                     Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
                         format!("{} (invalid colorcode {})", id, colorcode),
                     )))
                 } else {
-                    // TODO: とっとと実装しろ
-                    unimplemented!()
+                    match colorcode.len() {
+                        3 | 6 => character_set
+                            .add_custom(id, name, colorcode)
+                            .map_err(ErrorKind::Semantic),
+                        _ => Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
+                            format!("{} (invalid colorcode {})", id, colorcode),
+                        ))),
+                    }
                 }
             }
         }

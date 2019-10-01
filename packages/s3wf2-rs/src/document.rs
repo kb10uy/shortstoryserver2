@@ -1,5 +1,5 @@
 use crate::error::SemanticErrorKind;
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt};
 
 /// Indicates the type of characters in document.
 pub enum CharacterType {
@@ -14,6 +14,17 @@ pub enum CharacterType {
 
     /// Customized color character
     Custom(String, String),
+}
+
+impl fmt::Display for CharacterType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CharacterType::Male(index, name) => write!(f, "{} (Male, #{})", name, index),
+            CharacterType::Female(index, name) => write!(f, "{} (Female, #{})", name, index),
+            CharacterType::Mob(index, name) => write!(f, "{} (Mob, #{})", name, index),
+            CharacterType::Custom(color, name) => write!(f, "{} (Custom, #{})", name, color),
+        }
+    }
 }
 
 /// The characters container.
@@ -79,6 +90,19 @@ impl CharacterSet {
         }
     }
 
+    /// Adds a custom color character.
+    pub fn add_custom(&mut self, id: &str, name: &str, color: &str) -> Result<(), SemanticErrorKind> {
+        if self.characters.contains_key(id) {
+            Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
+        } else {
+            self.characters.insert(
+                id.to_string(),
+                CharacterType::Custom(color.to_string(), name.to_string()),
+            );
+            Ok(())
+        }
+    }
+
     pub fn get(&self, id: &str) -> Option<&CharacterType> {
         self.characters.get(id)
     }
@@ -91,13 +115,24 @@ impl CharacterSet {
             CharacterType::Male(n, _) => format!("male-{}", n % self.preset_max),
             CharacterType::Female(n, _) => format!("female-{}", n % self.preset_max),
             CharacterType::Mob(n, _) => format!("mob-{}", n % self.preset_max),
-            CharacterType::Custom(_, _) => unimplemented!(),
+            CharacterType::Custom(c, _) => format!("custom-{}", c),
         })
     }
 }
 
+impl fmt::Display for CharacterSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Characters [")?;
+        for (id, character) in self.characters.iter() {
+            write!(f, "\"{}\" => {}, ", id, character)?;
+        }
+        write!(f, "]")?;
+        Ok(())
+    }
+}
+
 /// Represents block element.
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Block {
     /// Horizontal line
     Horizontal,
@@ -119,7 +154,7 @@ pub enum Block {
 }
 
 /// Represents inline element.
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Element {
     /// Parameter
     Parameter,
@@ -178,6 +213,17 @@ impl<'a> BlockNode<'a> {
     }
 }
 
+impl<'a> fmt::Display for BlockNode<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?} [", self.kind)?;
+        for child in self.children.iter() {
+            write!(f, "{}, ", child)?;
+        }
+        write!(f, "]")?;
+        Ok(())
+    }
+}
+
 /// Represents a element level node.
 pub enum ElementNode<'a> {
     /// Plain text node
@@ -207,6 +253,22 @@ impl<'a> ElementNode<'a> {
     }
 }
 
+impl<'a> fmt::Display for ElementNode<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ElementNode::Text(text) => write!(f, "\"{}\"", text),
+            ElementNode::Surrounded { kind, children, .. } => {
+                write!(f, "[{:?} ", kind)?;
+                for child in children.iter() {
+                    write!(f, "{}, ", child)?;
+                }
+                write!(f, "]")?;
+                Ok(())
+            }
+        }
+    }
+}
+
 /// Represents whole S3WF2 document.
 pub struct Document<'a> {
     pub(crate) characters: CharacterSet,
@@ -219,5 +281,17 @@ impl<'a> Document<'a> {
             characters: CharacterSet::new(4),
             blocks: vec![],
         }
+    }
+}
+
+impl<'a> fmt::Display for Document<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Document {{")?;
+        writeln!(f, "  {}", self.characters)?;
+        for block in self.blocks.iter() {
+            writeln!(f, "  {}", block)?;
+        }
+        writeln!(f, "}}")?;
+        Ok(())
     }
 }
