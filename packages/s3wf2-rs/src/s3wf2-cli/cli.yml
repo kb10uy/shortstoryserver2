@@ -1,0 +1,11 @@
+name: 's3wf2-cli'
+description: "Standalone tool for ShortStoryServer Writer's Format v2"
+version: '1.0.0'
+subcommands:
+  - debug:
+      about: 'Parse source text and show the result in debug format'
+      args:
+        - INPUT:
+            help: 'Source text file (will be stdin when omitted)'
+            required: false
+

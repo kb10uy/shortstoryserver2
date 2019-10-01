@@ -57,8 +57,20 @@ impl fmt::Display for ErrorKind {
 /// Represents an error of S3WF2 format parsing.
 #[derive(Debug)]
 pub struct Error {
-    pub line_number: usize,
-    pub kind: ErrorKind,
+    pub(crate) line_number: usize,
+    pub(crate) kind: ErrorKind,
+}
+
+impl Error {
+    /// The line number this error occured.
+    pub fn line(&self) -> usize {
+        self.line_number
+    }
+
+    /// The error reason.
+    pub fn reason(&self) -> &ErrorKind {
+        &self.kind
+    }
 }
 
 impl fmt::Display for Error {

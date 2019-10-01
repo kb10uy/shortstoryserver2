@@ -15,6 +15,7 @@ lazy_static! {
 }
 
 /// S3WF2 parser state.
+#[derive(Default)]
 pub struct Parser {}
 
 impl<'a> Parser {
@@ -23,28 +24,36 @@ impl<'a> Parser {
     }
 
     /// Parses text and append the result to held document.
-    pub fn parse(&mut self, source: &'a str) -> Result<Document<'a>, Error> {
+    pub fn parse(self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
         let lines = source.lines();
+        let mut errors = vec![];
         let mut document = Document::new();
         let mut current_block = BlockNode::new(Block::Paragraph);
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
             let trimmed_line = line.trim();
-            let error_mapper = |kind| Error { kind, line_number };
+            if trimmed_line == "" && !current_block.is_empty() {
+                document.blocks.push(current_block);
+                current_block = BlockNode::new(Block::Paragraph);
+                continue;
+            }
 
             let re_result = REGEX_LINE_HEAD.captures(trimmed_line);
             let line_parse_result = if let Some(captures) = re_result {
                 let cmd_type = captures.get(1).unwrap().as_str();
                 let name = captures.get(2).unwrap().as_str();
-                let rest = captures.get(2).map(|m| m.as_str());
+                let rest = captures.get(4).map(|m| m.as_str());
                 match cmd_type {
                     ":" => self.parse_command(&mut document, name, rest),
                     "/" => {
-                        current_block = self
-                            .parse_block(&mut document, current_block, name, rest)
-                            .map_err(error_mapper)?;
-                        Ok(())
+                        let (next, error) =
+                            self.parse_block(&mut document, current_block, name, rest);
+                        current_block = next;
+                        match error {
+                            Some(kind) => Err(kind),
+                            None => Ok(()),
+                        }
                     }
                     "@" => self.parse_line(&document.characters, &mut current_block, name, rest),
                     // Not included in regex, therefore unreachable
@@ -54,14 +63,23 @@ impl<'a> Parser {
                 self.parse_normal(&mut current_block.children, trimmed_line)
             };
 
-            line_parse_result.map_err(error_mapper)?;
+            if let Err(kind) = line_parse_result {
+                errors.push(Error { line_number, kind });
+            }
+        }
+        if !current_block.is_empty() {
+            document.blocks.push(current_block);
         }
 
-        Ok(document)
+        if errors.is_empty() {
+            Ok(document)
+        } else {
+            Err(errors)
+        }
     }
 
     fn parse_command(
-        &mut self,
+        &self,
         document: &mut Document,
         name: &'a str,
         rest: Option<&'a str>,
@@ -92,37 +110,53 @@ impl<'a> Parser {
     }
 
     fn parse_block(
-        &mut self,
+        &self,
         document: &mut Document<'a>,
         current_block: BlockNode<'a>,
         element: &'a str,
         rest: Option<&'a str>,
-    ) -> Result<BlockNode<'a>, ErrorKind> {
-        let kind = Parser::parse_block_kind(element)?;
+    ) -> (BlockNode<'a>, Option<ErrorKind>) {
+        let kind = match Parser::parse_block_kind(element) {
+            Ok(kind) => kind,
+            Err(kind) => return (current_block, Some(kind)),
+        };
         let previous_kind = current_block.kind;
-        if !current_block.is_empty() {
-            document.blocks.push(current_block);
-        }
 
         match rest {
-            Some(">>>") => Ok(BlockNode::new(kind)),
+            Some(">>>") => {
+                if !current_block.is_empty() {
+                    document.blocks.push(current_block);
+                }
+                (BlockNode::new(kind), None)
+            },
             Some("<<<") => {
                 if previous_kind != kind {
-                    Err(ErrorKind::InvalidBlockPair)
+                    (current_block, Some(ErrorKind::InvalidBlockPair))
                 } else {
-                    Ok(BlockNode::new(Block::Paragraph))
+                    if !current_block.is_empty() {
+                        document.blocks.push(current_block);
+                    }
+                    (BlockNode::new(Block::Paragraph), None)
                 }
             }
 
             Some(content) => {
                 let mut block = BlockNode::new(kind);
-                self.parse_normal(&mut block.children, content)?;
+                if let Err(kind) = self.parse_normal(&mut block.children, content) {
+                    return (current_block, Some(kind));
+                }
+                if !current_block.is_empty() {
+                    document.blocks.push(current_block);
+                }
                 document.blocks.push(block);
-                Ok(BlockNode::new(Block::Paragraph))
+                (BlockNode::new(Block::Paragraph), None)
             }
             None => {
+                if !current_block.is_empty() {
+                    document.blocks.push(current_block);
+                }
                 document.blocks.push(BlockNode::new(kind));
-                Ok(BlockNode::new(Block::Paragraph))
+                (BlockNode::new(Block::Paragraph), None)
             }
         }
     }
@@ -140,7 +174,7 @@ impl<'a> Parser {
     }
 
     fn parse_line(
-        &mut self,
+        &self,
         characters: &CharacterSet,
         parent_block: &mut BlockNode<'a>,
         element: &'a str,
@@ -164,7 +198,7 @@ impl<'a> Parser {
     }
 
     fn parse_normal(
-        &mut self,
+        &self,
         parent: &mut Vec<ElementNode<'a>>,
         line: &'a str,
     ) -> Result<(), ErrorKind> {
@@ -175,14 +209,17 @@ impl<'a> Parser {
         while let Some(captures) = REGEX_ELEMENT_LINE.captures(rest) {
             // before tag separation
             let whole_match = captures.get(0).unwrap();
-            let leading_text = ElementNode::Text(&rest[0..whole_match.start()]);
-            // TODO: 本当はこれを何回も書きたくない
-            if uncommited.is_empty() {
-                commited.push(leading_text);
-            } else {
-                match uncommited.last_mut().unwrap() {
-                    ElementNode::Surrounded { children, .. } => children.push(leading_text),
-                    ElementNode::Text(_) => unreachable!("Text node must not be pushed as a tag"),
+            let leading_text = &rest[0..whole_match.start()];
+            if leading_text != "" {
+                let leading = ElementNode::Text(leading_text);
+                // TODO: 本当はこれを何回も書きたくない
+                if uncommited.is_empty() {
+                    commited.push(leading);
+                } else {
+                    match uncommited.last_mut().unwrap() {
+                        ElementNode::Surrounded { children, .. } => children.push(leading),
+                        ElementNode::Text(_) => unreachable!("Text node must not be pushed as a tag"),
+                    }
                 }
             }
 
@@ -294,7 +331,7 @@ impl<'a> Parser {
     // command functions ------------------------------------------------------
 
     fn command_character(
-        &mut self,
+        &self,
         character_set: &mut CharacterSet,
         kind: &'a str,
         id: &'a str,
