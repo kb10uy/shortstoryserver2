@@ -5,6 +5,7 @@ use std::{error::Error as StdError, fmt};
 pub enum SemanticErrorKind {
     UndefinedCharacter(String),
     DuplicateCharacter(String),
+    Nonsurrounding,
 }
 
 impl fmt::Display for SemanticErrorKind {
@@ -16,6 +17,7 @@ impl fmt::Display for SemanticErrorKind {
             SemanticErrorKind::DuplicateCharacter(chara) => {
                 write!(f, "Duplicate character ID: {}", chara)
             }
+            SemanticErrorKind::Nonsurrounding => write!(f, "Non-surrounding block detected"),
         }
     }
 }
@@ -25,8 +27,9 @@ impl fmt::Display for SemanticErrorKind {
 pub enum ErrorKind {
     TooManyTagOpening,
     TooManyTagClosing,
+    InvalidParenPair,
+    InvalidBlockPair,
     NotEnoughParameters { given: usize, needed: usize },
-    Nonsurrounding,
     UnknownCommand(String),
     UnknownElement(String),
     Semantic(SemanticErrorKind),
@@ -37,12 +40,13 @@ impl fmt::Display for ErrorKind {
         match self {
             ErrorKind::TooManyTagOpening => write!(f, "Too many tag opening '[' appear"),
             ErrorKind::TooManyTagClosing => write!(f, "Too many tag opening ']' appear"),
+            ErrorKind::InvalidParenPair => write!(f, "Invalid brace/bracket pair detected"),
+            ErrorKind::InvalidBlockPair => write!(f, "Invalid block pair detected"),
             ErrorKind::NotEnoughParameters { given, needed } => write!(
                 f,
                 "Not enough parameters ({} given, {} needed)",
                 given, needed
             ),
-            ErrorKind::Nonsurrounding => write!(f, "Non-surrounding block detected"),
             ErrorKind::UnknownCommand(cmd) => write!(f, "Unknown command: {}", cmd),
             ErrorKind::UnknownElement(elm) => write!(f, "Unknown element: {}", elm),
             ErrorKind::Semantic(kind) => write!(f, "Semantic error ({})", kind),

@@ -79,6 +79,10 @@ impl CharacterSet {
         }
     }
 
+    pub fn get(&self, id: &str) -> Option<&CharacterType> {
+        self.characters.get(id)
+    }
+
     /// Returns CSS class name for character.
     pub fn get_class(&self, id: &str) -> Option<String> {
         let character = self.characters.get(id)?;
@@ -93,6 +97,7 @@ impl CharacterSet {
 }
 
 /// Represents block element.
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Block {
     /// Horizontal line
     Horizontal,
@@ -108,60 +113,104 @@ pub enum Block {
 
     /// Block quotation
     Quotation,
+
+    /// Unordered list
+    UnorderedList,
 }
 
 /// Represents inline element.
+#[derive(PartialEq, Eq)]
 pub enum Element {
-    /// new line
+    /// Parameter
+    Parameter,
+
+    /// New line
     Newline,
 
-    /// bold text
+    /// Old text
     Bold,
 
-    /// italic text
+    /// Italic text
     Italic,
 
-    /// dotted (傍点) text
+    /// Dotted (傍点) text
     Dotted,
 
-    /// underlined text
+    /// Underlined text
     Underlined,
 
-    /// deleted text
+    /// Deleted text
     Deleted,
 
-    /// link
-    Link(String),
+    /// Link
+    Link,
 
-    /// text with ruby
-    Ruby(Box<Element>),
+    /// Text with ruby
+    Ruby,
 
-    /// line, speech
+    /// List item
+    Item,
+
+    /// Line, speech (the parameter should contain the ID)
     Line(String),
 }
 
-pub enum BlockNode<'a> {
-    Singular(Block),
+/// Represents a block level node.
+pub struct BlockNode<'a> {
+    /// Block type
+    pub kind: Block,
+
+    /// Child nodes
+    pub children: Vec<ElementNode<'a>>,
+}
+
+impl<'a> BlockNode<'a> {
+    pub fn new(kind: Block) -> BlockNode<'a> {
+        BlockNode {
+            kind,
+            children: vec![],
+        }
+    }
+
+    /// Checks whether this BlockNode is empty (unused).
+    pub fn is_empty(&self) -> bool {
+        self.children.is_empty()
+    }
+}
+
+/// Represents a element level node.
+pub enum ElementNode<'a> {
+    /// Plain text node
+    Text(&'a str),
+
+    /// Surrounded element node
     Surrounded {
-        kind: Block,
+        /// Element type
+        kind: Element,
+
+        /// Corresponding parameter nodes
+        parameters: Vec<ElementNode<'a>>,
+
+        /// Child nodes
         children: Vec<ElementNode<'a>>,
     },
 }
 
-pub enum ElementNode<'a> {
-    Text(&'a str),
-    Singular(Element),
-    Surrounded {
-        kind: Element,
-        children: Vec<ElementNode<'a>>,
-    },
+impl<'a> ElementNode<'a> {
+    /// Creates a surrounded node.
+    pub fn new_surrounded(kind: Element) -> ElementNode<'a> {
+        ElementNode::Surrounded {
+            kind,
+            parameters: vec![],
+            children: vec![],
+        }
+    }
 }
 
 /// Represents whole S3WF2 document.
 pub struct Document<'a> {
     pub(crate) characters: CharacterSet,
     pub(crate) blocks: Vec<BlockNode<'a>>,
-    pub(crate) uncommited_block: BlockNode<'a>,
 }
 
 impl<'a> Document<'a> {
@@ -169,7 +218,6 @@ impl<'a> Document<'a> {
         Document {
             characters: CharacterSet::new(4),
             blocks: vec![],
-            uncommited_block: BlockNode::Surrounded { kind: Block::Paragraph, children: vec![] },
         }
     }
 }

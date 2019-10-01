@@ -26,69 +26,41 @@ impl<'a> Parser {
     pub fn parse(&mut self, source: &'a str) -> Result<Document<'a>, Error> {
         let lines = source.lines();
         let mut document = Document::new();
+        let mut current_block = BlockNode::new(Block::Paragraph);
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
             let trimmed_line = line.trim();
+            let error_mapper = |kind| Error { kind, line_number };
 
             let re_result = REGEX_LINE_HEAD.captures(trimmed_line);
             let line_parse_result = if let Some(captures) = re_result {
                 let cmd_type = captures.get(1).unwrap().as_str();
                 let name = captures.get(2).unwrap().as_str();
                 let rest = captures.get(2).map(|m| m.as_str());
-                self.parse_command_line(&mut document, cmd_type, name, rest)
+                match cmd_type {
+                    ":" => self.parse_command(&mut document, name, rest),
+                    "/" => {
+                        current_block = self
+                            .parse_block(&mut document, current_block, name, rest)
+                            .map_err(error_mapper)?;
+                        Ok(())
+                    }
+                    "@" => self.parse_line(&document.characters, &mut current_block, name, rest),
+                    // Not included in regex, therefore unreachable
+                    _ => unreachable!("Unexpected command type"),
+                }
             } else {
-                let parent_block = &mut document.uncommited_block;
-                self.parse_element_line(parent_block, trimmed_line)
+                self.parse_normal(&mut current_block.children, trimmed_line)
             };
 
-            line_parse_result.map_err(|kind| Error { kind, line_number })?;
+            line_parse_result.map_err(error_mapper)?;
         }
 
         Ok(document)
     }
 
-    fn parse_command_line(
-        &mut self,
-        document: &mut Document,
-        ctype: &'a str,
-        name: &'a str,
-        rest: Option<&'a str>,
-    ) -> Result<(), ErrorKind> {
-        match ctype {
-            ":" => self.parse_meta_command(document, name, rest),
-            "/" => self.parse_meta_block(document, name, rest),
-            "@" => self.parse_meta_line(document, name, rest),
-            // Not included in regex, therefore unreachable
-            _ => unreachable!("Unexpected command type"),
-        }
-    }
-
-    fn parse_element_line(
-        &mut self,
-        parent_block: &mut BlockNode<'a>,
-        line: &'a str,
-    ) -> Result<(), ErrorKind> {
-        let mut uncommited: Vec<ElementNode<'a>> = vec![];
-        let commited = match parent_block {
-            BlockNode::Surrounded { children, .. } => children,
-            _ => return Err(ErrorKind::Nonsurrounding),
-        };
-
-        let mut rest = line;
-        loop {
-            match REGEX_ELEMENT_LINE.captures(rest) {
-                Some(captures) => {
-
-                }
-                // whole `rest` is plain text
-                None => break,
-            }
-        }
-        Ok(())
-    }
-
-    fn parse_meta_command(
+    fn parse_command(
         &mut self,
         document: &mut Document,
         name: &'a str,
@@ -119,22 +91,115 @@ impl<'a> Parser {
         }
     }
 
-    fn parse_meta_block(
+    fn parse_block(
         &mut self,
-        document: &mut Document,
+        document: &mut Document<'a>,
+        current_block: BlockNode<'a>,
+        element: &'a str,
+        rest: Option<&'a str>,
+    ) -> Result<BlockNode<'a>, ErrorKind> {
+        let kind = Parser::parse_block_kind(element)?;
+        let previous_kind = current_block.kind;
+        if !current_block.is_empty() {
+            document.blocks.push(current_block);
+        }
+
+        match rest {
+            Some(">>>") => Ok(BlockNode::new(kind)),
+            Some("<<<") => {
+                if previous_kind != kind {
+                    Err(ErrorKind::InvalidBlockPair)
+                } else {
+                    Ok(BlockNode::new(Block::Paragraph))
+                }
+            }
+
+            Some(content) => {
+                let mut block = BlockNode::new(kind);
+                self.parse_normal(&mut block.children, content)?;
+                document.blocks.push(block);
+                Ok(BlockNode::new(Block::Paragraph))
+            }
+            None => {
+                document.blocks.push(BlockNode::new(kind));
+                Ok(BlockNode::new(Block::Paragraph))
+            }
+        }
+    }
+
+    fn parse_block_kind(name: &'a str) -> Result<Block, ErrorKind> {
+        match name {
+            "para" => Ok(Block::Paragraph),
+            "sec" => Ok(Block::Section),
+            "subsec" => Ok(Block::Subsection),
+            "quote" => Ok(Block::Quotation),
+            "hori" => Ok(Block::Horizontal),
+            "list" => Ok(Block::UnorderedList),
+            _ => Err(ErrorKind::UnknownElement(name.to_string())),
+        }
+    }
+
+    fn parse_line(
+        &mut self,
+        characters: &CharacterSet,
+        parent_block: &mut BlockNode<'a>,
         element: &'a str,
         rest: Option<&'a str>,
     ) -> Result<(), ErrorKind> {
+        let id = element.to_string();
+        if let None = characters.get(element) {
+            return Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
+                id,
+            )));
+        }
+
+        let mut children = vec![];
+        self.parse_normal(&mut children, rest.unwrap_or(""));
+        parent_block.children.push(ElementNode::Surrounded {
+            kind: Element::Line(id),
+            parameters: vec![],
+            children,
+        });
         Ok(())
     }
 
-    fn parse_meta_line(
+    fn parse_normal(
         &mut self,
-        document: &mut Document,
-        element: &'a str,
-        rest: Option<&'a str>,
+        parent: &mut Vec<ElementNode<'a>>,
+        line: &'a str,
     ) -> Result<(), ErrorKind> {
-        Ok(())
+        let mut uncommited: Vec<ElementNode<'a>> = vec![];
+        let commited = parent;
+
+        let mut rest = line;
+        while let Some(captures) = REGEX_ELEMENT_LINE.captures(rest) {
+            let next_rest_start = 0;
+            rest = &rest[next_rest_start..];
+        }
+
+        if !uncommited.is_empty() {
+            Err(ErrorKind::TooManyTagOpening)
+        } else {
+            if rest != "" {
+                commited.push(ElementNode::Text(rest));
+            }
+            Ok(())
+        }
+    }
+
+    fn parse_element_kind(name: &'a str) -> Result<Element, ErrorKind> {
+        match name {
+            "b" => Ok(Element::Bold),
+            "i" => Ok(Element::Italic),
+            "ul" => Ok(Element::Underlined),
+            "st" => Ok(Element::Deleted),
+            "dt" => Ok(Element::Dotted),
+            "br" => Ok(Element::Newline),
+            "link" => Ok(Element::Link),
+            "ruby" => Ok(Element::Ruby),
+            "item" => Ok(Element::Item),
+            _ => Err(ErrorKind::UnknownElement(name.to_string())),
+        }
     }
 
     // command functions ------------------------------------------------------
