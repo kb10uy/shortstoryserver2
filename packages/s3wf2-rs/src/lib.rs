@@ -1,7 +1,7 @@
-pub mod parser;
 pub mod document;
-pub mod html;
 pub mod error;
+pub mod html;
+pub mod parser;
 
 #[cfg(test)]
 mod tests {

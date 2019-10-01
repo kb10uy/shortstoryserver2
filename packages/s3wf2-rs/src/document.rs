@@ -91,7 +91,12 @@ impl CharacterSet {
     }
 
     /// Adds a custom color character.
-    pub fn add_custom(&mut self, id: &str, name: &str, color: &str) -> Result<(), SemanticErrorKind> {
+    pub fn add_custom(
+        &mut self,
+        id: &str,
+        name: &str,
+        color: &str,
+    ) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
             Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
         } else {

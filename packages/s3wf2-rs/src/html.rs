@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::io::{Write, Result as IoResult};
+use std::io::{Result as IoResult, Write};
 
 /// Can generate HTML string.
 trait EmitHtml {
