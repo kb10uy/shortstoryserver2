@@ -28,8 +28,8 @@ impl fmt::Display for CharacterType {
 }
 
 /// The characters container.
+#[derive(Default)]
 pub struct CharacterSet {
-    preset_max: usize,
     used_male: usize,
     used_female: usize,
     used_mob: usize,
@@ -38,9 +38,8 @@ pub struct CharacterSet {
 
 impl CharacterSet {
     /// Creates new instance.
-    pub fn new(preset_max: usize) -> CharacterSet {
+    pub fn new() -> CharacterSet {
         CharacterSet {
-            preset_max,
             used_male: 0,
             used_female: 0,
             used_mob: 0,
@@ -108,20 +107,14 @@ impl CharacterSet {
         }
     }
 
+    /// Gets the character type related to the key.
     pub fn get(&self, id: &str) -> Option<&CharacterType> {
         self.characters.get(id)
     }
 
-    /// Returns CSS class name for character.
-    pub fn get_class(&self, id: &str) -> Option<String> {
-        let character = self.characters.get(id)?;
-
-        Some(match character {
-            CharacterType::Male(n, _) => format!("male-{}", n % self.preset_max),
-            CharacterType::Female(n, _) => format!("female-{}", n % self.preset_max),
-            CharacterType::Mob(n, _) => format!("mob-{}", n % self.preset_max),
-            CharacterType::Custom(c, _) => format!("custom-{}", c),
-        })
+    /// Returns character iterator.
+    pub fn characters(&self) -> impl Iterator<Item = (&String, &CharacterType)> {
+        self.characters.iter()
     }
 }
 
@@ -276,14 +269,14 @@ impl<'a> fmt::Display for ElementNode<'a> {
 
 /// Represents whole S3WF2 document.
 pub struct Document<'a> {
-    pub(crate) characters: CharacterSet,
-    pub(crate) blocks: Vec<BlockNode<'a>>,
+    pub characters: CharacterSet,
+    pub blocks: Vec<BlockNode<'a>>,
 }
 
 impl<'a> Document<'a> {
     pub(crate) fn new() -> Document<'a> {
         Document {
-            characters: CharacterSet::new(4),
+            characters: CharacterSet::new(),
             blocks: vec![],
         }
     }

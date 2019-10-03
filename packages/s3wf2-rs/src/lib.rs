@@ -1,7 +1,7 @@
 pub mod document;
 pub mod error;
-pub mod html;
 pub mod parser;
+pub mod emitter;
 
 #[cfg(test)]
 mod tests {
