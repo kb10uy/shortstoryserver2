@@ -16,6 +16,18 @@ pub enum CharacterType {
     Custom(String, String),
 }
 
+impl CharacterType {
+    /// Returns the name which should be displayed.
+    pub fn display_name(&self) -> &str {
+        match self {
+            CharacterType::Male(_, name) => &name,
+            CharacterType::Female(_, name) => &name,
+            CharacterType::Mob(_, name) => &name,
+            CharacterType::Custom(_, name) => &name,
+        }
+    }
+}
+
 impl fmt::Display for CharacterType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -175,6 +187,9 @@ pub enum Element {
     /// Deleted text
     Deleted,
 
+    /// Monospace font text
+    Monospaced,
+
     /// Link
     Link,
 
@@ -247,6 +262,14 @@ impl<'a> ElementNode<'a> {
             kind,
             parameters: vec![],
             children: vec![],
+        }
+    }
+
+    /// Unwraps the node, and take children from parameter.
+    pub fn unwrap_parameter(&self) -> &Vec<ElementNode<'a>> {
+        match self {
+            ElementNode::Surrounded { kind: Element::Parameter, children, .. } => children,
+            _ => panic!("Failed to unwrap non-parameter node"),
         }
     }
 }

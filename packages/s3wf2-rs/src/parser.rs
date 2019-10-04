@@ -320,6 +320,7 @@ impl<'a> Parser {
             "ul" => Ok(Element::Underlined),
             "st" => Ok(Element::Deleted),
             "dt" => Ok(Element::Dotted),
+            "m" => Ok(Element::Monospaced),
             "br" => Ok(Element::Newline),
             "link" => Ok(Element::Link),
             "ruby" => Ok(Element::Ruby),
