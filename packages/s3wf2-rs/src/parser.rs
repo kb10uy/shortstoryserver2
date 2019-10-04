@@ -6,12 +6,12 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|/|@)([[:word:]]+)(\s+(.*))?$").unwrap();
+    static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|/|@)([A-Za-z0-9_]+)(\s+(.*))?$").unwrap();
     static ref REGEX_SPACES: Regex = Regex::new(r"\s+").unwrap();
-    static ref REGEX_CHARACTER_ID: Regex = Regex::new(r"^[[:word:]]+$").unwrap();
-    static ref REGEX_COLORCODE: Regex = Regex::new(r"^#([[:xdigit:]]{3,6})$").unwrap();
+    static ref REGEX_CHARACTER_ID: Regex = Regex::new(r"^[A-Za-z0-9_]+$").unwrap();
+    static ref REGEX_COLORCODE: Regex = Regex::new(r"^#([A-Fa-f0-9]{3,6})$").unwrap();
     // MEMO: 後方一致が無いのでキャプチャーグループの終端でもってマッチを終了させる
-    static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[[:word:]]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
+    static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[A-Za-z0-9_]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
 }
 
 /// S3WF2 parser state.
@@ -288,8 +288,8 @@ impl<'a> Parser {
                                     commited.push(popped);
                                 } else {
                                     match uncommited.last_mut().unwrap() {
-                                        ElementNode::Surrounded { children, .. } => {
-                                            children.push(popped)
+                                        ElementNode::Surrounded { parameters, .. } => {
+                                            parameters.push(popped)
                                         }
                                         ElementNode::Text(_) => {
                                             unreachable!("Text node must not be pushed as a tag")

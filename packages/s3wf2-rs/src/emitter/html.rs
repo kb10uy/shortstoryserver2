@@ -60,7 +60,7 @@ impl HtmlEmitter {
 
     /// Finds some characters needs to escape in string.
     fn find_escape_chars(text: &str) -> Option<(usize, char)> {
-        text.chars().enumerate().find_map(|(i, ch)| match ch {
+        text.char_indices().find_map(|(i, ch)| match ch {
             '<' | '>' | '&' | '"' => Some((i, ch)),
             _ => None,
         })
@@ -134,6 +134,7 @@ impl HtmlEmitter {
                         characters,
                         children,
                     )?;
+                    target.push('\n');
                 }
                 Element::Bold => self.write_simple_surrounded_element(
                     target, "strong", None, characters, children,
@@ -160,9 +161,10 @@ impl HtmlEmitter {
                 )?,
                 Element::Monospaced => self
                     .write_simple_surrounded_element(target, "code", None, characters, children)?,
-                Element::Item => self.write_simple_surrounded_element(
-                    target, "strong", None, characters, children,
-                )?,
+                Element::Item => {
+                    self.write_simple_surrounded_element(target, "li", None, characters, children)?;
+                    target.push('\n');
+                }
                 Element::Link => {
                     let href = parameters
                         .first()
@@ -177,7 +179,7 @@ impl HtmlEmitter {
                             }
                         })
                         .ok_or(HtmlEmitterError::InvalidParameter(
-                            "Only a plain text content is valid for link target",
+                            "Link URL needed",
                         ))??;
                     target.push_str("<a href=\"");
                     target.push_str(href);
