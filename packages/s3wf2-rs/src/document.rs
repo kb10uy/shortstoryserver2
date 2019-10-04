@@ -268,7 +268,11 @@ impl<'a> ElementNode<'a> {
     /// Unwraps the node, and take children from parameter.
     pub fn unwrap_parameter(&self) -> &Vec<ElementNode<'a>> {
         match self {
-            ElementNode::Surrounded { kind: Element::Parameter, children, .. } => children,
+            ElementNode::Surrounded {
+                kind: Element::Parameter,
+                children,
+                ..
+            } => children,
             _ => panic!("Failed to unwrap non-parameter node"),
         }
     }

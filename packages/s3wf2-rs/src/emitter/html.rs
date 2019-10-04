@@ -4,6 +4,7 @@ use crate::{
 };
 
 /// Represents error kinds in HtmlEmitter.
+#[derive(Debug)]
 pub enum HtmlEmitterError {
     UndefinedCharacter(String),
     InvalidParameter(&'static str),
@@ -137,33 +138,47 @@ impl HtmlEmitter {
                 Element::Bold => self.write_simple_surrounded_element(
                     target, "strong", None, characters, children,
                 )?,
-                Element::Italic => self.write_simple_surrounded_element(
-                    target, "i", None, characters, children,
-                )?,
+                Element::Italic => {
+                    self.write_simple_surrounded_element(target, "i", None, characters, children)?
+                }
                 Element::Underlined => self.write_simple_surrounded_element(
-                    target, "span", Some("underline"), characters, children,
+                    target,
+                    "span",
+                    Some("underline"),
+                    characters,
+                    children,
                 )?,
-                Element::Deleted => self.write_simple_surrounded_element(
-                    target, "del", None, characters, children,
-                )?,
+                Element::Deleted => {
+                    self.write_simple_surrounded_element(target, "del", None, characters, children)?
+                }
                 Element::Dotted => self.write_simple_surrounded_element(
-                    target, "span", Some("dots"), characters, children,
+                    target,
+                    "span",
+                    Some("dots"),
+                    characters,
+                    children,
                 )?,
-                Element::Monospaced => self.write_simple_surrounded_element(
-                    target, "code", None, characters, children,
-                )?,
+                Element::Monospaced => self
+                    .write_simple_surrounded_element(target, "code", None, characters, children)?,
                 Element::Item => self.write_simple_surrounded_element(
                     target, "strong", None, characters, children,
                 )?,
                 Element::Link => {
-                    let href = parameters.first().map(|p| {
-                        let children = p.unwrap_parameter();
-                        if let Some(ElementNode::Text(url)) = children.first() {
-                            Ok(url)
-                        } else {
-                            Err(HtmlEmitterError::InvalidParameter("Only a plain text content is valid for link target"))
-                        }
-                    }).ok_or(HtmlEmitterError::InvalidParameter("Only a plain text content is valid for link target"))??;
+                    let href = parameters
+                        .first()
+                        .map(|p| {
+                            let children = p.unwrap_parameter();
+                            if let Some(ElementNode::Text(url)) = children.first() {
+                                Ok(url)
+                            } else {
+                                Err(HtmlEmitterError::InvalidParameter(
+                                    "Only a plain text content is valid for link target",
+                                ))
+                            }
+                        })
+                        .ok_or(HtmlEmitterError::InvalidParameter(
+                            "Only a plain text content is valid for link target",
+                        ))??;
                     target.push_str("<a href=\"");
                     target.push_str(href);
                     target.push_str("\">");
@@ -185,7 +200,7 @@ impl HtmlEmitter {
                 }
                 Element::Newline => {
                     target.push_str("<br>\n");
-                },
+                }
                 Element::Parameter => {
                     for child in children {
                         self.write_element(target, characters, child)?;

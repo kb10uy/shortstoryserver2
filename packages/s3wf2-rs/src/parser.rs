@@ -128,7 +128,7 @@ impl<'a> Parser {
                     document.blocks.push(current_block);
                 }
                 (BlockNode::new(kind), None)
-            },
+            }
             Some("<<<") => {
                 if previous_kind != kind {
                     (current_block, Some(ErrorKind::InvalidBlockPair))
@@ -218,7 +218,9 @@ impl<'a> Parser {
                 } else {
                     match uncommited.last_mut().unwrap() {
                         ElementNode::Surrounded { children, .. } => children.push(leading),
-                        ElementNode::Text(_) => unreachable!("Text node must not be pushed as a tag"),
+                        ElementNode::Text(_) => {
+                            unreachable!("Text node must not be pushed as a tag")
+                        }
                     }
                 }
             }

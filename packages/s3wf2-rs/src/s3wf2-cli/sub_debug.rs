@@ -1,6 +1,7 @@
 use clap::ArgMatches;
-use std::{error::Error, fs::File, io, process::exit};
+use std::{error::Error, fs::File, io};
 
+use crate::util::exit_document_errors;
 use s3wf2::parser::Parser;
 
 pub fn subcommand_debug(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
@@ -26,17 +27,7 @@ pub fn subcommand_debug(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
             Ok(())
         }
         Err(errors) => {
-            use ansi_term::Colour::{Red, White};
-            eprintln!("{}", Red.bold().paint("Failed to parse!"));
-            for error in errors {
-                eprintln!(
-                    "{} {}: {}",
-                    Red.bold().paint("Error"),
-                    White.paint(format!("{}", error.line())),
-                    format!("{}", error.reason())
-                );
-            }
-            exit(1);
+            exit_document_errors(&errors);
         }
     }
 }

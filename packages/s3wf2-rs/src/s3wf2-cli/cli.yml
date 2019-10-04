@@ -2,6 +2,19 @@ name: 's3wf2-cli'
 description: "Standalone tool for ShortStoryServer Writer's Format v2"
 version: '1.0.0'
 subcommands:
+  - format:
+      about: 'Parse source text and convert into another format'
+      args:
+        - INPUT:
+            help: 'Source text file (will be stdin when omitted)'
+            required: false
+        - type:
+            short: 't'
+            help: 'Format type'
+            required: true
+            takes_value: true
+            possible_values:
+              - 'html'
   - debug:
       about: 'Parse source text and show the result in debug format'
       args:
