@@ -1,6 +1,6 @@
 # ShortStoryServer v2
-![](https://github.com/kb10uy/shortstoryserver2/workflows/build%20of%20s3wf2-rs/badge.svg)
-![](https://github.com/kb10uy/shortstoryserver2/workflows/build%20of%20kbs32/badge.svg)
+[![Build and test status of s3wf2-rs](https://github.com/kb10uy/shortstoryserver2/workflows/build%20of%20s3wf2-rs/badge.svg)](https://github.com/kb10uy/shortstoryserver2/actions?workflow=build+of+s3wf2-rs)
+[![Build and test status of kbs32](https://github.com/kb10uy/shortstoryserver2/workflows/build%20of%20kbs32/badge.svg)](https://github.com/kb10uy/shortstoryserver2/actions?workflow=build+of+kbs32)
 
 黒歴史保管・公開サービス
 
