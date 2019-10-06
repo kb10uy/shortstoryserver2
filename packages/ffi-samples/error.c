@@ -37,7 +37,7 @@ int main(void) {
     // as it is allocated in library
     if (html) {
         puts(html);
-        free(html);
+        s3wf2_buffer_free(html);
     }
 
     // we should release the parser
