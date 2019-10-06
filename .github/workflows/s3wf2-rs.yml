@@ -1,4 +1,4 @@
-name: 'Build and test s3wf2-rs'
+name: Build and test s3wf2-rs
 
 on: [push]
 
@@ -8,6 +8,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build
+      working-directory: ./packages/s3wf2-rs
       run: cargo build --path ./packages/s3wf2-rs --verbose
     - name: Run tests
+      working-directory: ./packages/s3wf2-rs
       run: cargo test --path ./packages/s3wf2-rs --verbose
