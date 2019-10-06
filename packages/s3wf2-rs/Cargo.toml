@@ -4,13 +4,17 @@ version = "0.1.0"
 authors = ["Yuu Kobayashi <kb10uy@kb10uy.org>"]
 edition = "2018"
 
+[features]
+cli = ["clap", "ansi_term"]
+foreign = ["libc"]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
 [[bin]]
 name = "s3wf2-cli"
 path = "src/s3wf2-cli/main.rs"
 required-features = ["cli"]
-
-[features]
-cli = ["clap", "ansi_term"]
 
 # Dependencies ----------------------------------------------------------------
 
@@ -28,4 +32,8 @@ optional = true
 [dependencies.clap]
 version = "2.33"
 features = ["yaml"]
+optional = true
+
+[dependencies.libc]
+version = "0.2"
 optional = true
