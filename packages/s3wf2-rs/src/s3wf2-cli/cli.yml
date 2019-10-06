@@ -21,6 +21,10 @@ subcommands:
             takes_value: true
             possible_values:
               - 'html'
+        - verbose:
+            short: 'v'
+            help: 'Show verbose debug information'
+            required: false
   - debug:
       about: 'Parse source text and show the result in debug format'
       args:

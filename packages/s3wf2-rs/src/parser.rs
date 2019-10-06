@@ -24,7 +24,7 @@ impl<'a> Parser {
     }
 
     /// Parses text and append the result to held document.
-    pub fn parse(self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
+    pub fn parse(&self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
         let lines = source.lines();
         let mut errors = vec![];
         let mut document = Document::new();
