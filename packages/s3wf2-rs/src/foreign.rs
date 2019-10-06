@@ -41,6 +41,13 @@ impl<'a> ParserWrapper<'a> {
     }
 }
 
+pub unsafe extern "C" fn s3wf2_buffer_free(buffer: *mut c_char) {
+    if buffer.is_null() {
+        return;
+    }
+    let _destroyed = CString::from_raw(buffer);
+}
+
 #[no_mangle]
 pub extern "C" fn s3wf2_parser_new<'a>() -> *mut ParserWrapper<'a> {
     let parser = Box::new(ParserWrapper::new());
@@ -138,7 +145,7 @@ pub unsafe extern "C" fn s3wf2_parser_next_error(
 #[no_mangle]
 pub unsafe extern "C" fn s3wf2_emit_html(
     parser: *const ParserWrapper,
-    result_ptr: *mut *const c_char,
+    result_ptr: *mut *mut c_char,
 ) -> Status {
     if parser.is_null() {
         return Status::Invalid;
@@ -154,8 +161,7 @@ pub unsafe extern "C" fn s3wf2_emit_html(
     match emitter.emit(&mut html_buffer, document) {
         Ok(()) => {
             let result = CString::from_vec_unchecked(html_buffer);
-            *result_ptr = result.as_ptr();
-            forget(result);
+            *result_ptr = result.into_raw();
             Status::Success
         }
         Err(_) => Status::Invalid,
