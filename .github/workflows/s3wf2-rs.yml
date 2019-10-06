@@ -1,4 +1,4 @@
-name: Build and test s3wf2-rs
+name: 'build of s3wf2-rs'
 
 on: [push]
 
