@@ -1,0 +1,13 @@
+name: 'build of kbs32'
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: composer install
+    - name: Analyze codes
+      run: composer analyze
