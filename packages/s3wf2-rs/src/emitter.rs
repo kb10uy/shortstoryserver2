@@ -1,18 +1,22 @@
 pub mod html;
 
 use crate::document::Document;
+use std::io::{prelude::*, Result};
 
 /// The trait which converts `Document` into other formats.
 pub trait Emit<'a> {
-    /// The main output type (e.g. `String`).
-    type Output;
-
-    /// The type which represents anchors to any position in document.
-    type Anchors;
-
     /// Emits formatted document.
-    fn emit(&self, document: &Document<'a>) -> Self::Output;
+    fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> Result<()>;
+}
 
-    /// Returns an Iterator which returns anchors to sections.
-    fn section_anchors(&self, document: &Document<'a>) -> Self::Anchors;
+/// The trait which extracts indices in document.
+pub trait ExtractIndices<'d, 's: 'd> {
+    /// Index item type.
+    type IndexItem;
+
+    /// The Iterator type which iterates IndexItem.
+    type IndexItemIter: Iterator<Item = Self::IndexItem>;
+
+    /// Returns an iterator which lists the index items.
+    fn indices(&self, document: &'d Document<'s>) -> Self::IndexItemIter;
 }

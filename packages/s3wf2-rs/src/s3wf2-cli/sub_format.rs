@@ -8,16 +8,20 @@ use s3wf2::{
 };
 
 pub fn subcommand_format(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
-    let (mut stdin, mut file);
-    let source: &mut dyn io::Read = match args.value_of("INPUT") {
+    let (stdin, stdout);
+    let mut source: Box<dyn io::Read> = match args.value_of("INPUT") {
         None | Some("-") => {
             stdin = io::stdin();
-            &mut stdin
+            Box::new(io::BufReader::new(stdin.lock()))
         }
-        Some(filename) => {
-            file = io::BufReader::new(File::open(filename)?);
-            &mut file
+        Some(filename) => Box::new(io::BufReader::new(File::open(filename)?)),
+    };
+    let mut destination: Box<dyn io::Write> = match args.value_of("output") {
+        None | Some("-") => {
+            stdout = io::stdout();
+            Box::new(stdout.lock())
         }
+        Some(filename) => Box::new(io::BufWriter::new(File::create(filename)?)),
     };
 
     let mut text = String::new();
@@ -31,18 +35,13 @@ pub fn subcommand_format(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         }
     };
 
-    let formatted = match args.value_of("type") {
+    match args.value_of("type") {
         Some("html") => {
             let emitter = HtmlEmitter::new(4);
-            emitter
-                .emit(&document)
-                .expect("Unexpected HTML error occured")
+            emitter.emit(&mut destination, &document)?;
         }
         _ => panic!("Invalid format type"),
-    };
+    }
 
-    let stdout = io::stdout();
-    let mut locked = io::BufWriter::new(stdout.lock());
-    write!(locked, "{}", formatted)?;
     Ok(())
 }

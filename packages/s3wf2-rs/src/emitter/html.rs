@@ -1,7 +1,15 @@
+use std::{
+    error::Error as StdError,
+    fmt,
+    io::{prelude::*, Error, ErrorKind, Result as IoResult},
+};
+
 use crate::{
     document::{Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode},
-    emitter::Emit,
+    emitter::{Emit, ExtractIndices},
 };
+
+// Error ----------------------------------------------------------------------
 
 /// Represents error kinds in HtmlEmitter.
 #[derive(Debug)]
@@ -10,14 +18,24 @@ pub enum HtmlEmitterError {
     InvalidParameter(&'static str),
 }
 
-/// Represents an anchor in HTML formatted document.
-pub struct HtmlAnchor {
-    /// Title
-    pub title: String,
-
-    /// Anchor id attribute
-    pub id: String,
+impl fmt::Display for HtmlEmitterError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            HtmlEmitterError::UndefinedCharacter(character) => {
+                write!(f, "Undefined character: {}", character)
+            }
+            HtmlEmitterError::InvalidParameter(e) => write!(f, "Invalid parameter: {}", e),
+        }
+    }
 }
+
+impl StdError for HtmlEmitterError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        None
+    }
+}
+
+// Emitter --------------------------------------------------------------------
 
 /// The HTML emitter.
 pub struct HtmlEmitter {
@@ -42,20 +60,23 @@ impl HtmlEmitter {
     }
 
     /// Returns <style> element which contains custom character styles.
-    fn emit_character_styles(&self, characters: &CharacterSet) -> String {
-        let mut result = String::new();
+    fn write_character_styles(
+        &self,
+        writer: &mut impl Write,
+        characters: &CharacterSet,
+    ) -> IoResult<()> {
         let custom_colors = characters.characters().filter_map(|(_, t)| match t {
             CharacterType::Custom(color, _) => Some(color),
             _ => None,
         });
 
-        result.push_str("<style>\n");
+        writeln!(writer, "<style>")?;
         for color in custom_colors {
-            result.push_str(&format!(".custom-{0} {{ color: #{0}; }}\n", color));
+            writeln!(writer, ".custom-{0} {{ color: #{0};", color)?;
         }
-        result.push_str("</style>\n");
+        writeln!(writer, "</style>")?;
 
-        result
+        Ok(())
     }
 
     /// Finds some characters needs to escape in string.
@@ -69,28 +90,23 @@ impl HtmlEmitter {
     /// Writes simple ElementNode into String.
     fn write_simple_surrounded_element(
         &self,
-        target: &mut String,
+        writer: &mut impl Write,
         tag: &str,
         classes: Option<&str>,
         characters: &CharacterSet,
         children: &[ElementNode],
-    ) -> Result<(), HtmlEmitterError> {
-        target.push('<');
-        target.push_str(tag);
+    ) -> IoResult<()> {
+        write!(writer, "<{}", tag)?;
         if let Some(cl) = classes {
-            target.push_str(" class=\"");
-            target.push_str(cl);
-            target.push('"');
+            write!(writer, " class=\"{}\"", cl)?;
         }
-        target.push('>');
+        write!(writer, ">")?;
 
         for child in children {
-            self.write_element(target, characters, child)?;
+            self.write_element(writer, characters, child)?;
         }
 
-        target.push_str("</");
-        target.push_str(tag);
-        target.push('>');
+        write!(writer, "</{}>", tag)?;
 
         Ok(())
     }
@@ -98,25 +114,25 @@ impl HtmlEmitter {
     /// Writes ElementNode content in HTML format into String.
     fn write_element(
         &self,
-        target: &mut String,
+        writer: &mut impl Write,
         characters: &CharacterSet,
         element: &ElementNode,
-    ) -> Result<(), HtmlEmitterError> {
+    ) -> IoResult<()> {
         match element {
             ElementNode::Text(text) => {
                 let mut rest = &text[..];
                 while let Some((head, ch)) = HtmlEmitter::find_escape_chars(rest) {
-                    target.push_str(&rest[..head]);
+                    writer.write_all(&rest[..head].as_bytes())?;
                     match ch {
-                        '<' => target.push_str("&lt;"),
-                        '>' => target.push_str("&gt;"),
-                        '&' => target.push_str("&amp;"),
-                        '"' => target.push_str("&quot;"),
+                        '<' => writer.write_all(b"&lt;")?,
+                        '>' => writer.write_all(b"&gt;")?,
+                        '&' => writer.write_all(b"&amp;")?,
+                        '"' => writer.write_all(b"&quot;")?,
                         _ => unreachable!("Undefined escaping char"),
                     }
                     rest = &rest[(head + 1)..];
                 }
-                target.push_str(rest);
+                writer.write_all(&rest.as_bytes())?;
             }
             ElementNode::Surrounded {
                 kind,
@@ -124,46 +140,49 @@ impl HtmlEmitter {
                 children,
             } => match kind {
                 Element::Line(id) => {
-                    let name = characters
-                        .get(id)
-                        .ok_or_else(|| HtmlEmitterError::UndefinedCharacter(id.to_string()))?;
+                    let name = characters.get(id).ok_or_else(|| {
+                        Error::new(
+                            ErrorKind::NotFound,
+                            HtmlEmitterError::UndefinedCharacter(id.to_string()),
+                        )
+                    })?;
                     self.write_simple_surrounded_element(
-                        target,
+                        writer,
                         "span",
                         Some(&self.get_character_class(name)),
                         characters,
                         children,
                     )?;
-                    target.push('\n');
+                    writeln!(writer)?;
                 }
                 Element::Bold => self.write_simple_surrounded_element(
-                    target, "strong", None, characters, children,
+                    writer, "strong", None, characters, children,
                 )?,
                 Element::Italic => {
-                    self.write_simple_surrounded_element(target, "i", None, characters, children)?
+                    self.write_simple_surrounded_element(writer, "i", None, characters, children)?
                 }
                 Element::Underlined => self.write_simple_surrounded_element(
-                    target,
+                    writer,
                     "span",
                     Some("underline"),
                     characters,
                     children,
                 )?,
                 Element::Deleted => {
-                    self.write_simple_surrounded_element(target, "del", None, characters, children)?
+                    self.write_simple_surrounded_element(writer, "del", None, characters, children)?
                 }
                 Element::Dotted => self.write_simple_surrounded_element(
-                    target,
+                    writer,
                     "span",
                     Some("dots"),
                     characters,
                     children,
                 )?,
                 Element::Monospaced => self
-                    .write_simple_surrounded_element(target, "code", None, characters, children)?,
+                    .write_simple_surrounded_element(writer, "code", None, characters, children)?,
                 Element::Item => {
-                    self.write_simple_surrounded_element(target, "li", None, characters, children)?;
-                    target.push('\n');
+                    self.write_simple_surrounded_element(writer, "li", None, characters, children)?;
+                    writeln!(writer)?;
                 }
                 Element::Link => {
                     let href = parameters
@@ -173,39 +192,43 @@ impl HtmlEmitter {
                             if let Some(ElementNode::Text(url)) = children.first() {
                                 Ok(url)
                             } else {
-                                Err(HtmlEmitterError::InvalidParameter(
-                                    "Only a plain text content is valid for link target",
+                                Err(Error::new(
+                                    ErrorKind::InvalidData,
+                                    HtmlEmitterError::InvalidParameter(
+                                        "Only a plain text content is valid for link target",
+                                    ),
                                 ))
                             }
                         })
-                        .ok_or(HtmlEmitterError::InvalidParameter(
-                            "Link URL needed",
-                        ))??;
-                    target.push_str("<a href=\"");
-                    target.push_str(href);
-                    target.push_str("\">");
+                        .ok_or_else(|| {
+                            Error::new(
+                                ErrorKind::Other,
+                                HtmlEmitterError::InvalidParameter("Link URL needed"),
+                            )
+                        })??;
+                    write!(writer, "<a href=\"{}\">", href)?;
                     for child in children {
-                        self.write_element(target, characters, child)?;
+                        self.write_element(writer, characters, child)?;
                     }
-                    target.push_str("</a>");
+                    writer.write_all(b"</a>")?;
                 }
                 Element::Ruby => {
-                    target.push_str("<ruby>");
+                    writer.write_all(b"<ruby>")?;
                     for child in children {
-                        self.write_element(target, characters, child)?;
+                        self.write_element(writer, characters, child)?;
                     }
-                    target.push_str("<rp>(</rp><rt>");
+                    writer.write_all(b"<rp>(</rp><rt>")?;
                     if let Some(first) = parameters.first() {
-                        self.write_element(target, characters, first)?;
+                        self.write_element(writer, characters, first)?;
                     }
-                    target.push_str("</rt><rp>)</rp></ruby>");
+                    writer.write_all(b"</rt><rp>)</rp></ruby>")?;
                 }
                 Element::Newline => {
-                    target.push_str("<br>\n");
+                    writer.write_all(b"<br>\n")?;
                 }
                 Element::Parameter => {
                     for child in children {
-                        self.write_element(target, characters, child)?;
+                        self.write_element(writer, characters, child)?;
                     }
                 }
             },
@@ -217,57 +240,54 @@ impl HtmlEmitter {
     /// Writes BlockNode content in HTML format into String.
     fn write_block(
         &self,
-        target: &mut String,
+        writer: &mut impl Write,
         characters: &CharacterSet,
         (i, block): (usize, &BlockNode),
-    ) -> Result<(), HtmlEmitterError> {
+    ) -> IoResult<()> {
         match block.kind {
             Block::Paragraph => {
-                target.push_str("<p>\n");
+                writeln!(writer, "<p>")?;
                 for child in &block.children {
-                    self.write_element(target, characters, child)?;
+                    self.write_element(writer, characters, child)?;
                 }
-                target.push('\n');
-                target.push_str("</p>\n");
+                writeln!(writer, "\n</p>")?;
             }
             Block::Quotation => {
-                target.push_str("<blockquote>\n");
+                writeln!(writer, "<blockquote>")?;
                 for child in &block.children {
-                    self.write_element(target, characters, child)?;
+                    self.write_element(writer, characters, child)?;
                 }
-                target.push('\n');
-                target.push_str("</blockquote>\n");
+                writeln!(writer, "\n</blockquote>")?;
             }
             Block::UnorderedList => {
-                target.push_str("<blockquote>\n");
+                writeln!(writer, "<ul>")?;
                 for child in &block.children {
                     if let ElementNode::Surrounded {
                         kind: Element::Item,
                         ..
                     } = child
                     {
-                        self.write_element(target, characters, child)?;
+                        self.write_element(writer, characters, child)?;
                     }
                 }
-                target.push('\n');
-                target.push_str("</blockquote>\n");
+                writeln!(writer, "\n</ul>")?;
             }
             Block::Section => {
-                target.push_str(&format!("<h2 id=\"{}\">", format!("section-{}", i)));
+                write!(writer, "<h2 id=\"section-{}\">", i)?;
                 for child in &block.children {
-                    self.write_element(target, characters, child)?;
+                    self.write_element(writer, characters, child)?;
                 }
-                target.push_str("</h2>\n");
+                writeln!(writer, "</h2>")?;
             }
             Block::Subsection => {
-                target.push_str(&format!("<h3 id=\"{}\">", format!("section-{}", i)));
+                write!(writer, "<h3 id=\"section-{}\">", i)?;
                 for child in &block.children {
-                    self.write_element(target, characters, child)?;
+                    self.write_element(writer, characters, child)?;
                 }
-                target.push_str("</h3>\n");
+                writeln!(writer, "</h3>")?;
             }
             Block::Horizontal => {
-                target.push_str("<hr>\n");
+                writeln!(writer, "<hr>")?;
             }
         }
         Ok(())
@@ -275,31 +295,58 @@ impl HtmlEmitter {
 }
 
 impl<'a> Emit<'a> for HtmlEmitter {
-    type Output = Result<String, HtmlEmitterError>;
-    type Anchors = Vec<HtmlAnchor>;
-
-    fn emit(&self, document: &Document<'a>) -> Self::Output {
-        let mut result = String::with_capacity(1 << 16);
-        result.push_str(&self.emit_character_styles(&document.characters));
+    fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> IoResult<()> {
+        self.write_character_styles(writer, &document.characters)?;
         for block in document.blocks.iter().enumerate() {
-            self.write_block(&mut result, &document.characters, block)?;
+            self.write_block(writer, &document.characters, block)?;
         }
 
-        Ok(result)
+        Ok(())
     }
+}
 
-    fn section_anchors(&self, document: &Document<'a>) -> Self::Anchors {
-        document
-            .blocks
-            .iter()
-            .enumerate()
-            .filter_map(|(i, b)| match b.kind {
-                Block::Section | Block::Subsection => Some(HtmlAnchor {
-                    id: format!("section-{}", i),
-                    title: format!(""),
-                }),
-                _ => None,
-            })
-            .collect()
+// Index extractor
+
+/// Represents an anchor in HTML formatted document.
+pub struct HtmlAnchor {
+    /// Title
+    pub title: String,
+
+    /// Anchor id attribute
+    pub id: String,
+}
+
+/// Iterator adaptor which iterates HtmlAnchor.
+pub struct HtmlAnchorIter<'d, 's>(&'d [BlockNode<'s>], usize);
+
+impl Iterator for HtmlAnchorIter<'_, '_> {
+    type Item = HtmlAnchor;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.1 < self.0.len() {
+            let target = &self.0[self.1];
+            match target.kind {
+                Block::Section | Block::Subsection => {
+                    return Some(HtmlAnchor {
+                        id: format!("section-{}", self.1),
+                        // TODO: タグなしタイトルをつける
+                        title: format!(""),
+                    })
+                }
+                _ => (),
+            }
+            self.1 += 1;
+        }
+
+        None
+    }
+}
+
+impl<'d, 's: 'd> ExtractIndices<'d, 's> for HtmlEmitter {
+    type IndexItemIter = HtmlAnchorIter<'d, 's>;
+    type IndexItem = HtmlAnchor;
+
+    fn indices(&self, document: &'d Document<'s>) -> Self::IndexItemIter {
+        HtmlAnchorIter(&document.blocks, 0)
     }
 }

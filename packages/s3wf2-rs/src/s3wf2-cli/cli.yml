@@ -8,6 +8,12 @@ subcommands:
         - INPUT:
             help: 'Source text file (will be stdin when omitted)'
             required: false
+            index: 1
+        - output:
+            short: 'o'
+            help: 'Output file (- for stdout)'
+            required: false
+            takes_value: true
         - type:
             short: 't'
             help: 'Format type'
@@ -21,4 +27,5 @@ subcommands:
         - INPUT:
             help: 'Source text file (will be stdin when omitted)'
             required: false
+            index: 1
 
