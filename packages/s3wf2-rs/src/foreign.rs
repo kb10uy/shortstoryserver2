@@ -87,6 +87,7 @@ pub unsafe extern "C" fn s3wf2_parser_parse(
     let status = if result.is_ok() {
         Status::Success
     } else {
+        parser.errors_position = Some(0);
         Status::ParseError
     };
     parser.parse_result = Some(result);
@@ -114,8 +115,8 @@ pub unsafe extern "C" fn s3wf2_parser_next_error(
         Some(next) => {
             if next < errors.len() {
                 let mut sized_buffer = from_raw_parts_mut(buffer as *mut c_uchar, buffer_length);
-                let message = format!("{}", errors[next]);
-                match sized_buffer.write(&message.as_bytes()) {
+                let message = CString::new(format!("{}", errors[next])).unwrap();
+                match sized_buffer.write_all(&message.to_bytes_with_nul()) {
                     Ok(_) => {
                         parser.errors_position = Some(next + 1);
                         1
