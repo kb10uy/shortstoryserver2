@@ -8,7 +8,7 @@ use std::{
 use crate::util::exit_document_errors;
 use s3wf2::{
     document::Document,
-    emitter::{html::HtmlEmitter, Emit},
+    emitter::{html::HtmlEmitter, console::ConsoleEmitter, Emit},
     parser::Parser,
 };
 
@@ -44,6 +44,9 @@ pub fn subcommand_format(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         Some("html") => {
             emit_html(&document, args)?;
         }
+        Some("console") => {
+            emit_console(&document)?;
+        }
         _ => panic!("Invalid format type"),
     }
 
@@ -51,7 +54,7 @@ pub fn subcommand_format(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 }
 
 fn emit_html(document: &Document, args: &ArgMatches) -> Result<(), io::Error> {
-    let emitter = HtmlEmitter::new(4);
+    let mut emitter = HtmlEmitter::new(4);
     match args.value_of("output") {
         None | Some("-") => {
             let stdout = io::stdout();
@@ -66,4 +69,12 @@ fn emit_html(document: &Document, args: &ArgMatches) -> Result<(), io::Error> {
             writer.flush()
         }
     }
+}
+
+fn emit_console(document: &Document) -> Result<(), io::Error> {
+    let mut emitter = ConsoleEmitter::new();
+    let stdout = io::stdout();
+    let mut writer = io::BufWriter::with_capacity(1 << 16, stdout.lock());
+    emitter.emit(&mut writer, document)?;
+    writer.flush()
 }
