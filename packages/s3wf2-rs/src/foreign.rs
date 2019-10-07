@@ -8,7 +8,6 @@ use libc::{c_char, c_int, c_uchar, size_t};
 use std::{
     ffi::{CStr, CString},
     io::Write,
-    mem::forget,
     slice::from_raw_parts_mut,
 };
 

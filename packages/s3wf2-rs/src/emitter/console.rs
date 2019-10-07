@@ -36,8 +36,8 @@ pub struct ConsoleEmitter {
 lazy_static! {
     static ref MALE_COLORS: Vec<Colour> = vec![
         Colour::Fixed(26),
-        Colour::Fixed(38),
-        Colour::Fixed(56),
+        Colour::Fixed(80),
+        Colour::Fixed(74),
         Colour::Fixed(62)
     ];
     static ref FEMALE_COLORS: Vec<Colour> = vec![
@@ -261,7 +261,6 @@ impl ConsoleEmitter {
                     self.confirm_newline(writer)
                 }
                 Element::Newline => {
-                    self.confirm_newline(writer)?;
                     writeln!(writer)
                 }
                 Element::Line(id, false) => {
