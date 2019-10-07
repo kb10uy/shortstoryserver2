@@ -1,14 +1,10 @@
 use clap::ArgMatches;
-use std::{
-    error::Error, fs::File, io, io::prelude::*,
-    time::Instant,
-
-};
+use std::{error::Error, fs::File, io, io::prelude::*, time::Instant};
 
 use crate::util::exit_document_errors;
 use s3wf2::{
     document::Document,
-    emitter::{html::HtmlEmitter, console::ConsoleEmitter, Emit},
+    emitter::{console::ConsoleEmitter, html::HtmlEmitter, Emit},
     parser::Parser,
 };
 
@@ -37,7 +33,11 @@ pub fn subcommand_format(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let parse_time = parse_started.elapsed();
     if verbose {
         use ansi_term::Color::Green;
-        eprintln!("{} It took {}ms.", Green.bold().paint("Parse succeeded."), parse_time.as_millis());
+        eprintln!(
+            "{} It took {}ms.",
+            Green.bold().paint("Parse succeeded."),
+            parse_time.as_millis()
+        );
     }
 
     match args.value_of("type") {
@@ -61,7 +61,6 @@ fn emit_html(document: &Document, args: &ArgMatches) -> Result<(), io::Error> {
             let mut writer = io::BufWriter::with_capacity(1 << 16, stdout.lock());
             emitter.emit(&mut writer, document)?;
             writer.flush()
-
         }
         Some(file) => {
             let mut writer = io::BufWriter::with_capacity(1 << 16, File::create(file)?);

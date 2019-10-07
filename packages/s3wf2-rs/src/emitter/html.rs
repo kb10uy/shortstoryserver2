@@ -143,21 +143,29 @@ impl HtmlEmitter {
                 parameters,
                 children,
             } => match kind {
-                Element::Line(id) => {
+                Element::Line(id, inline) => {
                     let name = characters.get(id).ok_or_else(|| {
                         Error::new(
                             ErrorKind::NotFound,
                             HtmlEmitterError::UndefinedCharacter(id.to_string()),
                         )
                     })?;
+                    let classes = if *inline {
+                        format!("inline line {}", self.get_character_class(name))
+                    } else {
+                        format!("line {}", self.get_character_class(name))
+                    };
+
                     self.write_simple_surrounded_element(
                         writer,
                         "span",
-                        Some(&self.get_character_class(name)),
+                        Some(&classes),
                         characters,
                         children,
                     )?;
-                    writeln!(writer)?;
+                    if *inline {
+                        writeln!(writer)?;
+                    }
                 }
                 Element::Bold => self.write_simple_surrounded_element(
                     writer, "strong", None, characters, children,
@@ -335,7 +343,7 @@ impl Iterator for HtmlAnchorIter<'_, '_> {
                         id: format!("section-{}", self.1),
                         // TODO: タグなしタイトルをつける
                         title: format!(""),
-                    })
+                    });
                 }
                 _ => (),
             }

@@ -218,8 +218,8 @@ pub enum Element {
     /// List item
     Item,
 
-    /// Line, speech (the parameter should contain the ID)
-    Line(String),
+    /// Line, speech (the parameter should contain the ID, and whether inline display or not)
+    Line(String, bool),
 }
 
 /// Represents a block level node.
@@ -354,10 +354,34 @@ mod test {
         characters.add_female("ayano", "文乃").unwrap();
 
         let mut iter = characters.characters();
-        assert_eq!(iter.next(), Some((&"ayano".to_string(), &CharacterType::Female(2, "文乃".to_string()))));
-        assert_eq!(iter.next(), Some((&"kb10uy".to_string(), &CharacterType::Male(1, "佑".to_string()))));
-        assert_eq!(iter.next(), Some((&"natsuki".to_string(), &CharacterType::Female(1, "夏稀".to_string()))));
-        assert_eq!(iter.next(), Some((&"tomone".to_string(), &CharacterType::Mob(1, "朋音".to_string()))));
+        assert_eq!(
+            iter.next(),
+            Some((
+                &"ayano".to_string(),
+                &CharacterType::Female(2, "文乃".to_string())
+            ))
+        );
+        assert_eq!(
+            iter.next(),
+            Some((
+                &"kb10uy".to_string(),
+                &CharacterType::Male(1, "佑".to_string())
+            ))
+        );
+        assert_eq!(
+            iter.next(),
+            Some((
+                &"natsuki".to_string(),
+                &CharacterType::Female(1, "夏稀".to_string())
+            ))
+        );
+        assert_eq!(
+            iter.next(),
+            Some((
+                &"tomone".to_string(),
+                &CharacterType::Mob(1, "朋音".to_string())
+            ))
+        );
         assert_eq!(iter.next(), None);
     }
 

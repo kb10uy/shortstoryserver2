@@ -61,7 +61,7 @@ impl<'a> Parser {
                             None => Ok(()),
                         }
                     }
-                    "@" => self.parse_line(&document.characters, &mut current_block, name, rest),
+                    "@" => self.parse_line(&document.characters, &mut current_block, false, name, rest),
                     // Not included in regex, therefore unreachable
                     _ => unreachable!("Unexpected command type"),
                 }
@@ -183,6 +183,7 @@ impl<'a> Parser {
         &self,
         characters: &CharacterSet,
         parent_block: &mut BlockNode<'a>,
+        inline: bool,
         element: &'a str,
         rest: Option<&'a str>,
     ) -> Result<(), ErrorKind> {
@@ -196,7 +197,7 @@ impl<'a> Parser {
         let mut children = vec![];
         self.parse_normal(&mut children, rest.unwrap_or(""))?;
         parent_block.children.push(ElementNode::Surrounded {
-            kind: Element::Line(id),
+            kind: Element::Line(id, inline),
             parameters: vec![],
             children,
         });
@@ -237,6 +238,7 @@ impl<'a> Parser {
                     // line element
                     uncommited.push(ElementNode::new_surrounded(Element::Line(
                         (&element[1..]).to_string(),
+                        true,
                     )));
                 } else {
                     // other

@@ -3,6 +3,7 @@ use crate::{
     emitter::Emit,
 };
 use ansi_term::{Colour, Style};
+use lazy_static::lazy_static;
 use std::io::{prelude::*, Result};
 
 #[derive(PartialEq)]
@@ -20,17 +21,44 @@ enum AbstractStyle {
     Color(Colour),
 }
 
+enum NewlineState {
+    InUse,
+    Ready,
+    NewParagraph,
+}
+
 /// Emitter for virtual terminal.
 pub struct ConsoleEmitter {
     style_stack: Vec<AbstractStyle>,
-    fresh_newline: bool,
+    newline_state: NewlineState,
+}
+
+lazy_static! {
+    static ref MALE_COLORS: Vec<Colour> = vec![
+        Colour::Fixed(26),
+        Colour::Fixed(38),
+        Colour::Fixed(56),
+        Colour::Fixed(62)
+    ];
+    static ref FEMALE_COLORS: Vec<Colour> = vec![
+        Colour::Fixed(170),
+        Colour::Fixed(179),
+        Colour::Fixed(209),
+        Colour::Fixed(229)
+    ];
+    static ref MOB_COLORS: Vec<Colour> = vec![
+        Colour::Fixed(195),
+        Colour::Fixed(230),
+        Colour::Fixed(153),
+        Colour::Fixed(158)
+    ];
 }
 
 impl ConsoleEmitter {
     pub fn new() -> ConsoleEmitter {
         ConsoleEmitter {
             style_stack: vec![],
-            fresh_newline: true,
+            newline_state: NewlineState::NewParagraph,
         }
     }
 
@@ -59,11 +87,46 @@ impl ConsoleEmitter {
         })
     }
 
-    fn confirm_newline(&mut self, writer: &mut impl Write) -> Result<()> {
-        if !self.fresh_newline {
-            self.fresh_newline = true;
-            writeln!(writer)?;
+    fn get_color<'c> (&self, character: Option<&'c CharacterType>) -> (Colour, &'c str) {
+        match character {
+            Some(CharacterType::Male(i, n)) => (MALE_COLORS[i % MALE_COLORS.len()], n),
+            Some(CharacterType::Female(i, n)) => (FEMALE_COLORS[i % FEMALE_COLORS.len()], n),
+            Some(CharacterType::Mob(i, n)) => (MOB_COLORS[i % MOB_COLORS.len()], n),
+            Some(CharacterType::Custom(cc, n)) => {
+                let (r, g, b) = if cc.len() == 3 {
+                    let r = u8::from_str_radix(&cc[0..1], 16).unwrap_or(7) * 17;
+                    let g = u8::from_str_radix(&cc[1..2], 16).unwrap_or(7) * 17;
+                    let b = u8::from_str_radix(&cc[2..3], 16).unwrap_or(7) * 17;
+                    (r, g, b)
+                } else {
+                    let r = u8::from_str_radix(&cc[0..2], 16).unwrap_or(127);
+                    let g = u8::from_str_radix(&cc[2..4], 16).unwrap_or(127);
+                    let b = u8::from_str_radix(&cc[4..6], 16).unwrap_or(127);
+                    (r, g, b)
+                };
+                (Colour::RGB(r, g, b), n)
+            }
+            None => (Colour::Fixed(249), "[Undefined]"),
         }
+    }
+
+    fn confirm_paragraph(&mut self, writer: &mut impl Write) -> Result<()> {
+        match self.newline_state {
+            NewlineState::InUse => writeln!(writer, "\n")?,
+            NewlineState::Ready => writeln!(writer)?,
+            NewlineState::NewParagraph => (),
+        }
+        self.newline_state = NewlineState::NewParagraph;
+        Ok(())
+    }
+
+    fn confirm_newline(&mut self, writer: &mut impl Write) -> Result<()> {
+        match self.newline_state {
+            NewlineState::InUse => writeln!(writer)?,
+            NewlineState::Ready => (),
+            NewlineState::NewParagraph => (),
+        }
+        self.newline_state = NewlineState::Ready;
         Ok(())
     }
 
@@ -75,55 +138,49 @@ impl ConsoleEmitter {
     ) -> Result<()> {
         match block.kind {
             Block::Section => {
-                self.confirm_newline(writer)?;
-                writeln!(writer)?;
-
+                self.confirm_paragraph(writer)?;
                 self.style_stack.push(AbstractStyle::Color(Colour::Yellow));
                 self.emit_element(writer, characters, &ElementNode::Text("###### "))?;
                 self.emit_elements(writer, characters, &block.children)?;
                 self.emit_element(writer, characters, &ElementNode::Text(" ######"))?;
                 self.style_stack.pop();
 
-                self.fresh_newline = true;
-                writeln!(writer)
+                self.confirm_paragraph(writer)
             }
             Block::Subsection => {
-                self.confirm_newline(writer)?;
-                writeln!(writer)?;
-
+                self.confirm_paragraph(writer)?;
                 self.style_stack.push(AbstractStyle::Color(Colour::Yellow));
                 self.emit_element(writer, characters, &ElementNode::Text("====== "))?;
                 self.emit_elements(writer, characters, &block.children)?;
                 self.emit_element(writer, characters, &ElementNode::Text(" ======"))?;
                 self.style_stack.pop();
 
-                self.fresh_newline = true;
-                writeln!(writer)
+                self.confirm_paragraph(writer)
             }
             Block::Horizontal => {
-                self.confirm_newline(writer)?;
-                self.fresh_newline = true;
-                writeln!(writer, "--------------------------------------------------------------------------------")
+                self.confirm_paragraph(writer)?;
+                writeln!(writer, "--------------------------------------------------------------------------------")?;
+                self.newline_state = NewlineState::Ready;
+                self.confirm_paragraph(writer)
             }
             Block::Paragraph => {
-                self.confirm_newline(writer)?;
-                writeln!(writer)?;
+                self.confirm_paragraph(writer)?;
                 self.emit_elements(writer, characters, &block.children)?;
-                self.confirm_newline(writer)
+                self.confirm_paragraph(writer)
             }
             Block::Quotation => {
+                self.confirm_paragraph(writer)?;
                 self.confirm_newline(writer)?;
                 self.style_stack
                     .push(AbstractStyle::Color(Colour::RGB(127, 127, 127)));
                 self.emit_elements(writer, characters, &block.children)?;
                 self.style_stack.pop();
-
-                self.fresh_newline = true;
-                writeln!(writer)
+                self.confirm_paragraph(writer)
             }
             Block::UnorderedList => {
-                self.confirm_newline(writer)?;
-                self.emit_elements(writer, characters, &block.children)
+                self.confirm_paragraph(writer)?;
+                self.emit_elements(writer, characters, &block.children)?;
+                self.confirm_paragraph(writer)
             }
         }
     }
@@ -148,7 +205,7 @@ impl ConsoleEmitter {
     ) -> Result<()> {
         match element {
             ElementNode::Text(text) => {
-                self.fresh_newline = false;
+                self.newline_state = NewlineState::InUse;
                 write!(writer, "{}", self.current_style().paint(*text))
             }
             ElementNode::Surrounded {
@@ -201,20 +258,28 @@ impl ConsoleEmitter {
                     self.confirm_newline(writer)?;
                     self.emit_element(writer, characters, &ElementNode::Text("・"))?;
                     self.emit_elements(writer, characters, children)?;
-                    self.fresh_newline = true;
-                    writeln!(writer)
+                    self.confirm_newline(writer)
                 }
                 Element::Newline => {
-                    self.fresh_newline = true;
+                    self.confirm_newline(writer)?;
                     writeln!(writer)
                 }
-                Element::Line(id) => {
+                Element::Line(id, false) => {
+                    let (color, name) = self.get_color(characters.get(id));
                     self.confirm_newline(writer)?;
-                    self.style_stack.push(AbstractStyle::Color(Colour::Green));
-                    self.emit_element(writer, characters, &ElementNode::Text(&id))?;
+                    self.style_stack.push(AbstractStyle::Color(color));
+                    self.emit_element(writer, characters, &ElementNode::Text(name))?;
                     self.emit_elements(writer, characters, children)?;
                     self.style_stack.pop();
                     self.confirm_newline(writer)
+                }
+                Element::Line(id, true) => {
+                    let ctype = characters.get(id);
+                    let (color, _) = self.get_color(ctype);
+                    self.style_stack.push(AbstractStyle::Color(color));
+                    self.emit_elements(writer, characters, children)?;
+                    self.style_stack.pop();
+                    Ok(())
                 }
                 Element::Monospaced | Element::Parameter => {
                     self.emit_elements(writer, characters, children)
