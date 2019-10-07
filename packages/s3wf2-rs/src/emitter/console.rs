@@ -108,7 +108,8 @@ impl ConsoleEmitter {
             Block::Paragraph => {
                 self.confirm_newline(writer)?;
                 writeln!(writer)?;
-                self.emit_elements(writer, characters, &block.children)
+                self.emit_elements(writer, characters, &block.children)?;
+                self.confirm_newline(writer)
             }
             Block::Quotation => {
                 self.confirm_newline(writer)?;
