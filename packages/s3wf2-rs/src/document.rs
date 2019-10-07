@@ -2,17 +2,18 @@ use crate::error::SemanticErrorKind;
 use std::{collections::BTreeMap, fmt};
 
 /// Indicates the type of characters in document.
+#[derive(Debug, PartialEq, Eq)]
 pub enum CharacterType {
-    /// Preset male character
+    /// Preset male character, with index and reference ID
     Male(usize, String),
 
-    /// Preset female character
+    /// Preset female character, with index and reference ID
     Female(usize, String),
 
-    /// Preset mob character
+    /// Preset mob character, with index and reference ID
     Mob(usize, String),
 
-    /// Customized color character
+    /// Customized color character, with colorcode (3 or 6 digit hexiadecimal, without `#`) and reference ID
     Custom(String, String),
 }
 
@@ -39,7 +40,7 @@ impl fmt::Display for CharacterType {
     }
 }
 
-/// The characters container.
+/// Contains characters metadata.
 #[derive(Default)]
 pub struct CharacterSet {
     used_male: usize,
@@ -49,7 +50,7 @@ pub struct CharacterSet {
 }
 
 impl CharacterSet {
-    /// Creates new instance.
+    /// Creates a new instance.
     pub fn new() -> CharacterSet {
         CharacterSet {
             used_male: 0,
@@ -60,6 +61,10 @@ impl CharacterSet {
     }
 
     /// Adds a male character.
+    ///
+    /// # Parameters
+    /// * `id` - The reference ID
+    /// * `name` - The name displayed in document
     pub fn add_male(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
             Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
@@ -74,6 +79,10 @@ impl CharacterSet {
     }
 
     /// Adds a female character.
+    ///
+    /// # Parameters
+    /// * `id` - The reference ID
+    /// * `name` - The name displayed in document
     pub fn add_female(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
             Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
@@ -88,6 +97,10 @@ impl CharacterSet {
     }
 
     /// Adds a mob character.
+    ///
+    /// # Parameters
+    /// * `id` - The reference ID
+    /// * `name` - The name displayed in document
     pub fn add_mob(&mut self, id: &str, name: &str) -> Result<(), SemanticErrorKind> {
         if self.characters.contains_key(id) {
             Err(SemanticErrorKind::DuplicateCharacter(id.to_string()))
@@ -102,6 +115,11 @@ impl CharacterSet {
     }
 
     /// Adds a custom color character.
+    ///
+    /// # Parameters
+    /// * `id` - The reference ID
+    /// * `name` - The name displayed in document
+    /// * `color` - A colorcode, which consists of 3 or 6 hexadecimal digits
     pub fn add_custom(
         &mut self,
         id: &str,
@@ -119,12 +137,13 @@ impl CharacterSet {
         }
     }
 
-    /// Gets the character type related to the key.
+    /// Gets the character type related to the ID.
     pub fn get(&self, id: &str) -> Option<&CharacterType> {
         self.characters.get(id)
     }
 
     /// Returns character iterator.
+    /// The order is guaranteed to be consistent.
     pub fn characters(&self) -> impl Iterator<Item = (&String, &CharacterType)> {
         self.characters.iter()
     }
@@ -301,6 +320,7 @@ pub struct Document<'a> {
 }
 
 impl<'a> Document<'a> {
+    /// Creates a new instance.
     pub(crate) fn new() -> Document<'a> {
         Document {
             characters: CharacterSet::new(),
@@ -318,5 +338,33 @@ impl<'a> fmt::Display for Document<'a> {
         }
         writeln!(f, "}}")?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn character_set_works() {
+        let mut characters = CharacterSet::new();
+        characters.add_male("kb10uy", "佑").unwrap();
+        characters.add_female("natsuki", "夏稀").unwrap();
+        characters.add_mob("tomone", "朋音").unwrap();
+        characters.add_female("ayano", "文乃").unwrap();
+
+        let mut iter = characters.characters();
+        assert_eq!(iter.next(), Some((&"ayano".to_string(), &CharacterType::Female(2, "文乃".to_string()))));
+        assert_eq!(iter.next(), Some((&"kb10uy".to_string(), &CharacterType::Male(1, "佑".to_string()))));
+        assert_eq!(iter.next(), Some((&"natsuki".to_string(), &CharacterType::Female(1, "夏稀".to_string()))));
+        assert_eq!(iter.next(), Some((&"tomone".to_string(), &CharacterType::Mob(1, "朋音".to_string()))));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    #[should_panic(expected = "Failed to unwrap non-parameter node")]
+    fn element_node_panics_on_unwrap_non_parameter() {
+        let element = ElementNode::new_surrounded(Element::Bold);
+        element.unwrap_parameter();
     }
 }
