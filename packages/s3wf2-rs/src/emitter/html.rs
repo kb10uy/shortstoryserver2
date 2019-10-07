@@ -299,7 +299,7 @@ impl HtmlEmitter {
 }
 
 impl<'a> Emit<'a> for HtmlEmitter {
-    fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> IoResult<()> {
+    fn emit(&mut self, writer: &mut impl Write, document: &Document<'a>) -> IoResult<()> {
         self.write_character_styles(writer, &document.characters)?;
         for block in document.blocks.iter().enumerate() {
             self.write_block(writer, &document.characters, block)?;

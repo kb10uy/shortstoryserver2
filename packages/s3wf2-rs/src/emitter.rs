@@ -1,5 +1,8 @@
 pub mod html;
 
+#[cfg(feature = "cli")]
+pub mod console;
+
 use crate::document::Document;
 use std::io::{prelude::*, Result};
 
@@ -9,7 +12,7 @@ pub trait Emit<'a> {
     ///
     /// # Parameters
     /// * `writer` - The `Write` object into which you want to write formatted text.
-    fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> Result<()>;
+    fn emit(&mut self, writer: &mut impl Write, document: &Document<'a>) -> Result<()>;
 }
 
 /// The trait which extracts indices in document.
