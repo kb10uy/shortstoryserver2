@@ -6,6 +6,9 @@ use std::io::{prelude::*, Result};
 /// The trait which converts `Document` into other formats.
 pub trait Emit<'a> {
     /// Emits formatted document.
+    ///
+    /// # Parameters
+    /// * `writer` - The `Write` object into which you want to write formatted text.
     fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> Result<()>;
 }
 
