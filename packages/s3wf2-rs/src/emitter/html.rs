@@ -14,7 +14,10 @@ use crate::{
 /// Represents error kinds in HtmlEmitter.
 #[derive(Debug)]
 pub enum HtmlEmitterError {
+    /// Undefined character ID appeared.
     UndefinedCharacter(String),
+
+    /// Invalid parameter value detected.
     InvalidParameter(&'static str),
 }
 
@@ -43,6 +46,7 @@ pub struct HtmlEmitter {
 }
 
 impl HtmlEmitter {
+    /// Creates a new instance.
     pub fn new(max_characters: usize) -> HtmlEmitter {
         HtmlEmitter {
             max_reserved_characters: max_characters,
@@ -295,7 +299,7 @@ impl HtmlEmitter {
 }
 
 impl<'a> Emit<'a> for HtmlEmitter {
-    fn emit(&self, writer: &mut impl Write, document: &Document<'a>) -> IoResult<()> {
+    fn emit(&mut self, writer: &mut impl Write, document: &Document<'a>) -> IoResult<()> {
         self.write_character_styles(writer, &document.characters)?;
         for block in document.blocks.iter().enumerate() {
             self.write_block(writer, &document.characters, block)?;

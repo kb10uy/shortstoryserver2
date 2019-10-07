@@ -3,8 +3,13 @@ use std::{error::Error as StdError, fmt};
 /// Represents semantic error in parsing S3WF2.
 #[derive(Debug)]
 pub enum SemanticErrorKind {
+    /// Undefined character ID appeared.
     UndefinedCharacter(String),
+
+    /// Detected duplicate character ID.
     DuplicateCharacter(String),
+
+    /// Surrounding tag is not supported for the `Element`.
     Nonsurrounding,
 }
 
@@ -25,13 +30,28 @@ impl fmt::Display for SemanticErrorKind {
 /// Represents any error in parsing S3WF2.
 #[derive(Debug)]
 pub enum ErrorKind {
+    /// Tag opening appears too much.
     TooManyTagOpening,
+
+    /// Tag closing appears too much.
     TooManyTagClosing,
+
+    /// Wrong (bracket/brace) pair detected (like `{ ]` and `[ }`).
     InvalidParenPair,
+
+    /// Wrong surrounding block pair detected. Maybe blank line exists in block.
     InvalidBlockPair,
+
+    /// Parameters are insufficient.
     NotEnoughParameters { given: usize, needed: usize },
+
+    /// Unknown command used.
     UnknownCommand(String),
+
+    /// Unknown element (`BlockNode` or `ElementNode`) used.
     UnknownElement(String),
+
+    /// Semantic error.
     Semantic(SemanticErrorKind),
 }
 
@@ -57,7 +77,10 @@ impl fmt::Display for ErrorKind {
 /// Represents an error of S3WF2 format parsing.
 #[derive(Debug)]
 pub struct Error {
+    /// The line number at which this error occurred.
     pub(crate) line_number: usize,
+
+    /// Error type.
     pub(crate) kind: ErrorKind,
 }
 

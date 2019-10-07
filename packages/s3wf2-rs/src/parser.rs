@@ -10,20 +10,26 @@ lazy_static! {
     static ref REGEX_SPACES: Regex = Regex::new(r"\s+").unwrap();
     static ref REGEX_CHARACTER_ID: Regex = Regex::new(r"^[A-Za-z0-9_]+$").unwrap();
     static ref REGEX_COLORCODE: Regex = Regex::new(r"^#([A-Fa-f0-9]{3,6})$").unwrap();
-    // MEMO: 後方一致が無いのでキャプチャーグループの終端でもってマッチを終了させる
+    // MEMO: regex crate does not support (?=expr) syntax, so use capture groups instead
     static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[A-Za-z0-9_]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
 }
 
 /// S3WF2 parser state.
 #[derive(Default)]
-pub struct Parser {}
+pub struct Parser;
 
 impl<'a> Parser {
+    /// Creates a new instance.
     pub fn new() -> Parser {
         Parser {}
     }
 
     /// Parses text and append the result to held document.
+    ///
+    /// # Return value
+    /// * `Ok(Document<'a>)` when parse completed successfully
+    /// * `Err(Vec<Error>)` when some error detected
+    ///     - Each item represents an error in single line
     pub fn parse(&self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
         let lines = source.lines();
         let mut errors = vec![];

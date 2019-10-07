@@ -21,6 +21,7 @@ subcommands:
             takes_value: true
             possible_values:
               - 'html'
+              - 'console'
         - verbose:
             short: 'v'
             help: 'Show verbose debug information'

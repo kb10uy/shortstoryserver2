@@ -157,7 +157,7 @@ pub unsafe extern "C" fn s3wf2_emit_html(
         _ => return Status::Invalid,
     };
     let mut html_buffer: Vec<u8> = Vec::with_capacity(1 << 16);
-    let emitter = HtmlEmitter::new(4);
+    let mut emitter = HtmlEmitter::new(4);
     match emitter.emit(&mut html_buffer, document) {
         Ok(()) => {
             let result = CString::from_vec_unchecked(html_buffer);
