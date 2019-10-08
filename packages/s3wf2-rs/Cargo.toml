@@ -7,6 +7,7 @@ edition = "2018"
 [features]
 cli = ["clap", "ansi_term"]
 foreign = ["libc"]
+wasm = ["wasm-bindgen", "console_error_panic_hook"]
 
 [lib]
 crate-type = ["rlib", "cdylib"]
@@ -15,6 +16,14 @@ crate-type = ["rlib", "cdylib"]
 name = "s3wf2-cli"
 path = "src/s3wf2-cli/main.rs"
 required-features = ["cli"]
+
+# Profiles --------------------------------------------------------------------
+
+[profile.release]
+lto = true
+
+[package.metadata.docs.rs]
+features = ["cli", "foreign", "wasm"]
 
 # Dependencies ----------------------------------------------------------------
 
@@ -36,4 +45,12 @@ optional = true
 
 [dependencies.libc]
 version = "0.2"
+optional = true
+
+[dependencies.wasm-bindgen]
+version = "0.2"
+optional = true
+
+[dependencies.console_error_panic_hook]
+version = "0.1"
 optional = true

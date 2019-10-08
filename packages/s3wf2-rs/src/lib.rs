@@ -9,3 +9,6 @@ pub mod parser;
 
 #[cfg(feature = "foreign")]
 pub mod foreign;
+
+#[cfg(feature = "wasm")]
+pub mod wasm;

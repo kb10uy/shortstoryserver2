@@ -1,3 +1,5 @@
+//! Includes abstract syntax node structs.
+
 use crate::error::SemanticErrorKind;
 use std::{collections::BTreeMap, fmt};
 
