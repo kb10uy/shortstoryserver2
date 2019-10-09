@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "target": "es2018",
-    "module": "es2015",
+    "module": "esNext",
     "moduleResolution": "node",
     "lib": [
       "es2018",

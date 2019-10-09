@@ -24,7 +24,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.scss'],
+    extensions: ['.ts', '.tsx', '.js', '.scss', '.wasm'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
     },
@@ -109,4 +109,12 @@ module.exports = {
     new VueLoaderPlugin(),
     new LaravelMixManifest(),
   ],
+
+  devServer: {
+    port: 3000,
+    contentBase: path.resolve(__dirname, 'public'),
+    proxy: {
+      '*': 'http://localhost:8000'
+    },
+  },
 };

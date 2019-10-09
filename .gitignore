@@ -5,6 +5,7 @@
 /public/scripts
 /public/styles
 /public/images
+/public/*.wasm
 /public/mix-manifest.json
 /storage/*.key
 /vendor
