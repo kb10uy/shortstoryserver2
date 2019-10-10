@@ -64,13 +64,13 @@ export default Vue.extend({
         case 'monospace':
           return h('code', {}, element.children.map(elementMapper));
         case 'link':
-          return h('a', { attrs: { href: element.parameters[0] } }, element.children.map(elementMapper));
+          return h('a', { attrs: { href: element.parameters[0].children[0] } }, element.children.map(elementMapper));
           break;
         case 'ruby': {
           const elements = element.children.map(elementMapper);
-          const rubyText = this.renderElement(h, element.parameters[0]);
+          const rubyText = element.parameters[0].children.map(elementMapper);
           elements.push(h('rp', '('));
-          elements.push(h('rt', {}, [rubyText]));
+          elements.push(h('rt', {}, rubyText));
           elements.push(h('rp', ')'));
           return h('ruby', {}, elements);
         }
