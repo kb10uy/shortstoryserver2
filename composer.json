@@ -56,6 +56,9 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
+    "serve": [
+      "php -S 0.0.0.0:8000 -t public/ server.php"
+    ],
     "lint": [
       "php-cs-fixer fix"
     ],

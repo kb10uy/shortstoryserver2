@@ -109,12 +109,4 @@ module.exports = {
     new VueLoaderPlugin(),
     new LaravelMixManifest(),
   ],
-
-  devServer: {
-    port: 3000,
-    contentBase: path.resolve(__dirname, 'public'),
-    proxy: {
-      '*': 'http://localhost:8000'
-    },
-  },
 };
