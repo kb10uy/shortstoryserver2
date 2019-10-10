@@ -12,3 +12,7 @@ pub mod foreign;
 
 #[cfg(feature = "wasm")]
 pub mod wasm;
+
+#[cfg(feature = "wasm")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;

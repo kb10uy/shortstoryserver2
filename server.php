@@ -17,6 +17,7 @@ if ('/' !== $uri && file_exists(__DIR__ . '/public' . $uri)) {
     if ($path['extension'] === 'wasm') {
         header('Content-Type: application/wasm');
         readfile(__DIR__ . '/public' . $uri);
+        return true;
     } else {
         return false;
     }

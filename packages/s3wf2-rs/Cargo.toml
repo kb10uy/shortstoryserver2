@@ -7,7 +7,7 @@ edition = "2018"
 [features]
 cli = ["clap", "ansi_term"]
 foreign = ["libc"]
-wasm = ["wasm-bindgen", "console_error_panic_hook", "serde", "serde_json"]
+wasm = ["wasm-bindgen", "console_error_panic_hook", "wee_alloc", "serde", "serde_json"]
 
 [lib]
 crate-type = ["rlib", "cdylib"]
@@ -63,4 +63,8 @@ features = ["derive"]
 
 [dependencies.serde_json]
 version = "1.0"
+optional = true
+
+[dependencies.wee_alloc]
+version = "0.4"
 optional = true
