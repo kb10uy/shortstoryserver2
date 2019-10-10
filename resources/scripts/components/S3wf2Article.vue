@@ -15,7 +15,6 @@ export default Vue.extend({
 
   render(h: CreateElement): VNode {
     const nodes = this.dom.map((b: any) => this.renderBlock(h, b));
-    console.log(nodes);
     return h('article', { class: { post: true } }, nodes);
   },
 
