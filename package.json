@@ -8,6 +8,7 @@
     "lint:script": "eslint --fix ./resources/scripts/**/*.ts"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.144",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "@typescript-eslint/typescript-estree": "^2.3.3",
@@ -32,7 +33,7 @@
     "stylelint-config-standard": "^19.0.0",
     "stylelint-scss": "^3.11.1",
     "ts-loader": "^6.2.0",
-    "typescript": "^3.6.3",
+    "typescript": "^3.7.0-beta",
     "vue-loader": "^15.7.1",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.41.0",
@@ -42,8 +43,8 @@
   "dependencies": {
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
+    "s3wf2": "file:./packages/s3wf2-rs/pkg",
     "vue": "^2.6.10",
-    "vuedraggable": "^2.23.2",
-    "s3wf2": "file:./packages/s3wf2-rs/pkg"
+    "vuedraggable": "^2.23.2"
   }
 }

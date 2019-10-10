@@ -2,11 +2,16 @@
 
 @section('title', __('titles.help-playground'))
 
+@section('includes')
+<script defer src="{{ mix('/scripts/playground.js') }}"></script>
+@endsection
+
 @section('content')
 <div class="container">
     <h1>@lang('titles.help-playground')</h1>
     <p>
         ここでは <i>ShortStoryServer Writer's Format</i> を試すことができます。
+        WebAssembly に対応したブラウザー環境が必要です。
     </p>
     <details>
         <summary>構文の説明 (クリックで展開)</summary>
@@ -58,20 +63,15 @@
     </details>
 
     <hr>
-    <form action="{{ route('help.playground') }}" method="post" name="trys3wf2">
-        @csrf
+    <div class="form-like" id="app">
         <div class="pair">
             <label for="body">@lang('labels.body-text')</label>
-            <textarea name="body" id="body" cols="30" rows="10">{{ old('body') }}</textarea>
+            <textarea id="body" cols="30" rows="10" v-model="source"></textarea>
         </div>
-        <div class="pair">
-            <button type="button" class="button" onclick="trys3wf2.submit();">@lang('actions.posts-submit')</button>
-        </div>
-    </form>
-
-    <hr>
-    <h2>パース結果</h2>
-    {!! $parsedHtml !!}
+        <hr>
+        <h2>パース結果</h2>
+        <s3wf2-renderer :source="source" />
+    </div>
 </div>
 @endsection
 

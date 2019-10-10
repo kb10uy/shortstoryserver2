@@ -1,15 +1,15 @@
 //! Functionalities for WebAssembly.
 
 use crate::{
-    document::{Block, BlockNode, Element, ElementNode},
+    document::{Block, BlockNode, CharacterSet, CharacterType, Element, ElementNode},
     parser::Parser,
 };
+use serde_json::{json, Map, Value};
 use std::panic;
 use wasm_bindgen::prelude::*;
-use serde_json::{Value, json};
 
-fn convert_element_type(element: &Element) -> &'static str {
-    match element {
+fn convert_element_type(et: &Element) -> &'static str {
+    match et {
         Element::Bold => "bold",
         Element::Italic => "italic",
         Element::Underlined => "underline",
@@ -44,13 +44,22 @@ fn convert_element_node<'a>(element: &ElementNode<'a>) -> Value {
             children,
             parameters,
         } => {
+            let mut result = Map::with_capacity(4);
             let children: Vec<_> = children.iter().map(convert_element_node).collect();
             let parameters: Vec<_> = parameters.iter().map(convert_element_node).collect();
-            json!({
-                "node_type": convert_element_type(kind).to_string(),
-                "children": children,
-                "parameters": parameters,
-            })
+            result.insert("children".to_string(), Value::Array(children));
+            result.insert("parameters".to_string(), Value::Array(parameters));
+            result.insert(
+                "node_type".to_string(),
+                Value::String(convert_element_type(kind).to_string()),
+            );
+
+            if let Element::Line(id, inline) = kind {
+                result.insert("character_id".to_string(), Value::String(id.to_owned()));
+                result.insert("inline".to_string(), Value::Bool(*inline));
+            }
+
+            Value::Object(result)
         }
     }
 }
@@ -61,6 +70,44 @@ fn convert_block_node<'a>(block: &BlockNode<'a>) -> Value {
         "node_type": convert_block_type(block.kind).to_string(),
         "children": children,
     })
+}
+
+fn convert_character_set(characters: &CharacterSet) -> Value {
+    let converted = characters
+        .characters()
+        .map(|(n, t)| match t {
+            CharacterType::Male(i, dn) => (
+                n.to_owned(),
+                json!({
+                    "color": format!("male-{}", i),
+                    "display_name": dn,
+                }),
+            ),
+            CharacterType::Female(i, dn) => (
+                n.to_owned(),
+                json!({
+                    "color": format!("female-{}", i),
+                    "display_name": dn,
+                }),
+            ),
+            CharacterType::Mob(i, dn) => (
+                n.to_owned(),
+                json!({
+                    "color": format!("mob-{}", i),
+                    "display_name": dn,
+                }),
+            ),
+            CharacterType::Custom(c, dn) => (
+                n.to_owned(),
+                json!({
+                    "color": format!("#{}", c),
+                    "display_name": dn,
+                }),
+            ),
+        })
+        .collect();
+
+    Value::Object(converted)
 }
 
 /// Initializes the library WASM.
@@ -78,15 +125,23 @@ pub fn parse(source: &str) -> JsValue {
         Ok(document) => {
             let blocks = document.blocks.iter().map(convert_block_node).collect();
             json!({
-                "document": Value::Array(blocks),
+                "document": {
+                    "blocks": Value::Array(blocks),
+                    "characters": convert_character_set(&document.characters),
+                },
                 "errors": Value::Null,
             })
         }
         Err(errors) => {
-            let errors = errors.iter().map(|err| json!({
-                "line_number": err.line_number as u32,
-                "description": format!("{}", err),
-            })).collect();
+            let errors = errors
+                .iter()
+                .map(|err| {
+                    json!({
+                        "line_number": err.line_number as u32,
+                        "description": format!("{}", err),
+                    })
+                })
+                .collect();
             json!({
                 "document": Value::Null,
                 "errors": Value::Array(errors),
