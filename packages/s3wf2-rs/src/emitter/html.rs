@@ -218,7 +218,9 @@ impl HtmlEmitter {
                                 HtmlEmitterError::InvalidParameter("Link URL needed"),
                             )
                         })??;
-                    write!(writer, "<a href=\"{}\">", href)?;
+                    write!(writer, "<a href=\"")?;
+                    self.write_element(writer, characters, &ElementNode::Text(href))?;
+                    write!(writer, "\">")?;
                     for child in children {
                         self.write_element(writer, characters, child)?;
                     }
