@@ -74,7 +74,7 @@ class S3wf2Format extends Format
         $sourceLines = preg_split('/\r\n|\r|\n/', $source) ?: [];
         foreach ($sourceLines as $lineNumber => $lineString) {
             ++$lineNumber;
-            $lineString = mb_trim($lineString);
+            $lineString = preg_replace('/^\s+|\s+$/gu', '', $lineString);
             if (0 === strpos($lineString, '//')) {
                 continue;
             }
