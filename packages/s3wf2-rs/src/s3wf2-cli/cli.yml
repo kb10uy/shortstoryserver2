@@ -1,6 +1,6 @@
 name: 's3wf2-cli'
 description: "Standalone tool for ShortStoryServer Writer's Format v2"
-version: '1.0.0'
+version: '0.1.1'
 subcommands:
   - format:
       about: 'Parse source text and convert into another format'
