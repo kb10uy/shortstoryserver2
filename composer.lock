@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c092074f4a5fc7d0d67f23973109b7e1",
+    "content-hash": "3c95a5c03897ac4cb48aaa5e7d1545dc",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -5590,17 +5590,11 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.4.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "ced5c2a216e1b7db7c27c4f1dee4c006f0b378e3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/ced5c2a216e1b7db7c27c4f1dee4c006f0b378e3",
-                "reference": "ced5c2a216e1b7db7c27c4f1dee4c006f0b378e3",
-                "shasum": ""
+                "url": "https://github.com/nunomaduro/larastan",
+                "reference": "7cfe77d96e0686b3ac6f20a022b4511783abf921"
             },
             "require": {
                 "composer/composer": "^1.0",
@@ -5642,7 +5636,24 @@
                     "NunoMaduro\\Larastan\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/",
+                    "App\\": "tests/Application/app"
+                }
+            },
+            "scripts": {
+                "phpstan:test": [
+                    "phpstan analyse --ansi"
+                ],
+                "phpunit:test": [
+                    "phpunit --colors=always"
+                ],
+                "test": [
+                    "@phpstan:test",
+                    "@phpunit:test"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -5654,16 +5665,16 @@
             ],
             "description": "Larastan - Discover bugs in your code without running it. A phpstan/phpstan wrapper for Laravel",
             "keywords": [
-                "PHPStan",
                 "code analyse",
                 "code analysis",
                 "larastan",
                 "laravel",
                 "package",
                 "php",
+                "phpstan",
                 "static analysis"
             ],
-            "time": "2019-10-22T08:33:26+00:00"
+            "time": "2019-11-12T10:27:11+00:00"
         },
         {
             "name": "nunomaduro/phpinsights",
@@ -8138,7 +8149,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "nunomaduro/larastan": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

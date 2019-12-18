@@ -102,6 +102,7 @@ class PostsCreationController extends Controller
             if (!is_string($tagName)) {
                 continue;
             }
+            /** @var Tag $model */
             $tag = Tag::firstOrCreate(['name' => $tagName]);
             $tagIds[] = $tag->id;
         }
