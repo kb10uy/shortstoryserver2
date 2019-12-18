@@ -11,6 +11,9 @@ pub enum SemanticErrorKind {
 
     /// Surrounding tag is not supported for the `Element`.
     Nonsurrounding,
+
+    /// Invalid parameter value was specified.
+    InvalidParameter(String),
 }
 
 impl fmt::Display for SemanticErrorKind {
@@ -23,6 +26,9 @@ impl fmt::Display for SemanticErrorKind {
                 write!(f, "Duplicate character ID: {}", chara)
             }
             SemanticErrorKind::Nonsurrounding => write!(f, "Non-surrounding block detected"),
+            SemanticErrorKind::InvalidParameter(reason) => {
+                write!(f, "Invalid parameter ({})", reason)
+            }
         }
     }
 }

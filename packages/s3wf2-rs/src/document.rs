@@ -315,10 +315,45 @@ impl<'a> fmt::Display for ElementNode<'a> {
     }
 }
 
+/// Selects the behavior of trimming of source lines.
+pub enum SourceTrimmingBehavior {
+    /// Never trim.
+    Never,
+
+    /// Trim ASCII whitespaces.
+    /// The PHP implementation of S3WF2 until 2019/12/18 actually trimmed only ASCII whitespaces.
+    /// For compatibility reasons, that behavior was removed (breaking change).
+    AsciiOnly,
+
+    /// Trim Unicode whitespaces.
+    Unicode,
+}
+
+/// Represents misc. configuration for the document.
+pub struct Configuration {
+    pub trimming_behavior: SourceTrimmingBehavior,
+}
+
+impl Configuration {
+    /// Creates a new instance.
+    pub fn new() -> Configuration {
+        Configuration {
+            trimming_behavior: SourceTrimmingBehavior::Unicode,
+        }
+    }
+}
+
+impl Default for Configuration {
+    fn default() -> Configuration {
+        Configuration::new()
+    }
+}
+
 /// Represents whole S3WF2 document.
 pub struct Document<'a> {
     pub characters: CharacterSet,
     pub blocks: Vec<BlockNode<'a>>,
+    pub configuration: Configuration,
 }
 
 impl<'a> Document<'a> {
@@ -327,6 +362,7 @@ impl<'a> Document<'a> {
         Document {
             characters: CharacterSet::new(),
             blocks: vec![],
+            configuration: Configuration::new(),
         }
     }
 }

@@ -1,5 +1,7 @@
 use crate::{
-    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode},
+    document::{
+        Block, BlockNode, CharacterSet, Document, Element, ElementNode, SourceTrimmingBehavior,
+    },
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
@@ -31,6 +33,7 @@ impl<'a> Parser {
     /// * `Err(Vec<Error>)` when some error detected
     ///     - Each item represents an error in single line
     pub fn parse(&self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
+        let ascii_whitespaces: &[_] = &[' ', '\t', '\r', '\n'];
         let lines = source.lines();
         let mut errors = vec![];
         let mut document = Document::new();
@@ -38,7 +41,11 @@ impl<'a> Parser {
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
-            let trimmed_line = line.trim();
+            let trimmed_line = match document.configuration.trimming_behavior {
+                SourceTrimmingBehavior::Never => line,
+                SourceTrimmingBehavior::AsciiOnly => line.trim_matches(ascii_whitespaces),
+                SourceTrimmingBehavior::Unicode => line.trim(),
+            };
             if trimmed_line == "" && !current_block.is_empty() {
                 document.blocks.push(current_block);
                 current_block = BlockNode::new(Block::Paragraph);
@@ -61,7 +68,9 @@ impl<'a> Parser {
                             None => Ok(()),
                         }
                     }
-                    "@" => self.parse_line(&document.characters, &mut current_block, false, name, rest),
+                    "@" => {
+                        self.parse_line(&document.characters, &mut current_block, false, name, rest)
+                    }
                     // Not included in regex, therefore unreachable
                     _ => unreachable!("Unexpected command type"),
                 }
@@ -92,24 +101,37 @@ impl<'a> Parser {
     ) -> Result<(), ErrorKind> {
         let params: Option<Vec<_>> = rest.map(|raw| REGEX_SPACES.split(raw).collect());
         match name {
+            // :character <type> <id> <name>
             "character" => {
                 let params = params.ok_or(ErrorKind::NotEnoughParameters {
                     given: 0,
                     needed: 3,
                 })?;
                 if params.len() < 3 {
-                    Err(ErrorKind::NotEnoughParameters {
+                    return Err(ErrorKind::NotEnoughParameters {
                         given: params.len(),
                         needed: 3,
-                    })
-                } else {
-                    self.command_character(
-                        &mut document.characters,
-                        params[0],
-                        params[1],
-                        params[2],
-                    )
+                    });
                 }
+                self.command_character(&mut document.characters, params[0], params[1], params[2])
+            }
+            "trim" => {
+                let params = params.ok_or(ErrorKind::NotEnoughParameters {
+                    given: 0,
+                    needed: 1,
+                })?;
+
+                document.configuration.trimming_behavior = match params[0] {
+                    "never" => SourceTrimmingBehavior::Never,
+                    "ascii" => SourceTrimmingBehavior::AsciiOnly,
+                    "unicode" => SourceTrimmingBehavior::Unicode,
+                    _ => {
+                        return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
+                            format!("Invalid trimming type: {}", params[0]),
+                        )))
+                    }
+                };
+                Ok(())
             }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
