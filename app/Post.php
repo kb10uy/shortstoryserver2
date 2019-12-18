@@ -5,6 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string $body
+ * @property string $body_type
+ * @property int $user_id
+ * @property string $description
+ * @property string $visibility
+ */
 class Post extends Model
 {
     protected $fillable = [
