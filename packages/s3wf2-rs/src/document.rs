@@ -1,7 +1,28 @@
 //! Includes abstract syntax node structs.
 
-use crate::error::SemanticErrorKind;
-use std::{collections::BTreeMap, fmt};
+use crate::error::{ErrorKind, SemanticErrorKind};
+use std::{collections::BTreeMap, fmt, str::FromStr};
+
+const ASCII_WHITESPACES: &[char] = &[' ', '\t', '\r', '\n'];
+
+/// Separated trimming implementations.
+pub struct Trimmer;
+impl Trimmer {
+    /// Never trims.
+    pub fn never(line: &str) -> &str {
+        line
+    }
+
+    /// Trims only ASCII whitespaces.
+    pub fn ascii_only(line: &str) -> &str {
+        line.trim_matches(ASCII_WHITESPACES)
+    }
+
+    /// Trims all whitespaces.
+    pub fn unicode(line: &str) -> &str {
+        line.trim()
+    }
+}
 
 /// Indicates the type of characters in document.
 #[derive(Debug, PartialEq, Eq)]
@@ -184,6 +205,22 @@ pub enum Block {
     UnorderedList,
 }
 
+impl FromStr for Block {
+    type Err = ErrorKind;
+
+    fn from_str(s: &str) -> Result<Block, ErrorKind> {
+        match s {
+            "para" => Ok(Block::Paragraph),
+            "sec" => Ok(Block::Section),
+            "subsec" => Ok(Block::Subsection),
+            "quote" => Ok(Block::Quotation),
+            "hori" => Ok(Block::Horizontal),
+            "list" => Ok(Block::UnorderedList),
+            _ => Err(ErrorKind::UnknownElement(s.to_string())),
+        }
+    }
+}
+
 /// Represents inline element.
 #[derive(PartialEq, Eq, Debug)]
 pub enum Element {
@@ -222,6 +259,26 @@ pub enum Element {
 
     /// Line, speech (the parameter should contain the ID, and whether inline display or not)
     Line(String, bool),
+}
+
+impl FromStr for Element {
+    type Err = ErrorKind;
+
+    fn from_str(s: &str) -> Result<Element, ErrorKind> {
+        match s {
+            "b" => Ok(Element::Bold),
+            "i" => Ok(Element::Italic),
+            "ul" => Ok(Element::Underlined),
+            "st" => Ok(Element::Deleted),
+            "dt" => Ok(Element::Dotted),
+            "m" => Ok(Element::Monospaced),
+            "br" => Ok(Element::Newline),
+            "link" => Ok(Element::Link),
+            "ruby" => Ok(Element::Ruby),
+            "item" => Ok(Element::Item),
+            _ => Err(ErrorKind::UnknownElement(s.to_string())),
+        }
+    }
 }
 
 /// Represents a block level node.
@@ -315,30 +372,16 @@ impl<'a> fmt::Display for ElementNode<'a> {
     }
 }
 
-/// Selects the behavior of trimming of source lines.
-pub enum SourceTrimmingBehavior {
-    /// Never trim.
-    Never,
-
-    /// Trim ASCII whitespaces.
-    /// The PHP implementation of S3WF2 until 2019/12/18 actually trimmed only ASCII whitespaces.
-    /// For compatibility reasons, that behavior was removed (breaking change).
-    AsciiOnly,
-
-    /// Trim Unicode whitespaces.
-    Unicode,
-}
-
 /// Represents misc. configuration for the document.
 pub struct Configuration {
-    pub trimming_behavior: SourceTrimmingBehavior,
+    pub trimming_behavior: fn(&str) -> &str,
 }
 
 impl Configuration {
     /// Creates a new instance.
     pub fn new() -> Configuration {
         Configuration {
-            trimming_behavior: SourceTrimmingBehavior::Unicode,
+            trimming_behavior: Trimmer::unicode,
         }
     }
 }

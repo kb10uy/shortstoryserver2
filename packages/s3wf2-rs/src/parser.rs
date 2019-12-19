@@ -1,7 +1,5 @@
 use crate::{
-    document::{
-        Block, BlockNode, CharacterSet, Document, Element, ElementNode, SourceTrimmingBehavior,
-    },
+    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode, Trimmer},
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
@@ -33,7 +31,6 @@ impl<'a> Parser {
     /// * `Err(Vec<Error>)` when some error detected
     ///     - Each item represents an error in single line
     pub fn parse(&self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
-        let ascii_whitespaces: &[_] = &[' ', '\t', '\r', '\n'];
         let lines = source.lines();
         let mut errors = vec![];
         let mut document = Document::new();
@@ -41,11 +38,8 @@ impl<'a> Parser {
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
-            let trimmed_line = match document.configuration.trimming_behavior {
-                SourceTrimmingBehavior::Never => line,
-                SourceTrimmingBehavior::AsciiOnly => line.trim_matches(ascii_whitespaces),
-                SourceTrimmingBehavior::Unicode => line.trim(),
-            };
+            let trimmer = document.configuration.trimming_behavior;
+            let trimmed_line = trimmer(line);
             if trimmed_line == "" && !current_block.is_empty() {
                 document.blocks.push(current_block);
                 current_block = BlockNode::new(Block::Paragraph);
@@ -113,25 +107,19 @@ impl<'a> Parser {
                         needed: 3,
                     });
                 }
-                self.command_character(&mut document.characters, params[0], params[1], params[2])
+                Command::command_character(
+                    &mut document.characters,
+                    params[0],
+                    params[1],
+                    params[2],
+                )
             }
             "trim" => {
                 let params = params.ok_or(ErrorKind::NotEnoughParameters {
                     given: 0,
                     needed: 1,
                 })?;
-
-                document.configuration.trimming_behavior = match params[0] {
-                    "never" => SourceTrimmingBehavior::Never,
-                    "ascii" => SourceTrimmingBehavior::AsciiOnly,
-                    "unicode" => SourceTrimmingBehavior::Unicode,
-                    _ => {
-                        return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
-                            format!("Invalid trimming type: {}", params[0]),
-                        )))
-                    }
-                };
-                Ok(())
+                Command::command_trim(document, params[0])
             }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
@@ -144,7 +132,7 @@ impl<'a> Parser {
         element: &'a str,
         rest: Option<&'a str>,
     ) -> (BlockNode<'a>, Option<ErrorKind>) {
-        let kind = match Parser::parse_block_kind(element) {
+        let kind = match element.parse() {
             Ok(kind) => kind,
             Err(kind) => return (current_block, Some(kind)),
         };
@@ -186,18 +174,6 @@ impl<'a> Parser {
                 document.blocks.push(BlockNode::new(kind));
                 (BlockNode::new(Block::Paragraph), None)
             }
-        }
-    }
-
-    fn parse_block_kind(name: &'a str) -> Result<Block, ErrorKind> {
-        match name {
-            "para" => Ok(Block::Paragraph),
-            "sec" => Ok(Block::Section),
-            "subsec" => Ok(Block::Subsection),
-            "quote" => Ok(Block::Quotation),
-            "hori" => Ok(Block::Horizontal),
-            "list" => Ok(Block::UnorderedList),
-            _ => Err(ErrorKind::UnknownElement(name.to_string())),
         }
     }
 
@@ -264,7 +240,7 @@ impl<'a> Parser {
                     )));
                 } else {
                     // other
-                    let kind = Parser::parse_element_kind(element)?;
+                    let kind = element.parse()?;
                     uncommited.push(ElementNode::new_surrounded(kind));
                 }
                 let ending = captures.get(2).unwrap();
@@ -344,31 +320,17 @@ impl<'a> Parser {
         }
         Ok(())
     }
+}
 
-    fn parse_element_kind(name: &'a str) -> Result<Element, ErrorKind> {
-        match name {
-            "b" => Ok(Element::Bold),
-            "i" => Ok(Element::Italic),
-            "ul" => Ok(Element::Underlined),
-            "st" => Ok(Element::Deleted),
-            "dt" => Ok(Element::Dotted),
-            "m" => Ok(Element::Monospaced),
-            "br" => Ok(Element::Newline),
-            "link" => Ok(Element::Link),
-            "ruby" => Ok(Element::Ruby),
-            "item" => Ok(Element::Item),
-            _ => Err(ErrorKind::UnknownElement(name.to_string())),
-        }
-    }
-
-    // command functions ------------------------------------------------------
-
+/// Separated command implementations.
+struct Command;
+impl Command {
+    /// Process `:character` command.
     fn command_character(
-        &self,
         character_set: &mut CharacterSet,
-        kind: &'a str,
-        id: &'a str,
-        name: &'a str,
+        kind: &str,
+        id: &str,
+        name: &str,
     ) -> Result<(), ErrorKind> {
         if !REGEX_CHARACTER_ID.is_match(id) {
             return Err(ErrorKind::Semantic(SemanticErrorKind::UndefinedCharacter(
@@ -402,5 +364,21 @@ impl<'a> Parser {
                 }
             }
         }
+    }
+
+    /// Process `:trim` command.
+    fn command_trim(document: &mut Document, trim_type: &str) -> Result<(), ErrorKind> {
+        document.configuration.trimming_behavior = match trim_type {
+            "never" => Trimmer::never,
+            "ascii" => Trimmer::ascii_only,
+            "unicode" => Trimmer::unicode,
+            _ => {
+                return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
+                    format!("Invalid trimming type: {}", trim_type),
+                )))
+            }
+        };
+
+        Ok(())
     }
 }
