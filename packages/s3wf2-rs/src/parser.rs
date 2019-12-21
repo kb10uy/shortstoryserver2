@@ -125,10 +125,10 @@ impl<'a> Parser {
             } else {
                 self.parse_normal(&mut current_block.children, trimmed_line)
                     .and_then(|_| match state.auto_newline {
-                        AutoNewline::Always => {
+                        AutoNewline::Always if trimmed_line != "" => {
                             self.parse_normal(&mut current_block.children, "[br]")
                         }
-                        AutoNewline::Never => Ok(()),
+                        _ => Ok(()),
                     })
             };
 
