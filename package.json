@@ -5,8 +5,10 @@
     "watch": "webpack --mode development --progress --hide-modules --watch",
     "production": "webpack --mode production --no-progress --hide-modules",
     "lint:style": "stylelint --fix ./resources/styles/**/*.scss",
-    "lint:script": "eslint --fix ./resources/scripts/**/*.ts"
+    "lint:script": "eslint --fix ./resources/scripts/**/*.ts",
+    "build-s3wf2": "wasm-pack build --out-dir target/s3wf2 ./packages/s3wf2-rs -- --features wasm"
   },
+  "workspaces": ["./packages/s3wf2-rs/target/s3wf2"],
   "devDependencies": {
     "@types/lodash": "^4.14.149",
     "@typescript-eslint/eslint-plugin": "^2.12.0",
@@ -43,7 +45,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "bootstrap": "^4.4.1",
-    "s3wf2": "file:./packages/s3wf2-rs/pkg",
+    "s3wf2": "*",
     "vue": "^2.6.11",
     "vuedraggable": "^2.23.2"
   }
