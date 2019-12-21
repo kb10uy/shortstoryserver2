@@ -372,16 +372,28 @@ impl<'a> fmt::Display for ElementNode<'a> {
     }
 }
 
+/// Judges whether the parser should insert [br] element
+/// ad the end of each line.
+pub enum AutoNewline {
+    /// Never inserts.
+    Never,
+
+    /// Always inserts.
+    Always,
+}
+
 /// Represents misc. configuration for the document.
 pub struct Configuration {
-    pub trimming_behavior: fn(&str) -> &str,
+    pub trimming_function: fn(&str) -> &str,
+    pub auto_newline: AutoNewline,
 }
 
 impl Configuration {
     /// Creates a new instance.
     pub fn new() -> Configuration {
         Configuration {
-            trimming_behavior: Trimmer::unicode,
+            trimming_function: Trimmer::unicode,
+            auto_newline: AutoNewline::Never,
         }
     }
 }

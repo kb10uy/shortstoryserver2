@@ -1,5 +1,7 @@
 use crate::{
-    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode, Trimmer},
+    document::{
+        AutoNewline, Block, BlockNode, CharacterSet, Document, Element, ElementNode, Trimmer,
+    },
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
@@ -38,7 +40,7 @@ impl<'a> Parser {
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
-            let trimmer = document.configuration.trimming_behavior;
+            let trimmer = document.configuration.trimming_function;
             let trimmed_line = trimmer(line);
             if trimmed_line == "" && !current_block.is_empty() {
                 document.blocks.push(current_block);
@@ -70,6 +72,12 @@ impl<'a> Parser {
                 }
             } else {
                 self.parse_normal(&mut current_block.children, trimmed_line)
+                    .and_then(|_| match document.configuration.auto_newline {
+                        AutoNewline::Always => {
+                            self.parse_normal(&mut current_block.children, "[br]")
+                        }
+                        AutoNewline::Never => Ok(()),
+                    })
             };
 
             if let Err(kind) = line_parse_result {
@@ -120,6 +128,13 @@ impl<'a> Parser {
                     needed: 1,
                 })?;
                 Command::command_trim(document, params[0])
+            }
+            "autobr" => {
+                let params = params.ok_or(ErrorKind::NotEnoughParameters {
+                    given: 0,
+                    needed: 1,
+                })?;
+                Command::command_autobr(document, params[0])
             }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
@@ -315,7 +330,8 @@ impl<'a> Parser {
 
         if !uncommited.is_empty() {
             return Err(ErrorKind::TooManyTagOpening);
-        } else if rest != "" {
+        }
+        if rest != "" {
             commited.push(ElementNode::Text(rest));
         }
         Ok(())
@@ -368,13 +384,27 @@ impl Command {
 
     /// Process `:trim` command.
     fn command_trim(document: &mut Document, trim_type: &str) -> Result<(), ErrorKind> {
-        document.configuration.trimming_behavior = match trim_type {
+        document.configuration.trimming_function = match trim_type {
             "never" => Trimmer::never,
             "ascii" => Trimmer::ascii_only,
             "unicode" => Trimmer::unicode,
             _ => {
                 return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
                     format!("Invalid trimming type: {}", trim_type),
+                )))
+            }
+        };
+
+        Ok(())
+    }
+
+    fn command_autobr(document: &mut Document, autobr_type: &str) -> Result<(), ErrorKind> {
+        document.configuration.auto_newline = match autobr_type {
+            "never" => AutoNewline::Never,
+            "always" => AutoNewline::Always,
+            _ => {
+                return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
+                    format!("Invalid auto-br type: {}", autobr_type),
                 )))
             }
         };
