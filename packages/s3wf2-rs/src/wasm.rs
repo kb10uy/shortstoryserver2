@@ -38,7 +38,7 @@ fn convert_block_type(element: Block) -> &'static str {
 
 fn convert_element_node<'a>(element: &ElementNode<'a>) -> Value {
     match element {
-        ElementNode::Text(text) => Value::String(text.to_string()),
+        ElementNode::Text(text) => Value::String((*text).to_string()),
         ElementNode::Surrounded {
             kind,
             children,

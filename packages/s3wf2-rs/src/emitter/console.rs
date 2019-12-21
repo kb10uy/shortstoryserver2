@@ -87,7 +87,7 @@ impl ConsoleEmitter {
         })
     }
 
-    fn get_color<'c> (&self, character: Option<&'c CharacterType>) -> (Colour, &'c str) {
+    fn get_color<'c>(&self, character: Option<&'c CharacterType>) -> (Colour, &'c str) {
         match character {
             Some(CharacterType::Male(i, n)) => (MALE_COLORS[i % MALE_COLORS.len()], n),
             Some(CharacterType::Female(i, n)) => (FEMALE_COLORS[i % FEMALE_COLORS.len()], n),
@@ -260,9 +260,7 @@ impl ConsoleEmitter {
                     self.emit_elements(writer, characters, children)?;
                     self.confirm_newline(writer)
                 }
-                Element::Newline => {
-                    writeln!(writer)
-                }
+                Element::Newline => writeln!(writer),
                 Element::Line(id, false) => {
                     let (color, name) = self.get_color(characters.get(id));
                     self.confirm_newline(writer)?;

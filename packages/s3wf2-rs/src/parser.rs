@@ -1,11 +1,11 @@
 use crate::{
-    document::{
-        AutoNewline, Block, BlockNode, CharacterSet, Document, Element, ElementNode, Trimmer,
-    },
+    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode},
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
 use regex::Regex;
+
+const ASCII_WHITESPACES: &[char] = &[' ', '\t', '\r', '\n'];
 
 lazy_static! {
     static ref REGEX_LINE_HEAD: Regex = Regex::new(r"^(:|/|@)([A-Za-z0-9_]+)(\s+(.*))?$").unwrap();
@@ -14,6 +14,57 @@ lazy_static! {
     static ref REGEX_COLORCODE: Regex = Regex::new(r"^#([A-Fa-f0-9]{3,6})$").unwrap();
     // MEMO: regex crate does not support (?=expr) syntax, so use capture groups instead
     static ref REGEX_ELEMENT_LINE: Regex = Regex::new(r"\[(@?[A-Za-z0-9_]+)([\[\]{}]|\s+)|[\]{}]").unwrap();
+}
+
+/// Separated trimming implementations.
+pub struct Trimmer;
+impl Trimmer {
+    /// Never trims.
+    pub fn never(line: &str) -> &str {
+        line
+    }
+
+    /// Trims only ASCII whitespaces.
+    pub fn ascii_only(line: &str) -> &str {
+        line.trim_matches(ASCII_WHITESPACES)
+    }
+
+    /// Trims all whitespaces.
+    pub fn unicode(line: &str) -> &str {
+        line.trim()
+    }
+}
+
+/// Judges whether the parser should insert [br] element
+/// ad the end of each line.
+pub enum AutoNewline {
+    /// Never inserts.
+    Never,
+
+    /// Always inserts.
+    Always,
+}
+
+/// Represents misc. configuration for the document.
+pub struct ParserState {
+    pub trimming_function: fn(&str) -> &str,
+    pub auto_newline: AutoNewline,
+}
+
+impl ParserState {
+    /// Creates a new instance.
+    pub fn new() -> ParserState {
+        ParserState {
+            trimming_function: Trimmer::unicode,
+            auto_newline: AutoNewline::Never,
+        }
+    }
+}
+
+impl Default for ParserState {
+    fn default() -> ParserState {
+        ParserState::new()
+    }
 }
 
 /// S3WF2 parser state.
@@ -34,13 +85,14 @@ impl<'a> Parser {
     ///     - Each item represents an error in single line
     pub fn parse(&self, source: &'a str) -> Result<Document<'a>, Vec<Error>> {
         let lines = source.lines();
+        let mut state = ParserState::new();
         let mut errors = vec![];
         let mut document = Document::new();
         let mut current_block = BlockNode::new(Block::Paragraph);
 
         for (index, line) in lines.enumerate() {
             let line_number = index + 1;
-            let trimmer = document.configuration.trimming_function;
+            let trimmer = state.trimming_function;
             let trimmed_line = trimmer(line);
             if trimmed_line == "" && !current_block.is_empty() {
                 document.blocks.push(current_block);
@@ -54,7 +106,7 @@ impl<'a> Parser {
                 let name = captures.get(2).unwrap().as_str();
                 let rest = captures.get(4).map(|m| m.as_str());
                 match cmd_type {
-                    ":" => self.parse_command(&mut document, name, rest),
+                    ":" => self.parse_command(&mut state, &mut document, name, rest),
                     "/" => {
                         let (next, error) =
                             self.parse_block(&mut document, current_block, name, rest);
@@ -72,7 +124,7 @@ impl<'a> Parser {
                 }
             } else {
                 self.parse_normal(&mut current_block.children, trimmed_line)
-                    .and_then(|_| match document.configuration.auto_newline {
+                    .and_then(|_| match state.auto_newline {
                         AutoNewline::Always => {
                             self.parse_normal(&mut current_block.children, "[br]")
                         }
@@ -97,6 +149,7 @@ impl<'a> Parser {
 
     fn parse_command(
         &self,
+        state: &mut ParserState,
         document: &mut Document,
         name: &'a str,
         rest: Option<&'a str>,
@@ -127,14 +180,14 @@ impl<'a> Parser {
                     given: 0,
                     needed: 1,
                 })?;
-                Command::command_trim(document, params[0])
+                Command::command_trim(state, params[0])
             }
             "autobr" => {
                 let params = params.ok_or(ErrorKind::NotEnoughParameters {
                     given: 0,
                     needed: 1,
                 })?;
-                Command::command_autobr(document, params[0])
+                Command::command_autobr(state, params[0])
             }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
@@ -383,8 +436,8 @@ impl Command {
     }
 
     /// Process `:trim` command.
-    fn command_trim(document: &mut Document, trim_type: &str) -> Result<(), ErrorKind> {
-        document.configuration.trimming_function = match trim_type {
+    fn command_trim(state: &mut ParserState, trim_type: &str) -> Result<(), ErrorKind> {
+        state.trimming_function = match trim_type {
             "never" => Trimmer::never,
             "ascii" => Trimmer::ascii_only,
             "unicode" => Trimmer::unicode,
@@ -398,8 +451,8 @@ impl Command {
         Ok(())
     }
 
-    fn command_autobr(document: &mut Document, autobr_type: &str) -> Result<(), ErrorKind> {
-        document.configuration.auto_newline = match autobr_type {
+    fn command_autobr(state: &mut ParserState, autobr_type: &str) -> Result<(), ErrorKind> {
+        state.auto_newline = match autobr_type {
             "never" => AutoNewline::Never,
             "always" => AutoNewline::Always,
             _ => {
@@ -410,5 +463,135 @@ impl Command {
         };
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn trimmer_works() {
+        assert_eq!(Trimmer::never("  ABC  "), "  ABC  ");
+        assert_eq!(Trimmer::ascii_only(" 　ABC  "), "　ABC");
+        assert_eq!(Trimmer::unicode(" 　ABC  "), "ABC");
+    }
+
+    #[test]
+    fn parser_parses_character_command() {
+        let parser = Parser::new();
+        let mut document = Document::new();
+        let mut state = ParserState::new();
+
+        assert!(parser
+            .parse_command(
+                &mut state,
+                &mut document,
+                "character",
+                Some("female natsuki 夏稀")
+            )
+            .is_ok());
+        assert!(parser
+            .parse_command(
+                &mut state,
+                &mut document,
+                "character",
+                Some("female natsuki")
+            )
+            .is_err());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "character", Some("female"))
+            .is_err());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "character", None)
+            .is_err());
+    }
+
+    #[test]
+    fn parser_parses_trim_command() {
+        let parser = Parser::new();
+        let mut document = Document::new();
+        let mut state = ParserState::new();
+
+        assert!(parser
+            .parse_command(&mut state, &mut document, "trim", Some("never"))
+            .is_ok());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "trim", Some("ascii"))
+            .is_ok());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "trim", Some("unicode"))
+            .is_ok());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "trim", None)
+            .is_err());
+    }
+
+    #[test]
+    fn parser_parses_autobr_command() {
+        let parser = Parser::new();
+        let mut document = Document::new();
+        let mut state = ParserState::new();
+
+        assert!(parser
+            .parse_command(&mut state, &mut document, "autobr", Some("never"))
+            .is_ok());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "autobr", Some("always"))
+            .is_ok());
+        assert!(parser
+            .parse_command(&mut state, &mut document, "autobr", None)
+            .is_err());
+    }
+
+    #[test]
+    fn parser_parses_block_element() {
+        let parser = Parser::new();
+        let mut document = Document::new();
+        let current_block = BlockNode::new(Block::Paragraph);
+
+        let (current_block, error) =
+            parser.parse_block(&mut document, current_block, "sec", Some("Section"));
+        assert!(error.is_none());
+        assert_eq!(document.blocks.last().map(|b| b.kind), Some(Block::Section));
+
+        let (current_block, error) =
+            parser.parse_block(&mut document, current_block, "subsec", Some("Subsection"));
+        assert!(error.is_none());
+        assert_eq!(
+            document.blocks.last().map(|b| b.kind),
+            Some(Block::Subsection)
+        );
+
+        let (_, error) = parser.parse_block(&mut document, current_block, "notfound", None);
+        assert!(error.is_some());
+    }
+
+    #[test]
+    fn parser_parses_inline_element() {
+        let parser = Parser::new();
+        let mut current_block = BlockNode::new(Block::Paragraph);
+
+        assert!(parser.parse_normal(&mut current_block.children, "").is_ok());
+        assert!(current_block.children.is_empty());
+
+        assert!(parser
+            .parse_normal(&mut current_block.children, "test")
+            .is_ok());
+        assert_eq!(
+            current_block.children.last(),
+            Some(&ElementNode::Text("test"))
+        );
+        assert!(parser
+            .parse_normal(&mut current_block.children, "[b hello]")
+            .is_ok());
+        assert_eq!(
+            current_block.children.last(),
+            Some(&ElementNode::Surrounded {
+                kind: Element::Bold,
+                parameters: vec![],
+                children: vec![ElementNode::Text("hello")]
+            }),
+        );
     }
 }

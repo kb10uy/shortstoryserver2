@@ -3,27 +3,6 @@
 use crate::error::{ErrorKind, SemanticErrorKind};
 use std::{collections::BTreeMap, fmt, str::FromStr};
 
-const ASCII_WHITESPACES: &[char] = &[' ', '\t', '\r', '\n'];
-
-/// Separated trimming implementations.
-pub struct Trimmer;
-impl Trimmer {
-    /// Never trims.
-    pub fn never(line: &str) -> &str {
-        line
-    }
-
-    /// Trims only ASCII whitespaces.
-    pub fn ascii_only(line: &str) -> &str {
-        line.trim_matches(ASCII_WHITESPACES)
-    }
-
-    /// Trims all whitespaces.
-    pub fn unicode(line: &str) -> &str {
-        line.trim()
-    }
-}
-
 /// Indicates the type of characters in document.
 #[derive(Debug, PartialEq, Eq)]
 pub enum CharacterType {
@@ -282,6 +261,7 @@ impl FromStr for Element {
 }
 
 /// Represents a block level node.
+#[derive(Debug, PartialEq, Eq)]
 pub struct BlockNode<'a> {
     /// Block type
     pub kind: Block,
@@ -316,6 +296,7 @@ impl<'a> fmt::Display for BlockNode<'a> {
 }
 
 /// Represents a element level node.
+#[derive(Debug, PartialEq, Eq)]
 pub enum ElementNode<'a> {
     /// Plain text node
     Text(&'a str),
@@ -372,43 +353,10 @@ impl<'a> fmt::Display for ElementNode<'a> {
     }
 }
 
-/// Judges whether the parser should insert [br] element
-/// ad the end of each line.
-pub enum AutoNewline {
-    /// Never inserts.
-    Never,
-
-    /// Always inserts.
-    Always,
-}
-
-/// Represents misc. configuration for the document.
-pub struct Configuration {
-    pub trimming_function: fn(&str) -> &str,
-    pub auto_newline: AutoNewline,
-}
-
-impl Configuration {
-    /// Creates a new instance.
-    pub fn new() -> Configuration {
-        Configuration {
-            trimming_function: Trimmer::unicode,
-            auto_newline: AutoNewline::Never,
-        }
-    }
-}
-
-impl Default for Configuration {
-    fn default() -> Configuration {
-        Configuration::new()
-    }
-}
-
 /// Represents whole S3WF2 document.
 pub struct Document<'a> {
     pub characters: CharacterSet,
     pub blocks: Vec<BlockNode<'a>>,
-    pub configuration: Configuration,
 }
 
 impl<'a> Document<'a> {
@@ -417,7 +365,6 @@ impl<'a> Document<'a> {
         Document {
             characters: CharacterSet::new(),
             blocks: vec![],
-            configuration: Configuration::new(),
         }
     }
 }
