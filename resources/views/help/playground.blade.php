@@ -27,6 +27,18 @@
                         <li><strong>name</strong> 実際に表示する名前</li>
                     </ul>
                 </li>
+                <li>
+                    <code>:trim <i>type</i></code> 各行のトリミング挙動の変更
+                    <ul>
+                        <li><strong>type</strong> トリミングの挙動。 <code>never ascii unicode</code> のいずれかを指定。それぞれ「トリミングしない」、「ASCII 空白のみ」、「全ての空白」</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>:autobr <i>type</i></code> 自動改行の挙動の変更
+                    <ul>
+                        <li><strong>type</strong> 自動改行をさせる場合は <code>always</code> 、させない場合(デフォルト)は <code>never</code> を指定する
+                    </ul>
+                </li>
             </ul>
 
             <h3>セリフ展開</h3>
