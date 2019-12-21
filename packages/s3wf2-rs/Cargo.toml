@@ -1,6 +1,6 @@
 [package]
 name = "s3wf2"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Yū Kobayashi <kb10uy@kb10uy.org>"]
 edition = "2018"
 
