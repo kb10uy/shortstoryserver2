@@ -72,6 +72,8 @@
     </div>
     <hr>
 
-    {!! $articleHtml !!}
+    <article class="post">
+        {!! $articleHtml !!}
+    </article>
 </div>
 @endsection

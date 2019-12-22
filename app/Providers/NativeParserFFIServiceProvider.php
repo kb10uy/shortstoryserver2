@@ -25,7 +25,7 @@ class NativeParserFFIServiceProvider extends ServiceProvider
             $relativePath = env('LIBS3WF2_PATH', '/usr/local/lib/libs3wf2.so');
             $libraryPath = realpath($basePath . '/' . $relativePath);
 
-            return new S3wf2Native::new($libraryPath);
+            return new S3wf2Native($libraryPath);
         });
     }
 

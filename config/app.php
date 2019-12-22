@@ -177,6 +177,7 @@ return [
          * Custom Providers...
          */
         App\Providers\Kbs3HelperProvider::class,
+        App\Providers\NativeParserFFIServiceProvider::class,
     ],
 
     /*

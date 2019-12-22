@@ -5,10 +5,18 @@ namespace App\Http\Controllers;
 use App\Post;
 use Auth;
 use Illuminate\Http\Request;
-use Lib\Formats\S3wf2\S3wf2Format;
+use App\Text\Parser\S3wf2Native;
 
 class PostsController extends Controller
 {
+    /** @var S3wf2Native */
+    private S3wf2Native $s3wf2;
+
+    public function __construct(S3wf2Native $s3wf2)
+    {
+        $this->s3wf2 = $s3wf2;
+    }
+
     public function latest()
     {
         $posts = Post::with(['user', 'tags'])
@@ -27,18 +35,17 @@ class PostsController extends Controller
         $author = $post->user;
         $isAuthor = Auth::check() && Auth::user()->id === $author->id;
 
+        $articleHtml = '';
         switch ($post->body_type) {
             case 's3wf2':
-                $format = new S3wf2Format();
+                $articleHtml = $this->s3wf2->generateHtml($post->body);
                 break;
             default:
                 return response()->view('index', [], 500);
         }
-        $format->parse($post->body);
 
         $id = $post->id;
         $title = $post->title;
-        $articleHtml = $format->toHtml();
         $description = $post->description;
         $tags = $post->tags;
 
