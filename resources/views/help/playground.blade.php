@@ -31,12 +31,21 @@
                     <code>:trim <i>type</i></code> 各行のトリミング挙動の変更
                     <ul>
                         <li><strong>type</strong> トリミングの挙動。 <code>never ascii unicode</code> のいずれかを指定。それぞれ「トリミングしない」、「ASCII 空白のみ」、「全ての空白」</li>
+                        <li>書いた行より下に効果が発揮されるため、一部のみ変更することが可能です。</li>
                     </ul>
                 </li>
                 <li>
                     <code>:autobr <i>type</i></code> 自動改行の挙動の変更
                     <ul>
                         <li><strong>type</strong> 自動改行をさせる場合は <code>always</code> 、させない場合(デフォルト)は <code>never</code> を指定する
+                        <li>書いた行より下に効果が発揮されるため、一部のみ変更することが可能です。</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>:linename <i>type</i></code> セリフの名前表示の挙動の変更
+                    <ul>
+                        <li><strong>type</strong> 名前を表示させる場合(デフォルト)は <code>shown</code> 、させない場合は <code>hidden</code> を指定する
+                        <li>書いた行より下に効果が発揮されるため、一部のみ変更することが可能です。</li>
                     </ul>
                 </li>
             </ul>
