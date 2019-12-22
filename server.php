@@ -14,9 +14,10 @@ $uri = urldecode(
 // application without having installed a "real" web server software here.
 if ('/' !== $uri && file_exists(__DIR__ . '/public' . $uri)) {
     $path = pathinfo($uri);
-    if ($path['extension'] === 'wasm') {
+    if ('wasm' === $path['extension']) {
         header('Content-Type: application/wasm');
         readfile(__DIR__ . '/public' . $uri);
+
         return true;
     } else {
         return false;

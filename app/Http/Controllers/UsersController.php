@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
 use App\Post;
-use App\User;
 use App\Series;
+use App\User;
+use Auth;
+use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {

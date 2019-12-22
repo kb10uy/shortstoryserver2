@@ -20,8 +20,6 @@ class Character
 
     /**
      * セリフで表示される名前.
-     *
-     * @return string
      */
     public function displayName(): string
     {
@@ -30,8 +28,6 @@ class Character
 
     /**
      * このキャラクターに割り当てられたクラス.
-     *
-     * @return string
      */
     public function colorClass(): string
     {

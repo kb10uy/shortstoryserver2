@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Validation\Rule;
-use Illuminate\Http\Request;
 use App\Post;
-use App\User;
 use App\Tag;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
 {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Post;
 use Auth;
 use Illuminate\Http\Request;
-use App\Post;
 use Lib\Formats\S3wf2\S3wf2Format;
 
 class PostsController extends Controller

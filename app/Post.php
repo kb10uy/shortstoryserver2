@@ -2,15 +2,15 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
+ * @property int    $id
  * @property string $title
  * @property string $body
  * @property string $body_type
- * @property int $user_id
+ * @property int    $user_id
  * @property string $description
  * @property string $visibility
  */

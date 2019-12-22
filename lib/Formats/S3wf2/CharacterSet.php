@@ -74,8 +74,6 @@ class CharacterSet
 
     /**
      * カスタムキャラクターカラーの style タグの Node を生成する。
-     *
-     * @return Node
      */
     public function generateCustomColorsStyle(): Node
     {

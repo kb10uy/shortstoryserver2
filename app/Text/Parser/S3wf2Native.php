@@ -11,7 +11,7 @@ class S3wf2Native
 
     public function __construct(string $libraryPath)
     {
-        $this->library = FFI::load('
+        $this->library = FFI::cdef('
             struct environment_t;
 
             environment_t * s3wf2_init();
@@ -24,4 +24,4 @@ class S3wf2Native
             int s3wf2_reset_error(environment_t *);
         ', $libraryPath);
     }
-};
+}

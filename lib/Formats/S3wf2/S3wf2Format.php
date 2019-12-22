@@ -7,8 +7,8 @@ namespace Lib\Formats\S3wf2;
 use Illuminate\Support\Collection;
 use Lib\Formats\Format;
 use Lib\Formats\Node;
-use Lib\Formats\SingularNode;
 use Lib\Formats\ParseErrorException;
+use Lib\Formats\SingularNode;
 
 /**
  * ShortStoryServer Writer's Format v2.

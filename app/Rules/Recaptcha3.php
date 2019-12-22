@@ -2,10 +2,10 @@
 
 namespace App\Rules;
 
-use Log;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Validation\Rule;
+use Log;
 
 class Recaptcha3 implements Rule
 {

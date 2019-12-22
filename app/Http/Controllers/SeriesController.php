@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use DateTime;
-use Illuminate\Http\Request;
-use Auth;
-use DB;
-use App\Series;
 use App\Post;
+use App\Series;
+use Auth;
+use DateTime;
+use DB;
+use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {

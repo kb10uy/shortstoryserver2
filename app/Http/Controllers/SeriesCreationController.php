@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpsertSeries;
+use App\Series;
 use Auth;
 use Illuminate\Http\Request;
-use App\Series;
-use App\Http\Requests\UpsertSeries;
 
 class SeriesCreationController extends Controller
 {
