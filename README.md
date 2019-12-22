@@ -7,6 +7,9 @@
 ## 機能
 * S3WF2 (ShortStoryServer Writer's Format v2) によるそこそこ快適なスタイリング
 
+## Prerequisites
+* PHP 7.4 or above (kbs32 uses FFI)
+
 ## Try with Docker
 1. `docker-compose up -d`
 2. `docker-compose exec php artisan migrate`
