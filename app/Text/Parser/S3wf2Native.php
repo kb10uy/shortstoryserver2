@@ -13,8 +13,11 @@ class S3wf2Native
     public const STATUS_INVALID_SOURCE = 4;
     public const STATUS_PARSE_ERROR = 5;
 
-    /** @var FFI libs3wf2.so の FFI インスタンス */
-    private FFI $library;
+    /**
+     * @var mixed libs3wf2.so の FFI インスタンス。
+     * 本当は `FFI` なんだけど PHPStan の黙らせ方がわからないので……
+     */
+    private $library;
 
     public function __construct(string $libraryPath)
     {
