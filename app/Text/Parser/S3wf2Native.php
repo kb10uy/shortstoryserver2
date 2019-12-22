@@ -13,7 +13,6 @@ class S3wf2Native
     public const STATUS_INVALID_SOURCE = 4;
     public const STATUS_PARSE_ERROR = 5;
 
-
     /** @var FFI libs3wf2.so の FFI インスタンス */
     private FFI $library;
 
@@ -53,11 +52,11 @@ class S3wf2Native
             case self::STATUS_PARSE_ERROR:
                 $html = "<ul>\n";
                 $errorPointer = FFI::new('char *');
-                while ($this->library->s3wf2_get_next_error($environment, FFI::addr($errorPointer)) != self::STATUS_NO_MORE_ERROR) {
+                while (self::STATUS_NO_MORE_ERROR != $this->library->s3wf2_get_next_error($environment, FFI::addr($errorPointer))) {
                     $html .= '<li>' . htmlspecialchars(FFI::string($errorPointer)) . "</li>\n";
                     $this->library->s3wf2_free_string($errorPointer);
                 }
-                $html .= "</ul>";
+                $html .= '</ul>';
                 break;
 
             default:
@@ -66,6 +65,7 @@ class S3wf2Native
         }
 
         $this->library->s3wf2_free($environment);
+
         return $html;
     }
 }

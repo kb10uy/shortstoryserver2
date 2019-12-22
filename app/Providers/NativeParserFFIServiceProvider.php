@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Text\Parser\S3wf2Native;
+use Illuminate\Support\ServiceProvider;
 
 class NativeParserFFIServiceProvider extends ServiceProvider
 {

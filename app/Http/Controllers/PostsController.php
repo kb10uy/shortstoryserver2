@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Text\Parser\S3wf2Native;
 use Auth;
 use Illuminate\Http\Request;
-use App\Text\Parser\S3wf2Native;
 
 class PostsController extends Controller
 {
