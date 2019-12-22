@@ -1,5 +1,7 @@
 use crate::{
-    document::{Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode},
+    document::{
+        Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode, LineType,
+    },
     emitter::Emit,
 };
 use ansi_term::{Colour, Style};
@@ -261,22 +263,24 @@ impl ConsoleEmitter {
                     self.confirm_newline(writer)
                 }
                 Element::Newline => writeln!(writer),
-                Element::Line(id, false) => {
-                    let (color, name) = self.get_color(characters.get(id));
-                    self.confirm_newline(writer)?;
-                    self.style_stack.push(AbstractStyle::Color(color));
-                    self.emit_element(writer, characters, &ElementNode::Text(name))?;
-                    self.emit_elements(writer, characters, children)?;
-                    self.style_stack.pop();
-                    self.confirm_newline(writer)
-                }
-                Element::Line(id, true) => {
+                Element::Line(id, LineType::Inline) => {
                     let ctype = characters.get(id);
                     let (color, _) = self.get_color(ctype);
                     self.style_stack.push(AbstractStyle::Color(color));
                     self.emit_elements(writer, characters, children)?;
                     self.style_stack.pop();
                     Ok(())
+                }
+                Element::Line(id, line_type) => {
+                    let (color, name) = self.get_color(characters.get(id));
+                    self.confirm_newline(writer)?;
+                    self.style_stack.push(AbstractStyle::Color(color));
+                    if *line_type == LineType::NameShownBlock {
+                        self.emit_element(writer, characters, &ElementNode::Text(name))?;
+                    }
+                    self.emit_elements(writer, characters, children)?;
+                    self.style_stack.pop();
+                    self.confirm_newline(writer)
                 }
                 Element::Monospaced | Element::Parameter => {
                     self.emit_elements(writer, characters, children)

@@ -5,7 +5,9 @@ use std::{
 };
 
 use crate::{
-    document::{Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode},
+    document::{
+        Block, BlockNode, CharacterSet, CharacterType, Document, Element, ElementNode, LineType,
+    },
     emitter::{Emit, ExtractIndices},
 };
 
@@ -143,28 +145,44 @@ impl HtmlEmitter {
                 parameters,
                 children,
             } => match kind {
-                Element::Line(id, inline) => {
+                Element::Line(id, line_type) => {
                     let name = characters.get(id).ok_or_else(|| {
                         Error::new(
                             ErrorKind::NotFound,
                             HtmlEmitterError::UndefinedCharacter(id.to_string()),
                         )
                     })?;
-                    let classes = if *inline {
-                        format!("inline line {}", self.get_character_class(name))
-                    } else {
-                        format!("line {}", self.get_character_class(name))
-                    };
 
-                    self.write_simple_surrounded_element(
-                        writer,
-                        "span",
-                        Some(&classes),
-                        characters,
-                        children,
-                    )?;
-                    if *inline {
-                        writeln!(writer)?;
+                    match line_type {
+                        LineType::Inline => {
+                            let classes = format!("inline line {}", self.get_character_class(name));
+                            self.write_simple_surrounded_element(
+                                writer,
+                                "span",
+                                Some(&classes),
+                                characters,
+                                children,
+                            )?;
+                        }
+                        _ => {
+                            write!(
+                                writer,
+                                "\n<span class=\"line {}\">",
+                                self.get_character_class(name)
+                            )?;
+                            if *line_type == LineType::NameShownBlock {
+                                self.write_element(
+                                    writer,
+                                    characters,
+                                    &ElementNode::Text(name.display_name()),
+                                )?;
+                            }
+                            for element in children {
+                                self.write_element(writer, characters, element)?;
+                            }
+
+                            writeln!(writer, "</span>")?;
+                        }
                     }
                 }
                 Element::Bold => self.write_simple_surrounded_element(

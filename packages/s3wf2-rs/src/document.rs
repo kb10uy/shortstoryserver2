@@ -200,6 +200,19 @@ impl FromStr for Block {
     }
 }
 
+/// Represents the sub-type of `Element::Line`.
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
+pub enum LineType {
+    /// Shown in a dedicated line with name.
+    NameShownBlock,
+
+    /// Shown in a dedicated line without name.
+    NameHiddenBlock,
+
+    /// Shown in a inline element.
+    Inline,
+}
+
 /// Represents inline element.
 #[derive(PartialEq, Eq, Debug)]
 pub enum Element {
@@ -237,7 +250,7 @@ pub enum Element {
     Item,
 
     /// Line, speech (the parameter should contain the ID, and whether inline display or not)
-    Line(String, bool),
+    Line(String, LineType),
 }
 
 impl FromStr for Element {

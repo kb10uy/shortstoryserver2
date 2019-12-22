@@ -1,5 +1,5 @@
 use crate::{
-    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode},
+    document::{Block, BlockNode, CharacterSet, Document, Element, ElementNode, LineType},
     error::{Error, ErrorKind, SemanticErrorKind},
 };
 use lazy_static::lazy_static;
@@ -49,6 +49,7 @@ pub enum AutoNewline {
 pub struct ParserState {
     pub trimming_function: fn(&str) -> &str,
     pub auto_newline: AutoNewline,
+    pub block_line_type: LineType,
 }
 
 impl ParserState {
@@ -57,6 +58,7 @@ impl ParserState {
         ParserState {
             trimming_function: Trimmer::unicode,
             auto_newline: AutoNewline::Never,
+            block_line_type: LineType::NameShownBlock,
         }
     }
 }
@@ -116,9 +118,13 @@ impl<'a> Parser {
                             None => Ok(()),
                         }
                     }
-                    "@" => {
-                        self.parse_line(&document.characters, &mut current_block, false, name, rest)
-                    }
+                    "@" => self.parse_line(
+                        &document.characters,
+                        &mut current_block,
+                        state.block_line_type,
+                        name,
+                        rest,
+                    ),
                     // Not included in regex, therefore unreachable
                     _ => unreachable!("Unexpected command type"),
                 }
@@ -189,6 +195,13 @@ impl<'a> Parser {
                 })?;
                 Command::command_autobr(state, params[0])
             }
+            "linename" => {
+                let params = params.ok_or(ErrorKind::NotEnoughParameters {
+                    given: 0,
+                    needed: 1,
+                })?;
+                Command::command_linename(state, params[0])
+            }
             _ => Err(ErrorKind::UnknownCommand(name.to_string())),
         }
     }
@@ -249,7 +262,7 @@ impl<'a> Parser {
         &self,
         characters: &CharacterSet,
         parent_block: &mut BlockNode<'a>,
-        inline: bool,
+        inline: LineType,
         element: &'a str,
         rest: Option<&'a str>,
     ) -> Result<(), ErrorKind> {
@@ -304,7 +317,7 @@ impl<'a> Parser {
                     // line element
                     uncommited.push(ElementNode::new_surrounded(Element::Line(
                         (&element[1..]).to_string(),
-                        true,
+                        LineType::Inline,
                     )));
                 } else {
                     // other
@@ -451,6 +464,7 @@ impl Command {
         Ok(())
     }
 
+    /// Process `:autobr` command.
     fn command_autobr(state: &mut ParserState, autobr_type: &str) -> Result<(), ErrorKind> {
         state.auto_newline = match autobr_type {
             "never" => AutoNewline::Never,
@@ -458,6 +472,21 @@ impl Command {
             _ => {
                 return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
                     format!("Invalid auto-br type: {}", autobr_type),
+                )))
+            }
+        };
+
+        Ok(())
+    }
+
+    /// Process `:linename` command.
+    fn command_linename(state: &mut ParserState, linename_type: &str) -> Result<(), ErrorKind> {
+        state.block_line_type = match linename_type {
+            "shown" => LineType::NameShownBlock,
+            "hidden" => LineType::NameHiddenBlock,
+            _ => {
+                return Err(ErrorKind::Semantic(SemanticErrorKind::InvalidParameter(
+                    format!("Invalid line name visibility type: {}", linename_type),
                 )))
             }
         };
