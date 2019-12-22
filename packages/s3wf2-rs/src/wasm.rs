@@ -1,7 +1,7 @@
 //! Functionalities for WebAssembly.
 
 use crate::{
-    document::{Block, BlockNode, CharacterSet, CharacterType, Element, ElementNode},
+    document::{Block, BlockNode, CharacterSet, CharacterType, Element, ElementNode, LineType},
     parser::Parser,
 };
 use serde_json::{json, Map, Value};
@@ -56,7 +56,10 @@ fn convert_element_node<'a>(element: &ElementNode<'a>) -> Value {
 
             if let Element::Line(id, inline) = kind {
                 result.insert("character_id".to_string(), Value::String(id.to_owned()));
-                result.insert("inline".to_string(), Value::Bool(*inline));
+                result.insert(
+                    "inline".to_string(),
+                    Value::Bool(*inline == LineType::Inline),
+                );
             }
 
             Value::Object(result)
