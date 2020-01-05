@@ -5171,6 +5171,11 @@ rxjs@^6.4.0:
   dependencies:
     tslib "^1.9.0"
 
+s3wf2@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/s3wf2/-/s3wf2-0.3.0.tgz#07e589a9ac23b3850bba812e6157c964abf6945f"
+  integrity sha512-cLOEZhdBt/0IDY3P8C/u5sd54LMZJaV2tt2I/C18Liab/7r6LP5h63kqETDhLIUrsTtwUnXYNFA3l202XHEaaQ==
+
 safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@~5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.0.tgz#b74daec49b1148f88c64b68d49b1e815c1f2f519"

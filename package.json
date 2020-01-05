@@ -8,7 +8,6 @@
     "lint:script": "eslint --fix ./resources/scripts/**/*.ts",
     "build-s3wf2": "wasm-pack build --out-dir target/s3wf2 ./packages/s3wf2-rs -- --features wasm"
   },
-  "workspaces": ["./packages/s3wf2-rs/target/s3wf2"],
   "devDependencies": {
     "@types/lodash": "^4.14.149",
     "@typescript-eslint/eslint-plugin": "^2.12.0",
@@ -45,7 +44,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "bootstrap": "^4.4.1",
-    "s3wf2": "*",
+    "s3wf2": "^0.3.0",
     "vue": "^2.6.11",
     "vuedraggable": "^2.23.2"
   }
