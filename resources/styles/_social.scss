@@ -53,4 +53,13 @@ a.share-button {
       background-color: #198dd4;
     }
   }
+
+  // LINE
+  &.line {
+    background-color: #00c300;
+
+    &:hover {
+      background-color: #00ba00;
+    }
+  }
 }

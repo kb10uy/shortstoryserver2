@@ -51,6 +51,8 @@
             @endcomponent
             @component('components.tweet-button', ['text' => "$title - ShortStoryServer"])
             @endcomponent
+            @component('components.line-share', ['text' => "$title - ShortStoryServer"])
+            @endcomponent
         </div>
 
 
