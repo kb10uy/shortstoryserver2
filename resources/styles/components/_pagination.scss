@@ -6,18 +6,35 @@ ul.pagination {
   list-style-type: none;
 
   li {
+    display: block;
     box-sizing: border-box;
     min-width: 40px;
-    padding: 8px;
     text-align: center;
     border: 1px solid var(--color-body-border);
 
-    &:first-child {
+    &:first-child, &:first-child a, &:first-child span {
       border-radius: 10px 0 0 10px;
     }
 
-    &:last-child {
+    &:last-child, &:last-child a, &:last-child span {
       border-radius: 0 10px 10px 0;
+    }
+
+    &.disabled a, &.disabled span {
+      background-color: var(--color-input-background-disabled) !important;
+    }
+
+    a, span {
+      display: block;
+      padding: 8px;
+      text-decoration: none;
+      background-color: var(--color-floating-background);
+      transition: 0.15s all;
+
+      &:hover {
+        color: var(--color-floating-hover-foreground);
+        background-color: var(--color-floating-hover-background);
+      }
     }
   }
 }
