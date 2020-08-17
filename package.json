@@ -34,7 +34,7 @@
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.14.2",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.7",
     "vue-loader": "^15.9.0",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.41.6",
