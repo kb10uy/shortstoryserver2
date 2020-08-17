@@ -95,16 +95,18 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: ['styles/**/*', 'scripts/**/*'],
       cleanAfterEveryBuildPatterns: ['!images/**/*'],
     }),
-    new CopyWebpackPlugin([
-      {
-        from: './resources/assets/images',
-        to: './images'
-      },
-      {
-        from: './resources/assets/favicon.ico',
-        to: './favicon.ico',
-      },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './resources/assets/images',
+          to: './images'
+        },
+        {
+          from: './resources/assets/favicon.ico',
+          to: './favicon.ico',
+        },
+      ],
+    }),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[hash].css',
     }),
