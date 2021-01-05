@@ -42,7 +42,7 @@
     "webpack-laravel-mix-manifest": "^2.1.5"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.2",
     "s3wf2": "^0.3.0",
     "vue": "^2.6.11",
