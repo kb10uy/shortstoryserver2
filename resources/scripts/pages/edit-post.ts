@@ -8,3 +8,10 @@ const app = new Vue({
 });
 
 app.$mount('#app');
+
+window.addEventListener('submit', (e) => {
+  const form = e.target as HTMLFormElement;
+
+  e.preventDefault();
+  form.submit();
+});

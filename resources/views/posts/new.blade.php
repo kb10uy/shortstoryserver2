@@ -47,7 +47,7 @@
             </select>
         </div>
         <div class="pair">
-            <button type="button" class="button" onclick="newpost.submit();">@lang('actions.posts-submit')</button>
+            <button type="submit" class="button" onclick="newpost.submit();">@lang('actions.posts-submit')</button>
         </div>
     </form>
 </div>
